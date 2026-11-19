@@ -1,0 +1,78 @@
+#include "algorithms/bubblesort.h"
+#include "datastructures/structures.h"
+#include "controllers/structurecontroller.h"
+#include "controllers/graphcontroller.h"
+#include <QCoreApplication>
+#include <algorithm>
+#include <cassert>
+
+int main(int argc, char **argv)
+{
+    QCoreApplication app(argc, argv);
+    const QStringList algorithms = SortingAlgorithms::names();
+    const QVector<QVector<int>> cases = {
+        {}, {5}, {2, 1}, {1, 2, 3, 4}, {4, 3, 2, 1}, {3, 1, 3, -2, 0, -2}
+    };
+    for (const QString &algorithm : algorithms) {
+        for (const auto &input : cases) {
+            const auto trace = SortingAlgorithms::generate(algorithm, input);
+            assert(!trace.isEmpty());
+            assert(trace.first().values == input);
+            assert(trace.last().complete);
+            auto expected = input;
+            std::sort(expected.begin(), expected.end());
+            assert(trace.last().values == expected);
+            for (const auto &step : trace) {
+                assert(step.values.size() == input.size());
+                assert(step.nodeIds.size() == input.size());
+                assert(step.comparisons >= 0 && step.swaps >= 0 && step.writes >= 0);
+                auto ids = step.nodeIds;
+                std::sort(ids.begin(), ids.end());
+                for (int i = 0; i < ids.size(); ++i) assert(ids[i] == i);
+                for (int i = 0; i < step.values.size(); ++i) assert(step.values[i] == input[step.nodeIds[i]]);
+            }
+        }
+    }
+    SinglyLinkedList list;
+    assert(list.insertAt(0, 5)); assert(list.insertAt(1, 8)); assert(list.insertAt(1, 6));
+    assert((list.values() == std::vector<int>{5,6,8})); assert(list.find(6)==1); assert(!list.insertAt(5,4));
+    assert(list.eraseAt(1)); assert(!list.eraseAt(5)); assert((list.values()==std::vector<int>{5,8}));
+    LinkedStack stack; bool underflow=false; try{stack.pop();}catch(const std::underflow_error&){underflow=true;} assert(underflow);
+    stack.push(2); stack.push(7); assert(stack.peek()==7); assert(stack.pop()==7); assert(stack.pop()==2);
+    LinkedQueue queue; underflow=false; try{queue.dequeue();}catch(const std::underflow_error&){underflow=true;} assert(underflow);
+    queue.enqueue(3);queue.enqueue(9);assert(queue.peek()==3);assert(queue.dequeue()==3);assert(queue.dequeue()==9);assert(queue.hasValidEnds());
+    BinarySearchTree tree;for(int v:{5,3,7,2,4,6,8})assert(tree.insert(v));assert(!tree.insert(5));assert(tree.contains(4));assert(!tree.contains(9));
+    assert((tree.inorder()==std::vector<int>{2,3,4,5,6,7,8}));assert((tree.preorder()==std::vector<int>{5,3,2,4,7,6,8}));assert((tree.postorder()==std::vector<int>{2,4,3,6,8,7,5}));
+    WeightedGraph graph(5);assert(graph.addEdge(0,1,4));assert(graph.addEdge(0,2,1));assert(graph.addEdge(2,1,2));assert(graph.addEdge(1,3,1));
+    assert((graph.bfs(0)==std::vector<int>{0,1,2,3}));assert((graph.dfs(0)==std::vector<int>{0,1,2,3}));
+    const auto distances=graph.dijkstra(0);assert(distances[0]==0&&distances[1]==3&&distances[2]==1&&distances[3]==4);assert(distances[4]>1000000);
+    assert(!graph.addEdge(0,4,-1));assert(graph.dijkstra(9).empty());
+    for (const QString &algorithm : {QString("Linear Search"), QString("Binary Search")}) {
+        const QVector<int> searchInput{9,3,5,3,1};
+        for (int target : {3, 77}) {
+            auto trace=SortingAlgorithms::search(algorithm,searchInput,target);
+            assert(!trace.isEmpty()&&trace.last().complete);
+            for (const auto &step : trace) {
+                assert(step.nodeIds.size() == step.values.size());
+                for (int i = 0; i < step.values.size(); ++i) assert(step.values[i] == searchInput[step.nodeIds[i]]);
+            }
+            assert(trace.last().comparisons<=5);
+            if(algorithm=="Binary Search")assert(std::is_sorted(trace.last().values.begin(),trace.last().values.end()));
+            const bool found=std::find(trace.last().values.begin(),trace.last().values.end(),target)!=trace.last().values.end();
+            assert((trace.last().operation=="Target found")==found);
+        }
+    }
+    StructureController controller;
+    controller.reset();
+    controller.insert(4,0);controller.insert(2,1);assert(controller.values().size()==2);
+    controller.remove(9);assert(controller.status().contains("outside"));
+    controller.setKind("Stack");controller.remove();assert(controller.status().contains("empty"));
+    controller.insert(42);controller.search(0);assert(controller.values().first().toInt()==42);
+    controller.setKind("Binary Search Tree");assert(controller.treeNodes().size()==7);
+    GraphController graphController;
+    graphController.setAlgorithm("Dijkstra's Shortest Path");
+    while(graphController.stepIndex()+1<graphController.stepCount())graphController.next();
+    assert(graphController.distances().size()==7&&graphController.distances()[6]=="8");
+    assert(!graphController.addEdge(0,9,3));assert(graphController.addEdge(0,6,5));
+    return 0;
+}
