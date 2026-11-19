@@ -41,7 +41,7 @@ target_link_libraries(Algorythm PRIVATE Qt6::Quick Qt6::QuickControls2)
 
 include(CTest)
 if(BUILD_TESTING)
-    add_executable(AlgorythmAlgorithmTests tests/algorithm_tests.cpp src/algorithms/bubblesort.cpp src/controllers/structurecontroller.cpp src/controllers/graphcontroller.cpp)
+    add_executable(AlgorythmAlgorithmTests tests/algorithm_tests.cpp src/algorithms/bubblesort.cpp src/engine/playbackcontroller.cpp src/controllers/structurecontroller.cpp src/controllers/graphcontroller.cpp)
     target_include_directories(AlgorythmAlgorithmTests PRIVATE src)
     target_link_libraries(AlgorythmAlgorithmTests PRIVATE Qt6::Core)
     add_test(NAME algorithm_generators COMMAND AlgorythmAlgorithmTests)

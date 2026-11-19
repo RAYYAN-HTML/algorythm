@@ -1,10 +1,20 @@
 #include "algorithms/bubblesort.h"
+#include "engine/playbackcontroller.h"
 #include "datastructures/structures.h"
 #include "controllers/structurecontroller.h"
 #include "controllers/graphcontroller.h"
 #include <QCoreApplication>
 #include <algorithm>
 #include <cassert>
+#include <QEventLoop>
+#include <QTimer>
+
+static void waitMs(int ms)
+{
+    QEventLoop loop;
+    QTimer::singleShot(ms, &loop, &QEventLoop::quit);
+    loop.exec();
+}
 
 int main(int argc, char **argv)
 {
@@ -74,5 +84,23 @@ int main(int argc, char **argv)
     while(graphController.stepIndex()+1<graphController.stepCount())graphController.next();
     assert(graphController.distances().size()==7&&graphController.distances()[6]=="8");
     assert(!graphController.addEdge(0,9,3));assert(graphController.addEdge(0,6,5));
+
+    PlaybackController playback;
+    assert(playback.nodes()->rowCount() == 7);
+    assert(playback.nodes()->data(playback.nodes()->index(0), AlgorithmNodeModel::ValueRole).toInt() == 8);
+    playback.next(); assert(playback.stepIndex() == 1);
+    playback.previous(); assert(playback.stepIndex() == 0);
+    playback.seek(3); assert(playback.stepIndex() == 3);
+    playback.restart(); assert(playback.stepIndex() == 0);
+    playback.setSpeed(3.0); assert(playback.speed() == 3.0);
+    playback.playPause(); assert(playback.playing());
+    waitMs(260); const int pausedAt = playback.stepIndex(); assert(pausedAt > 0);
+    playback.playPause(); assert(!playback.playing());
+    waitMs(260); assert(playback.stepIndex() == pausedAt);
+    playback.playPause(); waitMs(260); assert(playback.stepIndex() > pausedAt);
+    playback.playPause();
+    playback.seek(playback.stepCount() - 2);
+    playback.playPause(); waitMs(260);
+    assert(playback.complete()); assert(!playback.playing());
     return 0;
 }
