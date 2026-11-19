@@ -24,6 +24,7 @@ int main(int argc, char **argv)
         {}, {5}, {2, 1}, {1, 2, 3, 4}, {4, 3, 2, 1}, {3, 1, 3, -2, 0, -2}
     };
     for (const QString &algorithm : algorithms) {
+        bool sawAlgorithmState = false;
         for (const auto &input : cases) {
             const auto trace = SortingAlgorithms::generate(algorithm, input);
             assert(!trace.isEmpty());
@@ -36,12 +37,16 @@ int main(int argc, char **argv)
                 assert(step.values.size() == input.size());
                 assert(step.nodeIds.size() == input.size());
                 assert(step.comparisons >= 0 && step.swaps >= 0 && step.writes >= 0);
+                assert(step.variables.contains("comparisons"));
+                assert(step.variables.contains("array"));
+                sawAlgorithmState = sawAlgorithmState || step.variables.contains("i") || step.variables.contains("pivot") || step.variables.contains("key") || step.variables.contains("writeIndex");
                 auto ids = step.nodeIds;
                 std::sort(ids.begin(), ids.end());
                 for (int i = 0; i < ids.size(); ++i) assert(ids[i] == i);
                 for (int i = 0; i < step.values.size(); ++i) assert(step.values[i] == input[step.nodeIds[i]]);
             }
         }
+        assert(sawAlgorithmState);
     }
     SinglyLinkedList list;
     assert(list.insertAt(0, 5)); assert(list.insertAt(1, 8)); assert(list.insertAt(1, 6));
@@ -64,6 +69,8 @@ int main(int argc, char **argv)
             assert(!trace.isEmpty()&&trace.last().complete);
             for (const auto &step : trace) {
                 assert(step.nodeIds.size() == step.values.size());
+                assert(step.variables.contains("target"));
+                assert(step.variables.contains("array"));
                 for (int i = 0; i < step.values.size(); ++i) assert(step.values[i] == searchInput[step.nodeIds[i]]);
             }
             assert(trace.last().comparisons<=5);
@@ -88,8 +95,8 @@ int main(int argc, char **argv)
     PlaybackController playback;
     assert(playback.nodes()->rowCount() == 7);
     assert(playback.nodes()->data(playback.nodes()->index(0), AlgorithmNodeModel::ValueRole).toInt() == 8);
-    playback.next(); assert(playback.stepIndex() == 1);
-    playback.previous(); assert(playback.stepIndex() == 0);
+    playback.next(); assert(playback.stepIndex() == 1); assert(playback.variables().contains("i"));
+    playback.previous(); assert(playback.stepIndex() == 0); assert(playback.variables().contains("n")); assert(!playback.variables().contains("i"));
     playback.seek(3); assert(playback.stepIndex() == 3);
     playback.restart(); assert(playback.stepIndex() == 0);
     playback.setSpeed(3.0); assert(playback.speed() == 3.0);

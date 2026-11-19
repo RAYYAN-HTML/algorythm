@@ -3,6 +3,7 @@
 #include <QString>
 #include <QMetaType>
 #include <QVector>
+#include <QVariantMap>
 
 struct ExecutionStep {
     QVector<int> values;
@@ -16,6 +17,7 @@ struct ExecutionStep {
     QString operation;
     QString narration;
     QString why;
+    QVariantMap variables;
     bool complete = false;
 };
 

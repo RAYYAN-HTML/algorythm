@@ -201,13 +201,20 @@ Item {
             PlaybackControls { Layout.fillWidth: true }
         }
 
-        ColumnLayout {
+        ScrollView {
+            id: assistantScroll
             Layout.preferredWidth: page.width < 920 ? 208 : page.width < 1120 ? 240 : 284
- Layout.fillHeight: true
+            Layout.fillHeight: true
+            clip: true
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            ColumnLayout {
+                width: assistantScroll.availableWidth
+                height: Math.max(implicitHeight, assistantScroll.availableHeight)
  spacing: 14
             NarrationPanel { Layout.fillWidth: true }
             PseudocodePanel { Layout.fillWidth: true }
             StatisticsPanel { Layout.fillWidth: true }
+            VariablesPanel { Layout.fillWidth: true }
             Rectangle {
                 Layout.fillWidth: true
  Layout.fillHeight: true
@@ -246,6 +253,7 @@ Item {
  color: theme.green
  font.pixelSize: 11 } }
                 }
+            }
             }
         }
     }

@@ -48,6 +48,7 @@ QVariantList PlaybackController::values() const { QVariantList out; for (int v :
 QString PlaybackController::operation() const { return current().operation; }
 QString PlaybackController::narration() const { return current().narration; }
 QString PlaybackController::why() const { return current().why; }
+QVariantMap PlaybackController::variables() const { return current().variables; }
 int PlaybackController::activeA() const { return current().activeA; }
 int PlaybackController::activeB() const { return current().activeB; }
 int PlaybackController::pseudocodeLine() const { return current().pseudocodeLine; }

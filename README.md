@@ -12,6 +12,8 @@
 
 Sorting and searching steps are generated from the C++ algorithm traces. Each element keeps its original identity while it changes position, so Qt Quick animates real swaps, shifts, merge writes, and binary-search preparation. Playback speed controls the pacing, with each automatic step spaced to let its transition complete.
 
+Each reversible frame also captures the active loop variables, search bounds, pivot or key, merge cursors, counters, and current array. The learning panel shows that snapshot alongside synchronized narration and pseudocode, including when rewinding or seeking.
+
 ## Build
 
 Requirements: CMake 3.21+, a C++17 compiler, and Qt 6 with Quick and Quick Controls 2.

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(Algorythm VERSION 1.0.0 LANGUAGES CXX)
+project(Algorythm VERSION 1.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -29,6 +29,7 @@ qt_add_qml_module(Algorythm
         qml/components/PseudocodePanel.qml
         qml/components/NarrationPanel.qml
         qml/components/StatisticsPanel.qml
+        qml/components/VariablesPanel.qml
         qml/pages/DashboardPage.qml
         qml/pages/SortingPage.qml
         qml/pages/StructurePage.qml

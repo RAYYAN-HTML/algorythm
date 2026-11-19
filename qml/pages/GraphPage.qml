@@ -32,8 +32,12 @@ Item {
             border.color: theme.border
             Canvas {
                 id: edgeCanvas
+                property real activeEdgeProgress: 0
+                property int trackedFrom: -2
+                property int trackedTo: -2
                 anchors.fill: parent
                 anchors.margins: 18
+                onActiveEdgeProgressChanged: requestPaint()
                 onPaint: {
                     var ctx = getContext("2d")
                     ctx.clearRect(0, 0, width, height)
@@ -42,15 +46,47 @@ Item {
                         var e = edges[i]
                         var x1 = page.px[e.from] * width, y1 = page.py[e.from] * height
                         var x2 = page.px[e.to] * width, y2 = page.py[e.to] * height
-                        var active = (graph.active === e.from && graph.edgeTo === e.to) || (graph.active === e.to && graph.edgeTo === e.from)
                         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2)
-                        ctx.strokeStyle = active ? "#22D3EE" : "#34435D"
-                        ctx.lineWidth = active ? 3 : 1.5; ctx.stroke()
+                        ctx.strokeStyle = "#34435D"
+                        ctx.lineWidth = 1.5; ctx.stroke()
                         ctx.fillStyle = "#94A3B8"; ctx.font = "12px sans-serif"
                         ctx.fillText(String(e.weight), (x1+x2)/2 + 5, (y1+y2)/2 - 5)
                     }
+                    if (graph.active >= 0 && graph.edgeTo >= 0) {
+                        var sx = page.px[graph.active] * width, sy = page.py[graph.active] * height
+                        var ex = page.px[graph.edgeTo] * width, ey = page.py[graph.edgeTo] * height
+                        ctx.beginPath(); ctx.moveTo(sx, sy)
+                        ctx.lineTo(sx + (ex - sx) * activeEdgeProgress, sy + (ey - sy) * activeEdgeProgress)
+                        ctx.strokeStyle = "#22D3EE"; ctx.lineWidth = 3
+                        ctx.shadowColor = "#22D3EE"; ctx.shadowBlur = 11
+                        ctx.stroke(); ctx.shadowBlur = 0
+                    }
                 }
-                Connections { target: graph; function onChanged() { edgeCanvas.requestPaint() } }
+                Connections {
+                    target: graph
+                    function onChanged() {
+                        var from = graph.active, to = graph.edgeTo
+                        if (from !== edgeCanvas.trackedFrom || to !== edgeCanvas.trackedTo) {
+                            edgeCanvas.trackedFrom = from; edgeCanvas.trackedTo = to
+                            if (from >= 0 && to >= 0) {
+                                edgeCanvas.activeEdgeProgress = 0
+                                edgeTravel.restart()
+                            } else {
+                                edgeTravel.stop()
+                                edgeCanvas.activeEdgeProgress = 0
+                            }
+                        }
+                        edgeCanvas.requestPaint()
+                    }
+                }
+                NumberAnimation {
+                    id: edgeTravel
+                    target: edgeCanvas
+                    property: "activeEdgeProgress"
+                    from: 0; to: 1
+                    duration: 320
+                    easing.type: Easing.OutCubic
+                }
             }
             Repeater {
                 model: 7

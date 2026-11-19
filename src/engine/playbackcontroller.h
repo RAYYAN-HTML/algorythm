@@ -28,6 +28,7 @@ class PlaybackController : public QObject {
     Q_PROPERTY(QString operation READ operation NOTIFY stateChanged)
     Q_PROPERTY(QString narration READ narration NOTIFY stateChanged)
     Q_PROPERTY(QString why READ why NOTIFY stateChanged)
+    Q_PROPERTY(QVariantMap variables READ variables NOTIFY stateChanged)
     Q_PROPERTY(int activeA READ activeA NOTIFY stateChanged)
     Q_PROPERTY(int activeB READ activeB NOTIFY stateChanged)
     Q_PROPERTY(int pseudocodeLine READ pseudocodeLine NOTIFY stateChanged)
@@ -49,6 +50,7 @@ public:
     QString operation() const;
     QString narration() const;
     QString why() const;
+    QVariantMap variables() const;
     int activeA() const;
     int activeB() const;
     int pseudocodeLine() const;

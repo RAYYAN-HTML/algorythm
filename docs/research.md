@@ -12,6 +12,13 @@ Qt Quick `Behavior` applies a default animation whenever a tracked property chan
 
 References: [Qt Quick Behavior](https://doc.qt.io/qt-6/qml-qtquick-behavior.html), [Qt Quick animations and transitions](https://doc.qt.io/qt-6/qtquick-statesanimations-animations.html), and [Qt Quick views with C++ models](https://doc.qt.io/qt-6/qtquick-modelviewsdata-cppmodels.html).
 
+## Algorithm learning references
+
+- [midudev/alg0.dev](https://github.com/midudev/alg0.dev) describes step-by-step visualizations paired with active code lines, variable tracking, contextual explanations, keyboard controls, and reduced-motion support. Algorythm already synchronizes narration and pseudocode with playback; the current-variable panel extends the same trace model to expose loop indices, bounds, pivots, counters, and the array at each reversible step.
+- [RhythmPahwa14/AlgoVisualizer](https://github.com/RhythmPahwa14/AlgoVisualizer) documents input validation and sample data, per-step controls and performance metrics, quizzes, and export features. The useful direction for this project is guided experimentation and understandable feedback. Algorythm keeps custom input local and offline and retains the circular-node visual identity; it does not import that web app's code or assets.
+
+Both projects are feature references rather than implementation dependencies. Their different frameworks, layouts, and identities are not copied into the Qt desktop app.
+
 ## Design constraints
 
 - Preserve the actual algorithm trace and teaching content as the source of the display state.
