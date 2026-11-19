@@ -202,7 +202,7 @@ Item {
         }
 
         ColumnLayout {
-            Layout.preferredWidth: 284
+            Layout.preferredWidth: page.width < 920 ? 208 : page.width < 1120 ? 240 : 284
  Layout.fillHeight: true
  spacing: 14
             NarrationPanel { Layout.fillWidth: true }

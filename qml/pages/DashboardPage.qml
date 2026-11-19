@@ -15,7 +15,7 @@ Item {
         Label { text: "Choose a lab to explore an algorithm one operation at a time."; color: theme.muted; font.pixelSize: 14 }
         GridLayout {
             Layout.fillWidth: true
-            columns: 3
+            columns: page.width < 840 ? 1 : page.width < 1120 ? 2 : 3
             rowSpacing: 16
             columnSpacing: 16
             Repeater {

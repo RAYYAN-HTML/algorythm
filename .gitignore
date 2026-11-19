@@ -1,4 +1,7 @@
 /build/
+/build-release/
+/release-package/
+/artifacts/
 /out/
 /.vs/
 *.user

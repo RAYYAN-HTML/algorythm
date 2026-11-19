@@ -8,8 +8,8 @@ ApplicationWindow {
     visible: true
     width: 1440
     height: 900
-    minimumWidth: 1060
-    minimumHeight: 700
+    minimumWidth: 780
+    minimumHeight: 560
     title: "Algorythm — An Algorithm Visual Simulation"
     color: appColors.background
     property string section: "Dashboard"
@@ -34,7 +34,7 @@ ApplicationWindow {
         spacing: 0
 
         Rectangle {
-            Layout.preferredWidth: window.width < 1180 ? 184 : 220
+            Layout.preferredWidth: window.width < 980 ? 74 : window.width < 1180 ? 184 : 220
             Layout.fillHeight: true
             color: appColors.secondary
             border.color: appColors.border
@@ -54,7 +54,7 @@ ApplicationWindow {
  font.bold: true
  font.pixelSize: 18 }
                     }
-                    ColumnLayout { spacing: 0
+                    ColumnLayout { spacing: 0; visible: window.width >= 980
                         Label { text: "Algorythm"
  color: appColors.text
  font.pixelSize: 18
@@ -68,7 +68,7 @@ ApplicationWindow {
                 Rectangle { Layout.fillWidth: true
  height: 1
  color: appColors.border }
-                Label { text: "WORKSPACE"
+                Label { text: "WORKSPACE"; visible: window.width >= 980
  color: appColors.muted
  font.pixelSize: 10
  font.bold: true
@@ -85,7 +85,7 @@ ApplicationWindow {
                         Label { anchors.verticalCenter: parent.verticalCenter
  anchors.left: parent.left
  anchors.leftMargin: 12
- text: ["⌂", "⌁", "⌕", "⇄", "▤", "⇥", "⌘", "◉"][index] + "  " + modelData
+  text: ["⌂", "⌁", "⌕", "⇄", "▤", "⇥", "⌘", "◉"][index] + (window.width < 980 ? "" : "  " + modelData)
  color: parent.selected ? appColors.cyan : appColors.muted
  font.pixelSize: 13 }
                         MouseArea { id: hover
@@ -105,20 +105,21 @@ ApplicationWindow {
                 Rectangle { Layout.fillWidth: true
  height: 1
  color: appColors.border }
-                Label { text: "◈  Compare Algorithms"
+                Label { text: window.width < 980 ? "◈" : "◈  Compare Algorithms"
  color: appColors.muted
  font.pixelSize: 13
  Layout.leftMargin: 8
  MouseArea { anchors.fill: parent
  cursorShape: Qt.PointingHandCursor
  onClicked: window.section = "Compare" } }
-                Label { text: "⚙  Settings"
+                Label { text: window.width < 980 ? "⚙" : "⚙  Settings"
  color: appColors.muted
  font.pixelSize: 13
  Layout.leftMargin: 8 }
                 Rectangle {
                     Layout.fillWidth: true
  height: 66
+                    visible: window.width >= 980
  radius: 12
  color: "#111D30"
  border.color: appColors.border
