@@ -11,6 +11,8 @@ Rectangle {
     property bool reducedMotion: false
     property int windowWidth: 1440
     property int windowHeight: 900
+    property string tooltipText: ""
+    property real tooltipCenterY: 0
     property real sidebarWidth: sidebarCollapsed || windowWidth < 980 ? 68 : windowWidth < 1180 ? 184 : 220
     property Gradient activeGradient: Gradient {
         GradientStop { position: 0.0; color: "#3C2465" }
@@ -25,6 +27,7 @@ Rectangle {
 
     Layout.preferredWidth: sidebarWidth
     Layout.fillHeight: true
+    z: tooltipText.length > 0 ? 10 : 0
     Behavior on sidebarWidth {
         NumberAnimation { duration: root.reducedMotion ? 0 : 220; easing.type: Easing.OutCubic }
     }
@@ -94,6 +97,7 @@ Rectangle {
                         { name: "Graphs", icon: "graph" }
                     ]
                     delegate: Button {
+                        id: navigationButton
                         required property var modelData
                         Layout.fillWidth: true
                         implicitHeight: root.windowHeight < 700 ? 34 : 42
@@ -103,8 +107,14 @@ Rectangle {
                         checked: selected
                         Accessible.name: modelData.name
                         Accessible.description: "Open the " + modelData.name + " learning lab"
-                        ToolTip.visible: (root.sidebarCollapsed || root.windowWidth < 980) && hovered
-                        ToolTip.text: modelData.name
+                        onHoveredChanged: {
+                            if (hovered && (root.sidebarCollapsed || root.windowWidth < 980)) {
+                                root.tooltipText = modelData.name
+                                root.tooltipCenterY = navigationButton.mapToItem(root, 0, navigationButton.height / 2).y
+                            } else if (root.tooltipText === modelData.name) {
+                                root.tooltipText = ""
+                            }
+                        }
                         onClicked: root.navigationRequested(modelData.name)
                         background: Rectangle {
                             radius: 10
@@ -127,14 +137,21 @@ Rectangle {
 
         Rectangle { Layout.fillWidth: true; height: 1; color: root.theme.border }
         Button {
+            id: compareButton
             Layout.fillWidth: true
             implicitHeight: root.windowHeight < 700 ? 34 : 42
             padding: 0
             checkable: true
             checked: root.section === "Compare"
             Accessible.name: "Compare algorithms"
-            ToolTip.visible: (root.sidebarCollapsed || root.windowWidth < 980) && hovered
-            ToolTip.text: "Compare algorithms"
+            onHoveredChanged: {
+                if (hovered && (root.sidebarCollapsed || root.windowWidth < 980)) {
+                    root.tooltipText = "Compare algorithms"
+                    root.tooltipCenterY = compareButton.mapToItem(root, 0, compareButton.height / 2).y
+                } else if (root.tooltipText === "Compare algorithms") {
+                    root.tooltipText = ""
+                }
+            }
             onClicked: root.navigationRequested("Compare")
             background: Rectangle { radius: 9; color: parent.checked ? "#30204E" : parent.hovered ? "#1A1930" : "transparent"; border.color: parent.checked ? "#6D28D9" : "transparent" }
             contentItem: RowLayout {
@@ -143,12 +160,19 @@ Rectangle {
             }
         }
         Button {
+            id: settingsButton
             implicitHeight: root.windowHeight < 700 ? 34 : 42
             Layout.fillWidth: true
             padding: 0
             Accessible.name: "Settings"
-            ToolTip.visible: (root.sidebarCollapsed || root.windowWidth < 980) && hovered
-            ToolTip.text: "Settings"
+            onHoveredChanged: {
+                if (hovered && (root.sidebarCollapsed || root.windowWidth < 980)) {
+                    root.tooltipText = "Settings"
+                    root.tooltipCenterY = settingsButton.mapToItem(root, 0, settingsButton.height / 2).y
+                } else if (root.tooltipText === "Settings") {
+                    root.tooltipText = ""
+                }
+            }
             onClicked: settingsMenu.open()
             background: Rectangle { radius: 8; color: parent.hovered ? "#1A1930" : "transparent" }
             contentItem: RowLayout {
@@ -171,6 +195,26 @@ Rectangle {
                     Label { text: "Offline workspace"; color: root.theme.muted; font.pixelSize: 10 }
                 }
             }
+        }
+    }
+
+    Rectangle {
+        visible: root.tooltipText.length > 0
+        x: root.width + 8
+        y: root.tooltipCenterY - height / 2
+        width: tooltipLabel.implicitWidth + 20
+        height: 30
+        radius: 7
+        color: root.theme.elevated
+        border.color: root.theme.border
+        z: 20
+
+        Label {
+            id: tooltipLabel
+            anchors.centerIn: parent
+            text: root.tooltipText
+            color: root.theme.text
+            font.pixelSize: 11
         }
     }
 
