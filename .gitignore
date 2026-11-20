@@ -2,6 +2,8 @@
 /build-release/
 /release-package/
 /artifacts/
+/profiler/build/
+/profiler/traces/*.qtd
 /out/
 /.vs/
 *.user
