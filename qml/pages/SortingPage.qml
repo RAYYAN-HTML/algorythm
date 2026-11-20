@@ -288,6 +288,7 @@ Item {
         id: prediction
         title: "Predict the operation"
         modal: true
+        width: 360
         anchors.centerIn: Overlay.overlay
         standardButtons: Dialog.NoButton
         contentItem: ColumnLayout {
@@ -303,6 +304,7 @@ Item {
         id: challengeFeedback
         title: "Prediction"
         modal: true
+        width: 360
         anchors.centerIn: Overlay.overlay
         standardButtons: Dialog.Ok
         contentItem: Label { text: page.challengeMessage; color: theme.text; wrapMode: Text.WordWrap; padding: 12 }

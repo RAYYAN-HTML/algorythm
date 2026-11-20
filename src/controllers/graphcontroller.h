@@ -18,6 +18,7 @@ class GraphController : public QObject {
     Q_PROPERTY(int stepIndex READ stepIndex NOTIFY changed)
     Q_PROPERTY(int stepCount READ stepCount NOTIFY changed)
     Q_PROPERTY(bool playing READ playing NOTIFY changed)
+    Q_PROPERTY(qreal speed READ speed WRITE setSpeed NOTIFY changed)
     Q_PROPERTY(QStringList distances READ distances NOTIFY changed)
     Q_PROPERTY(QVariantList edgeList READ edgeList NOTIFY changed)
 public:
@@ -32,6 +33,8 @@ public:
     int stepIndex()const{return m_index;}
     int stepCount()const{return m_steps.size();}
     bool playing()const{return m_timer.isActive();}
+    qreal speed()const{return m_speed;}
+    void setSpeed(qreal speed);
     QStringList distances()const;
     QVariantList edgeList()const;
     Q_INVOKABLE void run(int start);
@@ -48,5 +51,6 @@ private:
     QString m_algorithm="Breadth-First Search";
     int m_index=0;
     QTimer m_timer;
+    qreal m_speed=1.0;
     const GraphStep&current()const;
 };

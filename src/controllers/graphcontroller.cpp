@@ -9,6 +9,7 @@ GraphController::GraphController(QObject*p):QObject(p){
     m_edges={{0,1,4},{0,2,2},{1,3,5},{2,3,1},{2,4,7},{3,5,2},{4,5,1},{5,6,3}};
     m_timer.setInterval(650);connect(&m_timer,&QTimer::timeout,this,[this]{if(m_index+1<m_steps.size())++m_index;else m_timer.stop();emit changed();});run(0);
 }
+void GraphController::setSpeed(qreal speed){m_speed=qBound<qreal>(0.5,speed,3.0);m_timer.setInterval(qMax(100,int(650/m_speed)));emit changed();}
 const GraphStep&GraphController::current()const{static GraphStep empty;return m_steps.isEmpty()?empty:m_steps[qBound(0,m_index,m_steps.size()-1)];}
 QVariantList GraphController::visited()const{QVariantList a;for(int v:current().visited)a<<v;return a;}
 int GraphController::active()const{return current().active;}int GraphController::edgeTo()const{return current().edgeTo;}QString GraphController::narration()const{return current().narration;}int GraphController::edgesExamined()const{return current().edges;}

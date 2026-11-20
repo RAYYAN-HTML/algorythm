@@ -16,7 +16,7 @@ Each reversible frame also captures the active loop variables, search bounds, pi
 
 Insertion Sort uses stable adjacent exchanges so every visual node keeps one identity during a move. Merge Sort records the output prefix and the remaining input nodes without duplicating or losing a node in intermediate frames. Linked-list, stack, and queue panels use incremental Qt item-model updates, so insertions and removals animate the affected node and the displacement of its neighbors. BST insertion updates existing tree positions in place and animates the new node into the hierarchy.
 
-The workspace splitter remembers its preferred size. Navigation and the learning assistant can be collapsed, and the Settings menu includes a locally persisted reduced-motion option for node, graph, and data-structure transitions.
+The workspace splitter remembers its preferred size. Navigation and the learning assistant can be collapsed, and Settings persists playback speed, reduced motion, and compact-sidebar preference locally, with a restore-defaults action. Graph traversal uses the same saved playback speed as the sorting and comparison traces.
 
 The desktop controls use a dense dark theme with cyan/violet highlights, semantic navigation buttons, selected-state indicators, and clear primary/secondary action emphasis.
 

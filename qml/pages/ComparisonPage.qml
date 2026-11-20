@@ -7,6 +7,24 @@ Item {
     id: page
     property QtObject theme
     property string inputValues: "8, 3, 6, 1, 9, 4, 2"
+    property string inputError: ""
+
+    function applySharedInput() {
+        var text = data.text.trim()
+        var parts = text.length ? text.split(/[,\s]+/) : []
+        if (parts.length === 0 || parts.length > 16 || parts.some(function (part) {
+                if (!/^[+-]?\d+$/.test(part)) return true
+                var value = Number(part)
+                return !Number.isSafeInteger(value) || value < -2147483648 || value > 2147483647
+            })) {
+            page.inputError = "Enter 1–16 whole numbers in the 32-bit integer range."
+            return
+        }
+        page.inputValues = text
+        page.inputError = ""
+        playbackA.sortInput(text)
+        playbackB.sortInput(text)
+    }
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 22
@@ -34,10 +52,9 @@ Item {
  placeholderText: "shared input" }
             Button { text: "Apply shared input"
  highlighted: true
- onClicked: { page.inputValues = data.text
- playbackA.sortInput(data.text)
- playbackB.sortInput(data.text) } }
+ onClicked: page.applySharedInput() }
         }
+        Label { Layout.fillWidth: true; visible: page.inputError !== ""; text: page.inputError; color: theme.pink; font.pixelSize: 11 }
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -74,12 +91,14 @@ Item {
                             Repeater {
                                 model: modelData.nodes
                                 delegate: AlgorithmNode {
+                                    id: compareNode
                                     required property int index
                                     required property int nodePosition
                                     required property int nodeValue
                                     value: nodeValue
                                     state: nodePosition === card.modelData.activeA || nodePosition === card.modelData.activeB ? "compare" : card.modelData.complete ? "done" : "default"
-                                    x: parent.width / 2 - card.modelData.values.length * 34 + nodePosition * 68
+                                    readonly property real nodeGap: Math.min(68, Math.max(0, (parent.width - width) / Math.max(1, card.modelData.values.length - 1)))
+                                    x: card.modelData.values.length <= 1 ? (parent.width - width) / 2 : (parent.width - (card.modelData.values.length - 1) * nodeGap - width) / 2 + nodePosition * nodeGap
                                     y: parent.height / 2
                                 }
                             }

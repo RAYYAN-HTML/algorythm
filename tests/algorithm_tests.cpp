@@ -135,6 +135,8 @@ int main(int argc, char **argv)
     controller.setKind("Binary Search Tree");assert(controller.treeNodes().size()==7);assert(controller.treeVisualModel()->rowCount()==7);
     controller.insert(1);assert(controller.treeVisualModel()->rowCount()==8);
     GraphController graphController;
+    graphController.setSpeed(2.0); assert(qFuzzyCompare(graphController.speed(), 2.0));
+    graphController.setSpeed(4.0); assert(qFuzzyCompare(graphController.speed(), 3.0));
     graphController.setAlgorithm("Dijkstra's Shortest Path");
     while(graphController.stepIndex()+1<graphController.stepCount())graphController.next();
     assert(graphController.distances().size()==7&&graphController.distances()[6]=="8");

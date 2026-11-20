@@ -28,6 +28,7 @@ ApplicationWindow {
         playback.speed = appSettings.playbackSpeed
         playbackA.speed = appSettings.playbackSpeed
         playbackB.speed = appSettings.playbackSpeed
+        graph.speed = appSettings.playbackSpeed
     }
 
     Connections {
@@ -36,6 +37,7 @@ ApplicationWindow {
             playback.speed = appSettings.playbackSpeed
             playbackA.speed = appSettings.playbackSpeed
             playbackB.speed = appSettings.playbackSpeed
+            graph.speed = appSettings.playbackSpeed
         }
     }
 
@@ -234,6 +236,7 @@ ApplicationWindow {
                                 playback.speed = 1.0
                                 playbackA.speed = 1.0
                                 playbackB.speed = 1.0
+                                graph.speed = 1.0
                                 settingsMenu.close()
                             }
                             background: Rectangle { radius: 8; color: parent.hovered ? "#22314A" : "#101827"; border.color: appColors.border }

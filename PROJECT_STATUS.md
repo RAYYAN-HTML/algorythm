@@ -16,6 +16,8 @@ This file tracks verified repository state. Items are marked complete only after
 | Local settings and persistence | Reduced motion, playback speed, compact sidebar startup, workspace split persistence, and restore-defaults action | `src/controllers/settingscontroller.h`, `src/main.cpp`, `qml/Main.qml`, `tests/algorithm_tests.cpp` | Settings panel visually checked; tests cover defaults, speed bounds, saving/reloading values, workspace state, and reset. Restart behavior in the packaged app remains pending. |
 | Sort workspace splitter and persisted layout | Resizable workspace split can hide/show assistant and saves/restores divider state | `qml/pages/SortingPage.qml`, `src/controllers/settingscontroller.h` | Implemented; verify in runtime pass |
 | GitHub v1.1.0 release | Windows x64 package released from earlier stable revision | GitHub release `v1.1.0` | Published and verified in prior development session |
+| Graph playback speed preference | Graph traversal timer follows the persisted shared playback speed and clamps it to the same 0.5×–3× range as sorting | `src/controllers/graphcontroller.h`, `src/controllers/graphcontroller.cpp`, `qml/Main.qml` | Controller speed bounds tested in the Release test suite; full app runtime preference interaction pending |
+| Compare layout and shared-input validation | Compare nodes are laid out within each card at all supported trace sizes; invalid shared input now has a visible message and is rejected before either trace changes | `qml/pages/ComparisonPage.qml` | Release build and test suite passed; visual interaction verification pending |
 
 ## Currently Working
 
@@ -30,8 +32,9 @@ This file tracks verified repository state. Items are marked complete only after
 
 - Review remaining algorithm modules for clipped controls at narrow widths. Close an existing Algorythm instance before opening another.
 - Iterate on the button/sidebar design based on actual rendering; check keyboard focus, compact widths, and reduced motion.
-- Rebuild a clean Windows x64 package from the verified build and check startup with bundled Qt imports.
-- Commit and push the complete stable update, then publish the requested GitHub release with its verified package.
+- Exercise the clean Windows x64 package at runtime, including Settings restart persistence, Compare input/geometry, and Sorting dialogs; the latest isolated-path startup is clean.
+- Complete runtime interaction and resized-layout checks on Sorting, Searching, Compare, Graph, and Settings.
+- Commit and push the verified update; publish v1.2.0 and attach its verified package (GitHub release creation remains pending).
 
 ### Medium priority
 
@@ -74,8 +77,10 @@ This file tracks verified repository state. Items are marked complete only after
 | UI-05 | Playback timeline stretched across the entire workspace and ended at the far right on the final step. | `qml/components/PlaybackControls.qml` | Medium | Open an algorithm with a long trace or hide the assistant. | Resolved and verified in live app: timeline capped at 760 px, centered, with a step tooltip. It still correctly moves to the far right at the final step. |
 | UI-06 | Structure action controls or visualizations may overflow at the minimum supported width. | `qml/pages/StructurePage.qml` | Medium | Resize app to its 780 px minimum and open Linked Lists, Stacks, Queues, and Trees. | Resolved and verified in live captures: Linked List Position and operation controls wrap cleanly; Stack and Queue controls fit; Tree and mode selector remain legible, with all nodes/edges and status visible. |
 | UI-07 | BST nodes initially appeared stacked on the canvas edge; after positioning was fixed, the deepest row and status text overlapped. | `qml/pages/StructurePage.qml` tree canvas | High | At minimum width, open Trees. | Resolved and verified: the tree area is anchored to its parent, nodes use that area's width, narrow vertical spacing is synchronized with edges, the status moves below the canvas, and the mode selector has enough width. Screenshot confirms the full three-level sample tree and controls. |
+| UI-08 | Compare cards placed algorithm nodes at a fixed 68 px interval, clipping the default sequence on both sides and hiding more nodes for larger inputs; invalid shared input gave no visible feedback. | `qml/pages/ComparisonPage.qml` | High | Open Compare at default width; inspect both cards, then submit empty, malformed, or over-16 values. | In Progress: node spacing now adapts to card width and validation reports errors before either trace changes. Build and automated tests pass; live interaction/resize verification remains pending. |
+| FUNC-01 | Graph traversal timer ignored the shared playback speed preference, so Settings appeared to work only in sorting/comparison. | `src/controllers/graphcontroller.*`, `qml/Main.qml` | Medium | Change playback speed in Settings and run graph playback. | Fixed in code: GraphController has bounded speed and Main synchronizes it with initial preference, changes, and reset. Controller bounds are tested; full UI playback-speed interaction remains pending.
 
-No other currently reproduced open defects are known. Prior package startup issue (bundled Qt Quick Controls imports) was fixed using a package-local `qt.conf`; retain as history below.
+Other than UI-08 pending live verification, no additional high-severity defect has been reproduced in this audit. Search, Compare, and Graph still need a complete runtime pass. Prior package startup issue (bundled Qt Quick Controls imports) was fixed using a package-local `qt.conf`; retain as history below.
 
 ## Failed Attempts & Blockers
 
@@ -87,6 +92,7 @@ No other currently reproduced open defects are known. Prior package startup issu
 | Settings panel scope | Existing panel only exposed reduced motion. | Added saved playback speed and sidebar startup preference plus reset action. | Interact with each control and verify values after restart. |
 | Flow implicit height | First responsive structure-row version assigned the read-only `Flow.implicitHeight`, causing QML component loading to fail at runtime. | Changed to a width-dependent `Layout.preferredHeight`; added a narrow-mode canvas cap and tighter spacing. | Release build and app startup succeeded; Linked List, Stack, Queue, and Tree screens are now verified at minimum width. |
 | Tree area ignored Layout hints | The tree canvas was inside a plain `Item`, so attached `Layout.fillWidth/Height` hints did not size it; nodes used a zero-width parent and stacked at the edge. | Anchored the named tree area to its parent; node x bindings explicitly use its width. | Runtime screenshot shows centered tree layout at the minimum width. |
+| Compare node positioning overflowed the cards | Fixed interval spacing made the default seven nodes exceed each half-width comparison card, and larger input increased the overflow. | Replaced the fixed positions with card-width-aware spacing that preserves all node identities and centers a one-node trace. | Release build passes; visual size/input checks remain pending. |
 | Narrow tree rows collided with status text | Fixed horizontal centering exposed the third tree level underneath the status line and a truncated mode selector. | Reduced narrow-only tree row spacing, aligned canvas edges with node spacing, moved tree status below the canvas, and widened the mode selector. | Runtime screenshot shows all levels, status, selector, and operation controls unobstructed. |
 
 No active external blocker is known.
@@ -97,7 +103,7 @@ No active external blocker is known.
 |---|---|---|---|
 | High | Navigation | Give current section, hover, keyboard focus, and collapsed tooltips clear readable states. | Implemented, awaiting visual verification |
 | High | Buttons | Distinguish primary actions from secondary actions; eliminate default-looking controls and preserve legibility. | Implemented across key screens, awaiting visual verification |
-| High | Responsive layout | Keep nav and visualizer usable at narrow window sizes; avoid crowding and clipped controls. | Linked List, Stack, Queue, and Tree verified at 780 px; review other modules |
+| High | Responsive layout | Keep nav and visualizer usable at narrow window sizes; avoid crowding and clipped controls. | Linked List, Stack, Queue, and Tree verified at 780 px; Compare geometry fixed in source, visual verification pending; review other modules |
 | Medium | Accessibility | Verify keyboard operation, accessible names, and reduced-motion behavior in runtime. | Implemented in part; verification pending |
 | Medium | Animation | Check structure entrance/removal, tree repositioning, graph paths, and sorting motion in live playback. | Implemented; runtime check pending |
 | Medium | Layout | Validate saved splitter positions and hide/show behavior. | Implemented; runtime check pending |
@@ -109,10 +115,11 @@ No active external blocker is known.
 |---|---|---|---|
 | 2026-11-20 | Earlier Release CTest in `out/release-v1.2.0-ui` | Passed: `algorithm_generators` 1/1, 1.17 seconds | Recorded in `Testing/Temporary/LastTest.log` at 02:44 PKT. This run predates later UI edits; a fresh verification is recorded below. |
 | 2026-11-20 | Fresh Release build and CTest after settings, sidebar, timeline, placeholder, and responsive structure changes | Passed: `algorithm_generators` 1/1; `git diff --check` reported only Git line-ending notices | Runtime screenshots verified the settings panel, expanded sidebar, populated sorting input, and capped timeline. A first StructurePage launch failed due to assigning read-only `Flow.implicitHeight`; after correction the app launched successfully. Narrow-width layout not yet checked. |
+| 2026-11-20 | Release build/CTest after graph speed preference, Compare card geometry/input validation, and explicit Sorting dialog widths | Passed: `algorithm_generators` 1/1; `git diff --check` reported only line-ending notices | Graph speed clamping test passed. The final rebuilt Windows package was launched with only Windows directories on `PATH`; the process remained open with the correct window title and captured stderr was empty. Dialog and Compare interactions remain unverified at runtime. |
 | 2026-11-20 | Release build and CTest with settings tests and narrow structure layout | Passed: `algorithm_generators` 1/1, 1.16 seconds | Settings tests use an isolated temporary INI store and cover defaults, clamped speed, preference/workspace persistence, and reset. A 780 px narrow-window capture confirmed Stack controls remain visible; Linked List wrapping still needs a direct capture. |
 | 2026-11-20 | Fresh Release build/CTest after BST narrow-layout fixes | Passed: `algorithm_generators` 1/1; `git diff --check` returned only line-ending notices | Live captures at 780 px verified the complete Linked List, Stack, Queue, and BST views. BST nodes and connectors are centered, all three levels and status are visible, the selector label is no longer truncated, and action controls remain visible. |
 | Prior v1.1 work | Release algorithm tests and packaged app launch | Passed in prior session | v1.1.0 package published; exact current UI is newer and unverified. |
-| Prior v1.2 package attempt | Clean package startup | First failed, then passed after `qt.conf` correction | Do a final clean package verification after rebuilding. |
+| 2026-11-20 | Final v1.2 package dependency closure and smoke test | Passed: 25 transitive DLLs from the selected Qt/MinGW toolchain were staged; dependency scan found no unresolved non-system DLLs; isolated-path launch stayed open with empty stderr | The prior package attempt exposed that `windeployqt` omitted compiler runtime and transitive MinGW dependencies. `qt.conf` and copied dependency closure resolve launch-time imports. The latest package launches, but interactive package checks and release upload remain pending. |
 
 ## Development History
 
@@ -124,11 +131,13 @@ No active external blocker is known.
 | 2026-11-20 | Capped and centered playback timeline, removed floating input hint, repositioned Settings popup, and made structure controls wrap for narrow pages. | Fix additional layout problems visible in user screenshots and proactively address minimum-width overflow. | `qml/components/PlaybackControls.qml`, `qml/pages/SortingPage.qml`, `qml/Main.qml`, `qml/pages/StructurePage.qml` | Release build and CTest passed. Live app verified sidebar/input/timeline/settings; fixed a Flow runtime error and confirmed subsequent app startup. Minimum-width wrap still pending. |
 | 2026-11-20 | Added settings persistence/reset tests and tightened StructurePage at narrow sizes. | Verify SettingsController behavior and keep structure controls visible on smaller displays. | `tests/algorithm_tests.cpp`, `CMakeLists.txt`, `qml/pages/StructurePage.qml` | Fresh Release build/CTest passed. Live captures verified Linked List, Stack, Queue, and Tree at 780 px. |
 | 2026-11-20 | Fixed BST parent sizing, node alignment, narrow level spacing, and status/selector clipping. | Proactive check of Tree view found its drawing area had zero size and later exposed narrow-height overlap. | `qml/pages/StructurePage.qml` | Fresh Release build/CTest passed; final 780 px screenshot confirms every tree node, connector, selector label, status, and control is visible. |
+| 2026-11-20 | Connected the graph timer to the shared playback-speed preference and fixed Compare node overflow plus invalid-input feedback. | Close functional and layout consistency gaps found during cross-page audit. | `src/controllers/graphcontroller.*`, `qml/Main.qml`, `qml/pages/ComparisonPage.qml`, `tests/algorithm_tests.cpp` | Release build and CTest passed; runtime interaction pending. |
 | 2026-11-20 | Added this project status tracker and reconciled claims to repository and existing test log. | Keep current state and history auditable. | `PROJECT_STATUS.md` | File contents cross-checked against working tree and test log. |
 
 ## NEXT PRIORITIES
 
-1. Review Sorting, Searching, Graph, and Compare at narrow widths for clipped controls; apply the same scrutiny to default-looking buttons.
-2. Verify Settings persistence after restarting the packaged app and inspect navigation focus states.
-3. Rebuild and launch a clean Windows package with the Qt import fix.
-4. Commit and push the verified update; publish its GitHub release and asset.
+1. Finish runtime verification of Compare responsive nodes and valid/invalid shared input; inspect at minimum and maximized sizes.
+2. Exercise Graph speed preference, playback, rewind, restart, edge insertion, and reduced motion; check Searching and Sorting controls/dialogs.
+3. Verify saved Settings after restarting the clean package and inspect settings values; isolated-path launch and empty startup stderr are already confirmed.
+4. Commit and push the verified code and tracker, then publish v1.2.0 with the verified Windows x64 asset.
+5. Reconcile any defects found during remaining runtime checks before calling the broad quality overhaul complete.
