@@ -140,7 +140,7 @@ Item {
                                 width: nodeDiameter
                                 height: nodeDiameter
                                 value: nodeValue
-                                state: playback.complete ? "done" : displayPosition === playback.activeA ? "active" : displayPosition === playback.activeB ? "compare" : "default"
+                                state: playback.complete && playback.algorithm.endsWith("Search") && playback.operation === "Target found" && displayPosition === playback.activeA ? "found" : playback.complete ? "done" : displayPosition === playback.activeA ? "active" : displayPosition === playback.activeB ? "compare" : "default"
                                 opacity: page.focusMode && playback.activeA >= 0 && displayPosition !== playback.activeA && displayPosition !== playback.activeB ? 0.25 : 1.0
                                 x: playback.values.length > 1 ? (traceWidth - (playback.values.length - 1) * nodeGap - width) / 2 + displayPosition * nodeGap : (traceWidth - width) / 2
                                 y: (visualizationArea.height - height) / 2
