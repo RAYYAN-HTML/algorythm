@@ -33,6 +33,7 @@ qt_add_qml_module(Algorythm
         qml/components/StatisticsPanel.qml
         qml/components/VariablesPanel.qml
         qml/components/Icon.qml
+        qml/components/AppLogo.qml
         qml/components/AlgorithmInputBar.qml
         qml/components/ComplexityPanel.qml
         qml/components/PredictionChallenge.qml

@@ -41,11 +41,10 @@ Rectangle {
 
         RowLayout {
             spacing: 6
-            Rectangle {
+            AppLogo {
                 visible: root.windowWidth >= 980 && !root.sidebarCollapsed
-                width: 36; height: 36; radius: 11
-                color: "#2B2042"; border.color: root.theme.purple
-                Label { anchors.centerIn: parent; text: "A"; color: root.theme.purple; font.bold: true; font.pixelSize: 18 }
+                size: 36
+                theme: root.theme
             }
             ColumnLayout {
                 spacing: 0
