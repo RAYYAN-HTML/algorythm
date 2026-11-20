@@ -5,7 +5,7 @@ import "../components"
 
 Item {
     id: page
-    property QtObject theme
+    property AppTheme theme
     signal navigate(string section)
 
     ScrollView {
@@ -63,14 +63,14 @@ Item {
                             background: Rectangle {
                                 radius: 10
                                 gradient: Gradient {
-                                    GradientStop { position: 0.0; color: parent.down ? "#6D28D9" : parent.hovered ? "#A855F7" : "#8B5CF6" }
-                                    GradientStop { position: 1.0; color: parent.down ? "#581C87" : "#6D28D9" }
+                                    GradientStop { position: 0.0; color: parent.down ? page.theme.deepPurple : parent.hovered ? page.theme.brightPurple : page.theme.purple }
+                                    GradientStop { position: 1.0; color: page.theme.deepPurple }
                                 }
-                                border.color: "#A855F7"
+                                border.color: page.theme.brightPurple
                             }
                             contentItem: RowLayout {
-                                Label { text: "Start with sorting"; color: "#06111F"; font.pixelSize: 11; font.bold: true; leftPadding: 12 }
-                                Icon { name: "arrow-right"; color: "#06111F"; iconSize: 15; Layout.rightMargin: 10 }
+                                Label { text: "Start with sorting"; color: page.theme.textOnAccent; font.pixelSize: 11; font.bold: true; leftPadding: 12 }
+                                Icon { name: "arrow-right"; color: page.theme.textOnAccent; iconSize: 15; Layout.rightMargin: 10 }
                             }
                         }
                     }
@@ -106,7 +106,7 @@ Item {
                                     if (i === 0) ctx.moveTo(x, y)
                                     else ctx.lineTo(x, y)
                                 }
-                                ctx.strokeStyle = "#6D28D9"
+                                ctx.strokeStyle = page.theme.deepPurple
                                 ctx.globalAlpha = 0.72
                                 ctx.lineWidth = 2
                                 ctx.stroke()
@@ -122,9 +122,9 @@ Item {
                                 x: 12 + parent.traceX[index] * (parent.width - 24) - width / 2
                                 y: 12 + 24 + parent.traceY[index] * Math.max(1, parent.height - 62) - height / 2
                                 radius: width / 2
-                                color: index === 3 ? "#38245B" : "#1A1930"
+                                color: index === 3 ? page.theme.activeNode : page.theme.elevated
                                 border.width: index === 3 ? 2 : 1
-                                border.color: index === 3 ? page.theme.purple : "#594477"
+                                border.color: index === 3 ? page.theme.purple : page.theme.nodeOutline
                                 Label { anchors.centerIn: parent; text: modelData; color: page.theme.text; font.pixelSize: 10; font.bold: true }
                             }
                         }

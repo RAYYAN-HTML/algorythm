@@ -4,10 +4,11 @@ import QtQuick.Layouts
 
 Rectangle {
     id: panel
-    property color panelColor: "#17172A"
+    required property AppTheme theme
+    property color panelColor: theme.panel
     color: panelColor
     radius: 14
-    border.color: "#29243E"
+    border.color: theme.border
     implicitHeight: content.implicitHeight + 30
 
     ColumnLayout {
@@ -18,10 +19,10 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            Label { text: "{ }"; color: "#8B5CF6"; font.bold: true }
-            Label { text: "Current variables"; color: "#F8FAFC"; font.bold: true; font.pixelSize: 13 }
+            Label { text: "{ }"; color: theme.purple; font.bold: true }
+            Label { text: "Current variables"; color: theme.text; font.bold: true; font.pixelSize: 13 }
             Item { Layout.fillWidth: true }
-            Label { text: "STEP STATE"; color: "#94A3B8"; font.pixelSize: 8; font.letterSpacing: 0.8 }
+            Label { text: "STEP STATE"; color: theme.muted; font.pixelSize: 8; font.letterSpacing: 0.8 }
         }
 
         Repeater {
@@ -33,7 +34,7 @@ Rectangle {
                 Label {
                     Layout.preferredWidth: 78
                     text: modelData
-                    color: "#94A3B8"
+                    color: theme.muted
                     font.family: "Consolas"
                     font.pixelSize: 10
                     elide: Text.ElideRight
@@ -41,7 +42,7 @@ Rectangle {
                 Label {
                     Layout.fillWidth: true
                     text: String(playback.variables[modelData])
-                    color: "#C4B5FD"
+                    color: theme.code
                     font.family: "Consolas"
                     font.pixelSize: 10
                     elide: Text.ElideRight

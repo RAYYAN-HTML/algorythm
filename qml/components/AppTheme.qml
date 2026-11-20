@@ -1,0 +1,36 @@
+import QtQuick
+
+QtObject {
+    property bool reducedMotion: false
+
+    readonly property color background: "#080812"
+    readonly property color secondary: "#0D0D1A"
+    readonly property color panel: "#17172A"
+    readonly property color elevated: "#1A1930"
+    readonly property color border: "#29243E"
+    readonly property color content: "#CBD5E1"
+    readonly property color code: "#C4B5FD"
+    readonly property color textOnAccent: "#06111F"
+    readonly property color highlightSurface: "#30204E"
+    readonly property color selectedSurface: "#2B2042"
+    readonly property color activeNode: "#38245B"
+    readonly property color compareNode: "#40351C"
+    readonly property color foundNode: "#514018"
+    readonly property color visitedNode: "#15382F"
+    readonly property color nodeOutline: "#594477"
+    readonly property color graphEdge: "#34435D"
+    readonly property color focusOutline: "#53647E"
+    readonly property color treeEdge: "#52617D"
+    readonly property color purple: "#8B5CF6"
+    readonly property color brightPurple: "#A855F7"
+    readonly property color deepPurple: "#6D28D9"
+    readonly property color glowPurple: "#9333EA"
+    readonly property color amber: "#FBBF24"
+    readonly property color green: "#34D399"
+    readonly property color error: "#F87171"
+    readonly property color info: "#38BDF8"
+    readonly property color text: "#F8FAFC"
+    readonly property color muted: "#A1A1B5"
+    readonly property color supportText: "#94A3B8"
+    readonly property color subdued: "#71718A"
+}

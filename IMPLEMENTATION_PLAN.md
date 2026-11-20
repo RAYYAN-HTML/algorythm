@@ -6,7 +6,10 @@
 
 - Corrected the Dashboard’s static illustration label from “LIVE TRACE” to “SAMPLE TRACE · 7 VALUES.”
 - Renamed `AlgorithmNode.state` to `nodeState` to avoid shadowing `QQuickItem.state`, and updated Sorting/Comparison bindings.
+- Added typed `AppTheme.qml` and routed the shared learning panels, node states, graph/structure colors, Dashboard accents, and navigation surfaces through semantic color roles.
+- Bounded Graph to 21 unique undirected edges, rejected reverse duplicates, preserved specific validation feedback, and added controller regression coverage.
 - Rebuilt Release and passed CTest; visually and interactively checked Dashboard, Sorting, Search, Graph, and Compare at 1440×900.
+- After the final theme/graph changes, the Release build and CTest passed; hidden offscreen startup remained alive for 4 seconds with empty stdout/stderr and no QML runtime errors.
 - Created a QML-debug profiling build, cleanly exited `qmlprofiler`, and parsed its 3.59 MB trace. The 4.23-second sample reported estimated average 59.5 FPS, 31 frames and 1.68 MB peak QML heap; it covers startup/transition only and is not sustained playback evidence.
 
 This plan reflects the actual repository and existing pending work. It avoids replacing existing algorithms, controller APIs, or the current Qt Quick architecture.
@@ -17,10 +20,10 @@ This plan reflects the actual repository and existing pending work. It avoids re
 | P1 | Fix false “LIVE TRACE” Dashboard label | Complete | Label describes the hard-coded illustration honestly; release build and Dashboard inspection. |
 | P1 | Validate visualization workspace, playback and input recovery | Partly implemented; current runtime coverage incomplete | Build and CTest, then exercise run/step/back/restart/seek/speed and valid/invalid input; record unavailable interactions explicitly. |
 | P1 | Verify Comparison synchronization and compact layout | Existing shared playback behavior; compact behavior pending | Exercise mixed running/completed states and inspect both panels at 800×600 and 1024×768. |
-| P1 | Verify Graph post-fix geometry and traversal controls | Node geometry correction compiled; visual confirmation pending | Inspect BFS, DFS, Dijkstra, add-edge feedback, playback and speed in live app. |
+| P1 | Verify Graph post-fix geometry and traversal controls | Node geometry visually checked at 1440×900; edge input now bounded and duplicate-safe | Inspect BFS, DFS, Dijkstra, add-edge feedback, playback and speed in live app. |
 | P2 | Verify structures, settings persistence and BST boundary feedback | Controller behavior partly covered; status history reports some UI checks | Exercise Linked List, Stack, Queue, BST, underflow, duplicate, invalid/depth insertion, settings reset and restart persistence. |
 | P2 | Reduce actionable QML layout/type warnings in touched paths | Whole-project linter has mixed actionable/noisy results | Re-run qmllint with generated module paths; compare concrete diagnostics and runtime outcomes. |
-| P2 | Improve shared token reuse / component consistency | Existing shared palette, repeated local values remain | Documented role map; change only recurring semantic styles; regression screenshots across pages. |
+| P2 | Improve shared token reuse / component consistency | Core semantic colors centralized in typed `AppTheme`; spacing/radii and one-off illustration colors remain local | Confirm typed token references in QML; collect screenshots at requested sizes after theme migration. |
 | P2 | Accessibility pass | Partially implemented, not complete | Keyboard-only operation/focus visibility, accessible state labels, reduced-motion check, larger text and contrast spot checks. |
 | P3 | QML Quick Test harness | No QML tests exist | Defer harness until focused QML tests are authored; current C++ CTest remains required. |
 | P3 | Profile actual QML execution | Short launch/transition trace captured and parsed | For sustained performance conclusions, capture longer sorting, comparison and graph playback runs and compare frame-time distributions. |

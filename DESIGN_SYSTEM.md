@@ -1,6 +1,6 @@
 # Algorythm — Design System
 
-**Status:** Existing visual language documented; token cleanup is incremental.  
+**Status:** Core semantic colors are centralized in `qml/components/AppTheme.qml`; remaining one-off colors are limited to local illustration and decorative treatments.
 **Platform assumptions:** Resizable Qt 6 desktop app, rectangle display, desk viewing distance (~60 cm), English-first, mouse and keyboard. DPI and RTL requirements are not documented. Retain Qt Quick Controls Material Dark and the project’s deep-violet identity.
 
 ## Product design intent
@@ -11,7 +11,7 @@ Algorythm is an **interactive algorithm laboratory**. The visualization is prima
 
 ### Color
 
-The shared runtime palette is currently declared as `appColors` in `qml/Main.qml` and passed through each page/component’s `theme` property.
+The `AppTheme` object in `qml/components/AppTheme.qml` owns the runtime palette and is passed through each page/component’s typed `theme` property. Material Controls and the shared algorithm-learning panels use these roles.
 
 | Token | Current value | Role |
 |---|---|---|
@@ -20,6 +20,20 @@ The shared runtime palette is currently declared as `appColors` in `qml/Main.qml
 | `panel` | `#17172A` | Main panel |
 | `elevated` | `#1A1930` | Raised surface |
 | `border` | `#29243E` | Dividers and outlines |
+| `content` | `#CBD5E1` | Supporting readable body copy |
+| `code` | `#C4B5FD` | Monospace values and active code |
+| `supportText` | `#94A3B8` | Graph labels and compact secondary data |
+| `textOnAccent` | `#06111F` | Foreground on bright accent fills |
+| `highlightSurface` | `#30204E` | Selected code line and highlighted actions |
+| `selectedSurface` | `#2B2042` | Selected structure node |
+| `activeNode` | `#38245B` | Current algorithm/graph node fill |
+| `compareNode` | `#40351C` | Compared node fill |
+| `foundNode` | `#514018` | Found search-target fill |
+| `visitedNode` | `#15382F` | Completed or visited node fill |
+| `nodeOutline` | `#594477` | Resting node outline |
+| `graphEdge` | `#34435D` | Resting graph edge |
+| `focusOutline` | `#53647E` | Splitter hover/focus affordance |
+| `treeEdge` | `#52617D` | Tree connector stroke |
 | `purple` | `#8B5CF6` | Primary interactive accent / current node |
 | `brightPurple` | `#A855F7` | Secondary accent |
 | `deepPurple` | `#6D28D9` | Dark accent / pressed surface |
@@ -32,7 +46,7 @@ The shared runtime palette is currently declared as `appColors` in `qml/Main.qml
 | `error` | `#F87171` | Error state; pair with text |
 | `info` | `#38BDF8` | Informational state |
 
-Colors in page-local Canvas illustrations may stay local where semantic state is not represented. Repeated panel, border, text, and state colors should use the shared palette. Do not communicate a state by color alone.
+Colors in page-local Canvas illustrations may stay local where semantic state is not represented. Repeated panel, border, text, and state colors use the shared palette. Do not communicate a state by color alone.
 
 ### Typography
 

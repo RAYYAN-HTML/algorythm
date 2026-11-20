@@ -20,6 +20,23 @@ Identify where students lose the thread of an algorithm while starting a lab, se
 
 The findings combine a source-based heuristic walkthrough with one live evaluator walkthrough at 1440×900. Dashboard, Sorting, Searching, Graph, and Compare were opened; playback was stepped in Sorting and Graph, Search reached a found state, and Compare Run Both completed both traces. This method can surface labeling, feedback, hierarchy, and likely interaction risks. It cannot establish completion rates, discoverability in real use, perceived comprehension, or issue frequency. No user quotes or frequency estimates are claimed.
 
+## Product direction and outcomes
+
+**Positioning:** Algorythm is an interactive algorithm laboratory. Its central learning job is: “When I study a data-structure or algorithm concept, help me inspect each state change and understand why it happened, so I can connect the pseudocode to the visible result.”
+
+**Experience outcomes to validate:**
+
+- A first-time learner can start a relevant lab from the Dashboard without inventing progress or performance claims.
+- A learner can predict the next comparison/visit, use playback to check that prediction, and explain the result using the narration or pseudocode.
+- A learner can compare algorithms on the same input and distinguish measured operation counts from theoretical complexity.
+- A learner can change structure/graph inputs, receive specific feedback, and recover without losing the current workspace.
+
+**Information architecture:** Keep Dashboard as a launch/catalog surface; Sorting and Searching as the shared trace workspace; Linked List, Stack, Queue and Tree under the structure workspace; Graph as a topology lab; Compare as a cross-cutting paired experiment; Settings as persistent playback/layout preferences. The sidebar keeps these destinations visible and the current section explicit.
+
+**Design principles:** Show the state before the explanation; keep the visualization dominant; make playback reversible and nearby; connect narration/pseudocode to the current trace; use shared semantic tokens; show operation counts with definitions; pair color-coded states with labels/text; preserve context on invalid input; do not fabricate learning progress or a universal algorithm winner.
+
+**Proposed success measures (not currently instrumented):** task completion for “start and step through a lab”; time to first successful step; ability to correctly describe the active state after a step; recovery rate after invalid input; and whether participants can accurately explain the basis for a comparison. Collect these through moderated sessions before adding analytics or making outcome claims.
+
 ## User journeys: heuristic findings
 
 | Journey | Current support | Friction / risk | Suggested validation |

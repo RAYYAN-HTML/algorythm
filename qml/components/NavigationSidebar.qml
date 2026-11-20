@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Rectangle {
     id: root
-    property QtObject theme
+    property AppTheme theme
     property QtObject appSettings
     property string section: "Dashboard"
     property bool sidebarCollapsed: false
@@ -67,7 +67,7 @@ Rectangle {
                 ToolTip.visible: hovered
                 ToolTip.text: Accessible.name
                 onClicked: root.collapseRequested()
-                background: Rectangle { radius: 7; color: parent.hovered ? "#1A1930" : "transparent" }
+                background: Rectangle { radius: 7; color: parent.hovered ? root.theme.elevated : "transparent" }
                 contentItem: Icon { name: "menu"; color: root.theme.muted; iconSize: 18 }
             }
         }
@@ -119,7 +119,7 @@ Rectangle {
                         background: Rectangle {
                             radius: 10
                             color: parent.selected ? "#35215A" : parent.hovered ? "#211B39" : "transparent"
-                            border.color: parent.selected ? "#6D28D9" : "transparent"
+                            border.color: parent.selected ? root.theme.deepPurple : "transparent"
                             gradient: parent.selected ? activeGradient : undefined
                             Behavior on color { ColorAnimation { duration: root.reducedMotion ? 0 : 140 } }
                             Rectangle { x: 0; y: 6; width: 3; height: parent.height - 12; radius: 2; color: root.theme.purple; visible: parent.parent.selected }
@@ -153,7 +153,7 @@ Rectangle {
                 }
             }
             onClicked: root.navigationRequested("Compare")
-            background: Rectangle { radius: 9; color: parent.checked ? "#30204E" : parent.hovered ? "#1A1930" : "transparent"; border.color: parent.checked ? "#6D28D9" : "transparent" }
+            background: Rectangle { radius: 9; color: parent.checked ? root.theme.highlightSurface : parent.hovered ? root.theme.elevated : "transparent"; border.color: parent.checked ? root.theme.deepPurple : "transparent" }
             contentItem: RowLayout {
                 Icon { name: "compare"; color: root.section === "Compare" ? root.theme.purple : root.theme.muted; iconSize: 17; Layout.leftMargin: 12 }
                 Label { text: "Compare Algorithms"; visible: root.windowWidth >= 980 && !root.sidebarCollapsed; color: root.section === "Compare" ? root.theme.purple : root.theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
@@ -174,7 +174,7 @@ Rectangle {
                 }
             }
             onClicked: settingsMenu.open()
-            background: Rectangle { radius: 8; color: parent.hovered ? "#1A1930" : "transparent" }
+            background: Rectangle { radius: 8; color: parent.hovered ? root.theme.elevated : "transparent" }
             contentItem: RowLayout {
                 Icon { name: "settings"; color: root.theme.muted; iconSize: 17; Layout.leftMargin: 12 }
                 Label { text: "Settings"; visible: root.windowWidth >= 980 && !root.sidebarCollapsed; color: root.theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
@@ -185,7 +185,7 @@ Rectangle {
             Layout.fillWidth: true
             height: 66
             visible: root.windowWidth >= 980 && !root.sidebarCollapsed && root.windowHeight >= 700
-            radius: 12; color: "#17172A"; border.color: root.theme.border
+            radius: 12; color: root.theme.panel; border.color: root.theme.border
             RowLayout {
                 anchors.fill: parent; anchors.margins: 11
                 Rectangle { width: 34; height: 34; radius: 17; color: "#3A235F"; Label { anchors.centerIn: parent; text: "R"; color: "#D8B4FE"; font.bold: true } }

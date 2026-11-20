@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Item {
     id: page
-    property QtObject theme
+    property AppTheme theme
     property int itemValue: 12
     property int position: 0
     ColumnLayout {
@@ -78,7 +78,7 @@ Item {
                                 Rectangle {
                                     width: 58; height: 58; radius: 29
                                     anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
-                                    color: index === 0 ? "#2B2042" : "#1A1930"
+                                    color: index === 0 ? theme.selectedSurface : theme.elevated
                                     border.width: 2; border.color: index === 0 ? theme.purple : theme.purple
                                     Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 18; font.bold: true }
                                 }
@@ -111,7 +111,7 @@ Item {
                                 required property int value
                                 required property int index
                                 width: 116; height: 47
-                                Rectangle { anchors.fill: parent; radius: 10; color: index === 0 ? "#2B2042" : "#1A1930"; border.color: index === 0 ? theme.purple : theme.purple
+                                Rectangle { anchors.fill: parent; radius: 10; color: index === 0 ? theme.selectedSurface : theme.elevated; border.color: theme.purple
                                     Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 16; font.bold: true }
                                 }
                             }
@@ -135,7 +135,7 @@ Item {
                             onPaint: {
                                 var ctx = getContext("2d")
                                 ctx.clearRect(0, 0, width, height)
-                                ctx.strokeStyle = "#52617D"
+                                ctx.strokeStyle = theme.treeEdge
                                 ctx.lineWidth = 2
                                 var nodes = structures.treeNodes
                                 for (var i = 1; i < nodes.length; ++i) {
@@ -164,7 +164,7 @@ Item {
                                 radius: 26
                                 x: posX * treeArea.width - width / 2
                                 y: treeArea.treeTop + posY * treeArea.treeRowSpacing
-                                color: "#1A1930"
+                                color: theme.elevated
                                 border.width: 2
                                 border.color: theme.purple
                                 Behavior on x { NumberAnimation { duration: theme.reducedMotion ? 0 : 240 } }

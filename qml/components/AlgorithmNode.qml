@@ -2,14 +2,15 @@ import QtQuick
 
 Item {
     id: root
+    required property AppTheme theme
     property int value: 0
     property string nodeState: "default"
-    property color accent: "#A855F7"
-    property color activeFill: "#38245B"
-    property color compareFill: "#40351C"
-    property color foundFill: "#514018"
-    property color doneFill: "#15382F"
-    property color idleFill: "#1A1930"
+    property color accent: theme.brightPurple
+    property color activeFill: theme.activeNode
+    property color compareFill: theme.compareNode
+    property color foundFill: theme.foundNode
+    property color doneFill: theme.visitedNode
+    property color idleFill: theme.elevated
     property int animationDuration: 380
     Accessible.name: "Value " + root.value
     Accessible.description: root.nodeState === "found" ? "Search target found" : root.nodeState === "compare" ? "Currently being compared" : root.nodeState === "active" ? "Current algorithm element" : root.nodeState === "done" ? "Completed element" : "Unprocessed element"
@@ -27,7 +28,7 @@ Item {
  radius: width / 2
         color: root.nodeState === "active" ? root.activeFill : root.nodeState === "compare" || root.nodeState === "found" ? root.nodeState === "found" ? root.foundFill : root.compareFill : root.nodeState === "done" ? root.doneFill : root.idleFill
         border.width: root.nodeState === "active" || root.nodeState === "compare" || root.nodeState === "found" ? 2 : 1
-        border.color: root.nodeState === "active" ? root.accent : root.nodeState === "compare" || root.nodeState === "found" ? "#FBBF24" : root.nodeState === "done" ? "#34D399" : "#594477"
+        border.color: root.nodeState === "active" ? root.accent : root.nodeState === "compare" || root.nodeState === "found" ? root.theme.amber : root.nodeState === "done" ? root.theme.green : root.theme.nodeOutline
         Behavior on color { ColorAnimation { duration: root.animationDuration * 0.7 } }
         Behavior on border.color { ColorAnimation { duration: root.animationDuration * 0.7 } }
         Rectangle { anchors.fill: parent
@@ -40,7 +41,7 @@ Item {
  z: -1 }
         Text { anchors.centerIn: parent
  text: root.value
- color: "#F8FAFC"
+ color: root.theme.text
  font.pixelSize: 17
  font.bold: true }
     }

@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Item {
     id: root
-    property QtObject theme
+    property AppTheme theme
     property var controller
     property int score: 0
     property string feedback: ""

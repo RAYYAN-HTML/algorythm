@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Popup {
     id: root
-    property QtObject theme
+    property AppTheme theme
     property QtObject appSettings
     property bool reducedMotion: false
     property bool sidebarCollapsed: false

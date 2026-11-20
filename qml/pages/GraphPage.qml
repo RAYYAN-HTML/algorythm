@@ -5,7 +5,7 @@ import "../components"
 
 Item {
     id: page
-    property QtObject theme
+    property AppTheme theme
     property var px: [0.10, 0.29, 0.29, 0.49, 0.49, 0.72, 0.90]
     property var py: [0.48, 0.20, 0.76, 0.43, 0.86, 0.53, 0.35]
     property int startNode: 0
@@ -17,8 +17,6 @@ Item {
     function addWeightedEdge() {
         if (graph.addEdge(fromNode, toNode, weight))
             edgeFeedback = "Added edge " + fromNode + " ↔ " + toNode + " with weight " + weight + "."
-        else
-            edgeFeedback = "Choose two different nodes and a nonnegative weight."
     }
     ColumnLayout {
         anchors.fill: parent
@@ -57,9 +55,9 @@ Item {
                         var x1 = page.px[e.from] * width, y1 = page.py[e.from] * height
                         var x2 = page.px[e.to] * width, y2 = page.py[e.to] * height
                         ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2)
-                        ctx.strokeStyle = "#34435D"
+                        ctx.strokeStyle = theme.graphEdge
                         ctx.lineWidth = 1.5; ctx.stroke()
-                        ctx.fillStyle = "#94A3B8"; ctx.font = "12px sans-serif"
+                        ctx.fillStyle = theme.supportText; ctx.font = "12px sans-serif"
                         ctx.fillText(String(e.weight), (x1+x2)/2 + 5, (y1+y2)/2 - 5)
                     }
                     if (graph.active >= 0 && graph.edgeTo >= 0) {
@@ -67,8 +65,8 @@ Item {
                         var ex = page.px[graph.edgeTo] * width, ey = page.py[graph.edgeTo] * height
                         ctx.beginPath(); ctx.moveTo(sx, sy)
                         ctx.lineTo(sx + (ex - sx) * activeEdgeProgress, sy + (ey - sy) * activeEdgeProgress)
-                        ctx.strokeStyle = "#8B5CF6"; ctx.lineWidth = 3
-                        ctx.shadowColor = "#8B5CF6"; ctx.shadowBlur = 11
+                        ctx.strokeStyle = theme.purple; ctx.lineWidth = 3
+                        ctx.shadowColor = theme.purple; ctx.shadowBlur = 11
                         ctx.stroke(); ctx.shadowBlur = 0
                     }
                 }
@@ -105,7 +103,7 @@ Item {
                     width: 54; height: 54; radius: 27
                     x: 18 + page.px[index] * (graphPanel.width - 36) - width / 2
                     y: 18 + page.py[index] * (graphPanel.height - 36) - height / 2
-                    color: index === graph.active ? "#38245B" : graph.visited.indexOf(index) >= 0 ? "#15382F" : "#1A1930"
+                    color: index === graph.active ? theme.activeNode : graph.visited.indexOf(index) >= 0 ? theme.visitedNode : theme.elevated
                     border.width: index === graph.active ? 3 : 1.5
                     border.color: index === graph.active ? theme.purple : graph.visited.indexOf(index) >= 0 ? theme.green : theme.purple
                     scale: index === graph.active ? 1.12 : 1.0
@@ -149,7 +147,7 @@ Item {
                     Label { text: "→"; color: theme.muted }
                     SpinBox { from: 0; to: 6; value: page.toNode; onValueModified: page.toNode = value }
                     SpinBox { from: 0; to: 999; value: page.weight; onValueModified: page.weight = value }
-                    Button { text: "Add edge"; onClicked: page.addWeightedEdge(); background: Rectangle { radius: 8; color: "#30204E"; border.color: theme.purple }
+                    Button { text: "Add edge"; onClicked: page.addWeightedEdge(); background: Rectangle { radius: 8; color: theme.highlightSurface; border.color: theme.purple }
  contentItem: Text { text: parent.text; color: theme.purple; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
                 }
                 Label { Layout.fillWidth: true; text: page.edgeFeedback; color: page.edgeFeedback.startsWith("Added") ? theme.green : page.edgeFeedback.length ? theme.error : theme.muted; font.pixelSize: 10; wrapMode: Text.WordWrap }

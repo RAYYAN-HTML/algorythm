@@ -5,7 +5,7 @@ import "../components"
 
 Item {
     id: page
-    property QtObject theme
+    property AppTheme theme
     property string userInput: "8, 3, 6, 1, 9, 4, 2"
     property string errorMessage: ""
     property bool focusMode: false
@@ -20,7 +20,7 @@ Item {
         handle: Rectangle {
             implicitWidth: 6
             implicitHeight: 6
-            color: SplitHandle.pressed ? theme.purple : SplitHandle.hovered ? "#53647E" : "#29243E"
+            color: SplitHandle.pressed ? theme.purple : SplitHandle.hovered ? theme.focusOutline : theme.border
             radius: 3
             Behavior on color { ColorAnimation { duration: 140 } }
         }
@@ -65,7 +65,7 @@ Item {
  checkable: true
  onToggled: page.focusMode = checked
  background: Rectangle { radius: 8
- color: parent.checked ? "#30204E" : theme.secondary
+ color: parent.checked ? theme.highlightSurface : theme.secondary
  border.color: theme.border }
  contentItem: Text { text: parent.text
  color: parent.checked ? theme.purple : theme.muted
@@ -94,13 +94,13 @@ Item {
  delegate: Rectangle { x: index * 44
  width: 1
  height: parent.height
- color: "#1A1930"
+ color: theme.elevated
  opacity: 0.48 } }
                 Repeater { model: Math.floor(parent.height / 44)
  delegate: Rectangle { y: index * 44
  height: 1
  width: parent.width
- color: "#1A1930"
+ color: theme.elevated
  opacity: 0.48 } }
                 ColumnLayout {
                     anchors.fill: parent
@@ -139,6 +139,7 @@ Item {
                                 animationDuration: theme.reducedMotion || playback.stepIndex === 0 ? 0 : playback.animationDuration
                                 width: nodeDiameter
                                 height: nodeDiameter
+                                theme: page.theme
                                 value: nodeValue
                                 nodeState: playback.complete && playback.algorithm.endsWith("Search") && playback.operation === "Target found" && displayPosition === playback.activeA ? "found" : playback.complete ? "done" : displayPosition === playback.activeA ? "active" : displayPosition === playback.activeB ? "compare" : "default"
                                 opacity: page.focusMode && playback.activeA >= 0 && displayPosition !== playback.activeA && displayPosition !== playback.activeB ? 0.25 : 1.0
@@ -179,7 +180,7 @@ Item {
  text: page.errorMessage
  color: theme.error
  font.pixelSize: 11 }
-            PlaybackControls { Layout.fillWidth: true }
+            PlaybackControls { theme: page.theme; Layout.fillWidth: true }
         }
 
         ScrollView {
@@ -215,14 +216,14 @@ Item {
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 12
-                        NarrationPanel { Layout.fillWidth: true }
-                        StatisticsPanel { Layout.fillWidth: true }
+                        NarrationPanel { theme: page.theme; Layout.fillWidth: true }
+                        StatisticsPanel { theme: page.theme; Layout.fillWidth: true }
                     }
-                    PseudocodePanel { Layout.fillWidth: true }
+                    PseudocodePanel { theme: page.theme; Layout.fillWidth: true }
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 12
-                        VariablesPanel { Layout.fillWidth: true }
+                        VariablesPanel { theme: page.theme; Layout.fillWidth: true }
                         ComplexityPanel { theme: page.theme; controller: playback }
                     }
                 }

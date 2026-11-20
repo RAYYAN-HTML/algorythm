@@ -35,4 +35,16 @@ void GraphController::next(){m_timer.stop();if(m_index+1<m_steps.size())++m_inde
 void GraphController::previous(){m_timer.stop();if(m_index>0)--m_index;emit changed();}
 void GraphController::restart(){m_timer.stop();m_index=0;emit changed();}
 void GraphController::playPause(){if(m_timer.isActive())m_timer.stop();else if(m_index+1<m_steps.size())m_timer.start();emit changed();}
-bool GraphController::addEdge(int from,int to,int weight){if(from<0||to<0||from>=7||to>=7||from==to||weight<0){emit error("Edge endpoints must be nodes 0–6 and weight must be nonnegative.");return false;}m_edges<<Edge{from,to,weight};run(0);return true;}
+bool GraphController::addEdge(int from,int to,int weight){
+    constexpr int nodeCount=7;
+    constexpr int maxUndirectedEdges=nodeCount*(nodeCount-1)/2;
+    if(from<0||to<0||from>=nodeCount||to>=nodeCount||from==to||weight<0){emit error("Edge endpoints must be nodes 0–6, endpoints must differ, and weight must be nonnegative.");return false;}
+    if(m_edges.size()>=maxUndirectedEdges){emit error("The graph already has all 21 possible undirected edges.");return false;}
+    for(const Edge& edge:m_edges){
+        if((edge.from==from&&edge.to==to)||(edge.from==to&&edge.to==from)){
+            emit error("That undirected edge already exists.");
+            return false;
+        }
+    }
+    m_edges<<Edge{from,to,weight};run(0);return true;
+}

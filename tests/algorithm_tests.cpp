@@ -143,6 +143,17 @@ int main(int argc, char **argv)
     while(graphController.stepIndex()+1<graphController.stepCount())graphController.next();
     assert(graphController.distances().size()==7&&graphController.distances()[6]=="8");
     assert(!graphController.addEdge(0,9,3));assert(graphController.addEdge(0,6,5));
+    GraphController boundedGraph;
+    QString graphError;
+    QObject::connect(&boundedGraph,&GraphController::error,[&](const QString&message){graphError=message;});
+    const int initialEdgeCount=boundedGraph.edgeList().size();
+    assert(!boundedGraph.addEdge(1,0,4));
+    assert(graphError.contains("already exists")&&boundedGraph.edgeList().size()==initialEdgeCount);
+    int additionalEdges=0;
+    for(int from=0;from<7;++from)for(int to=from+1;to<7;++to)if(boundedGraph.addEdge(from,to,1))++additionalEdges;
+    assert(additionalEdges==21-initialEdgeCount&&boundedGraph.edgeList().size()==21);
+    assert(!boundedGraph.addEdge(0,6,2));
+    assert(graphError.contains("all 21")&&boundedGraph.edgeList().size()==21);
 
     PlaybackController playback;
     assert(playback.nodes()->rowCount() == 7);

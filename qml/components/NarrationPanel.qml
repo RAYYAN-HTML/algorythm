@@ -4,42 +4,43 @@ import QtQuick.Layouts
 import "."
 
 Rectangle {
-    property color panelColor: "#17172A"
+    required property AppTheme theme
+    property color panelColor: theme.panel
     color: panelColor
  radius: 14
- border.color: "#29243E"
+ border.color: theme.border
     implicitHeight: 190
     ColumnLayout {
         anchors.fill: parent
  anchors.margins: 16
  spacing: 10
-        RowLayout { Icon { name: "sparkle"; color: "#8B5CF6"; iconSize: 16 }
+        RowLayout { Icon { name: "sparkle"; color: theme.purple; iconSize: 16 }
  Label { text: "Learning assistant"
- color: "#F8FAFC"
+ color: theme.text
  font.bold: true
  font.pixelSize: 13 }
  Item { Layout.fillWidth: true }
  Label { text: "LIVE"
- color: "#34D399"
+ color: theme.green
  font.pixelSize: 9
  font.bold: true } }
         Label { text: playback.operation
- color: "#8B5CF6"
+ color: theme.purple
  font.pixelSize: 11
  font.bold: true }
         Label { Layout.fillWidth: true
  wrapMode: Text.WordWrap
  text: playback.narration
- color: "#CBD5E1"
+ color: theme.content
  font.pixelSize: 12 }
         Item { Layout.fillHeight: true }
         Button { text: "Why does this happen?"
  onClicked: whyDialog.open()
  background: Rectangle { radius: 7
- color: "#0D0D1A"
- border.color: "#29243E" }
+ color: theme.secondary
+ border.color: theme.border }
  contentItem: Text { text: parent.text
- color: "#C4B5FD"
+ color: theme.code
  font.pixelSize: 10
  horizontalAlignment: Text.AlignHCenter
  verticalAlignment: Text.AlignVCenter } }
@@ -52,7 +53,7 @@ Rectangle {
  width: 350
         contentItem: Label { text: playback.why
  wrapMode: Text.WordWrap
- color: "#CBD5E1"
+ color: theme.content
  padding: 12 }
         standardButtons: Dialog.Ok
     }

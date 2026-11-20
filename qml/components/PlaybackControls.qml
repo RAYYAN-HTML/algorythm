@@ -5,10 +5,11 @@ import "../components"
 
 Rectangle {
     id: root
-    property color panelColor: "#17172A"
+    required property AppTheme theme
+    property color panelColor: theme.panel
     color: panelColor
  radius: 14
- border.color: "#29243E"
+ border.color: theme.border
     implicitHeight: 88
     ColumnLayout {
         anchors.fill: parent
@@ -18,29 +19,29 @@ Rectangle {
             spacing: 8
             Button { Accessible.name: "Restart"; ToolTip.visible: hovered; ToolTip.text: "Restart (R)"
  onClicked: playback.restart()
- flat: true; contentItem: Icon { name: "restart"; color: "#94A3B8"; iconSize: 18 } }
+ flat: true; contentItem: Icon { name: "restart"; color: root.theme.muted; iconSize: 18 } }
             Button { Accessible.name: "Previous step"; ToolTip.visible: hovered; ToolTip.text: "Previous step (Left Arrow)"
  onClicked: playback.previous()
- flat: true; contentItem: Icon { name: "previous"; color: "#94A3B8"; iconSize: 18 } }
+ flat: true; contentItem: Icon { name: "previous"; color: root.theme.muted; iconSize: 18 } }
             Button {
                 Accessible.name: playback.playing ? "Pause" : "Play"
                 highlighted: true
                 onClicked: playback.playPause()
                 contentItem: RowLayout {
-                    Icon { name: playback.playing ? "pause" : "play"; color: "#06111F"; iconSize: 15 }
-                    Text { text: playback.playing ? "Pause" : "Play"; color: "#06111F"; font.pixelSize: 12 }
+                    Icon { name: playback.playing ? "pause" : "play"; color: root.theme.textOnAccent; iconSize: 15 }
+                    Text { text: playback.playing ? "Pause" : "Play"; color: root.theme.textOnAccent; font.pixelSize: 12 }
                 }
             }
             Button { Accessible.name: "Next step"; ToolTip.visible: hovered; ToolTip.text: "Next step (Right Arrow)"
  onClicked: playback.next()
- flat: true; contentItem: Icon { name: "next"; color: "#94A3B8"; iconSize: 18 } }
+ flat: true; contentItem: Icon { name: "next"; color: root.theme.muted; iconSize: 18 } }
             Label { Layout.leftMargin: 8
  text: playback.stepIndex + 1 + " / " + playback.stepCount
- color: "#94A3B8"
+ color: root.theme.muted
  font.pixelSize: 11 }
             Item { Layout.fillWidth: true }
             Label { text: playback.speed.toFixed(1) + "×"
- color: "#8B5CF6"
+ color: root.theme.purple
  font.bold: true
  font.pixelSize: 12 }
             Slider { id: speed

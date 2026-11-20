@@ -5,7 +5,7 @@ import "../components"
 
 Item {
     id: page
-    property QtObject theme
+    property AppTheme theme
     property string inputValues: "8, 3, 6, 1, 9, 4, 2"
     property string inputError: ""
 
@@ -126,6 +126,7 @@ Item {
                                     required property int nodeValue
                                     readonly property int displayPosition: card.modelData.stepIndex === 0 ? index : nodePosition
                                     animationDuration: theme.reducedMotion || card.modelData.stepIndex === 0 ? 0 : card.modelData.animationDuration
+                                    theme: page.theme
                                     value: nodeValue
                                     nodeState: card.modelData.complete ? "done" : displayPosition === card.modelData.activeA ? "active" : displayPosition === card.modelData.activeB ? "compare" : "default"
                                     readonly property real traceWidth: Math.max(1, (page.width < 900 ? cardsScroll.availableWidth : (cardsScroll.availableWidth - 14) / 2) - 32)
@@ -184,8 +185,8 @@ Item {
                     highlighted: true
                     onClicked: page.toggleBothPlayback()
                     contentItem: RowLayout {
-                        Icon { name: playbackA.playing && playbackB.playing ? "pause" : "play"; color: "#06111F"; iconSize: 15 }
-                        Label { text: playbackA.playing && playbackB.playing ? "Pause both" : "Run both"; color: "#06111F"; font.bold: true }
+                        Icon { name: playbackA.playing && playbackB.playing ? "pause" : "play"; color: theme.textOnAccent; iconSize: 15 }
+                        Label { text: playbackA.playing && playbackB.playing ? "Pause both" : "Run both"; color: theme.textOnAccent; font.bold: true }
                     }
                 }
                 Button { Accessible.name: "Next step both"; onClicked: { playbackA.next(); playbackB.next() }

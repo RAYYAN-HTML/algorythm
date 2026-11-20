@@ -3,26 +3,27 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Rectangle {
-    property color panelColor: "#17172A"
+    required property AppTheme theme
+    property color panelColor: theme.panel
     color: panelColor
  radius: 14
- border.color: "#29243E"
+ border.color: theme.border
     implicitHeight: 112
     ColumnLayout {
         anchors.fill: parent
  anchors.margins: 15
  spacing: 11
         Label { text: "Live statistics"
- color: "#F8FAFC"
+ color: theme.text
  font.bold: true
  font.pixelSize: 13 }
         RowLayout {
             Layout.fillWidth: true
-            Repeater { model: playback.algorithm.endsWith("Search") ? [["INSPECTED", playback.comparisons, "#FBBF24"], ["COMPARISONS", playback.comparisons, "#8B5CF6"], ["TARGET", playback.searchTarget, "#34D399"]] : [["COMPARE", playback.comparisons, "#FBBF24"], ["SWAPS", playback.swaps, "#A855F7"], ["WRITES", playback.writes, "#8B5CF6"]]
+            Repeater { model: playback.algorithm.endsWith("Search") ? [["INSPECTED", playback.comparisons, theme.amber], ["COMPARISONS", playback.comparisons, theme.purple], ["TARGET", playback.searchTarget, theme.green]] : [["COMPARE", playback.comparisons, theme.amber], ["SWAPS", playback.swaps, theme.brightPurple], ["WRITES", playback.writes, theme.purple]]
                 delegate: ColumnLayout { Layout.fillWidth: true
  spacing: 3
  Label { text: modelData[0]
- color: "#94A3B8"
+ color: theme.muted
  font.pixelSize: 9 }
  Label { text: modelData[1]
  color: modelData[2]

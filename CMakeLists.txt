@@ -26,6 +26,7 @@ qt_add_qml_module(Algorythm
     VERSION 1.0
     QML_FILES
         qml/Main.qml
+        qml/components/AppTheme.qml
         qml/components/AlgorithmNode.qml
         qml/components/PlaybackControls.qml
         qml/components/PseudocodePanel.qml

@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Button {
     id: root
-    property QtObject theme
+    property AppTheme theme
     property string labName: ""
     property string description: ""
     property string iconName: "dashboard"

@@ -3,25 +3,26 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Rectangle {
-    property color panelColor: "#17172A"
+    required property AppTheme theme
+    property color panelColor: theme.panel
     color: panelColor
  radius: 14
- border.color: "#29243E"
+ border.color: theme.border
     implicitHeight: 258
     ColumnLayout {
         anchors.fill: parent
  anchors.margins: 16
  spacing: 10
         RowLayout { Label { text: "{ }"
- color: "#A855F7"
+ color: theme.brightPurple
  font.bold: true }
  Label { text: "Pseudocode"
- color: "#F8FAFC"
+ color: theme.text
  font.bold: true
  font.pixelSize: 13 }
  Item { Layout.fillWidth: true }
  Label { text: "C++ logic"
- color: "#94A3B8"
+ color: theme.muted
  font.pixelSize: 10 } }
         Repeater {
             model: {
@@ -37,12 +38,12 @@ Rectangle {
                 Layout.fillWidth: true
  height: 21
  radius: 4
-                color: playback.pseudocodeLine === index + 1 ? "#30204E" : "transparent"
+                color: playback.pseudocodeLine === index + 1 ? theme.highlightSurface : "transparent"
                 Text { anchors.fill: parent
  anchors.leftMargin: 8
  verticalAlignment: Text.AlignVCenter
  text: (index + 1).toString().padStart(2, "0") + "   " + modelData
- color: playback.pseudocodeLine === index + 1 ? "#C4B5FD" : "#94A3B8"
+ color: playback.pseudocodeLine === index + 1 ? theme.code : theme.muted
  font.family: "Consolas"
  font.pixelSize: 10 }
             }

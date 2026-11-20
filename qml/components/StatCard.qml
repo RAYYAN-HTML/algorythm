@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Rectangle {
     id: root
-    property QtObject theme
+    property AppTheme theme
     property string iconName: "dashboard"
     property string value: ""
     property string caption: ""
@@ -25,7 +25,7 @@ Rectangle {
             Layout.preferredWidth: 38
             Layout.preferredHeight: 38
             radius: 12
-            color: "#2B2042"
+            color: theme.selectedSurface
             Icon { anchors.centerIn: parent; name: root.iconName; color: root.theme.purple; iconSize: 19 }
         }
         ColumnLayout {

@@ -3,7 +3,7 @@ import QtQuick.Shapes
 
 Rectangle {
     id: root
-    property QtObject theme
+    property AppTheme theme
     property int size: 36
 
     width: size
@@ -11,7 +11,7 @@ Rectangle {
     radius: Math.round(size * 0.27)
     border.width: 1
     color: "#241A3B"
-    border.color: theme ? theme.purple : "#8B5CF6"
+    border.color: theme.purple
 
     Item {
         id: mark

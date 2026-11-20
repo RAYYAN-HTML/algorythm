@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 Rectangle {
     id: root
-    property QtObject theme
+    property AppTheme theme
     property var controller
     property string userInput: ""
     property bool inputFocused: false
