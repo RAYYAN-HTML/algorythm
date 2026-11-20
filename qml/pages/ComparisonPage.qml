@@ -91,7 +91,7 @@ Item {
                     required property var modelData
                     required property int index
                     width: page.width < 900 ? cardsScroll.availableWidth : (cardsScroll.availableWidth - 14) / 2
-                    height: page.width < 900 ? 270 : 360
+                    height: page.width < 900 ? 320 : Math.min(460, Math.max(360, page.height * 0.48))
                     radius: 16
                     color: theme.secondary
                     border.color: theme.border
@@ -114,6 +114,8 @@ Item {
                             id: visualArea
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            Layout.preferredWidth: Math.max(1, card.width - 32)
+                            Layout.preferredHeight: 180
                             Layout.minimumHeight: 90
                             Repeater {
                                 model: modelData.nodes
@@ -122,10 +124,13 @@ Item {
                                     required property int index
                                     required property int nodePosition
                                     required property int nodeValue
+                                    readonly property int displayPosition: card.modelData.stepIndex === 0 ? index : nodePosition
+                                    animationDuration: theme.reducedMotion || card.modelData.stepIndex === 0 ? 0 : card.modelData.animationDuration
                                     value: nodeValue
-                                    state: card.modelData.complete ? "done" : nodePosition === card.modelData.activeA ? "active" : nodePosition === card.modelData.activeB ? "compare" : "default"
-                                    readonly property real nodeGap: Math.min(68, Math.max(0, (visualArea.width - width) / Math.max(1, card.modelData.values.length - 1)))
-                                    x: card.modelData.values.length <= 1 ? (visualArea.width - width) / 2 : (visualArea.width - (card.modelData.values.length - 1) * nodeGap - width) / 2 + nodePosition * nodeGap
+                                    state: card.modelData.complete ? "done" : displayPosition === card.modelData.activeA ? "active" : displayPosition === card.modelData.activeB ? "compare" : "default"
+                                    readonly property real traceWidth: Math.max(1, (page.width < 900 ? cardsScroll.availableWidth : (cardsScroll.availableWidth - 14) / 2) - 32)
+                                    readonly property real nodeGap: Math.min(68, Math.max(0, (traceWidth - width) / Math.max(1, card.modelData.values.length - 1)))
+                                    x: card.modelData.values.length <= 1 ? (traceWidth - width) / 2 : (traceWidth - (card.modelData.values.length - 1) * nodeGap - width) / 2 + displayPosition * nodeGap
                                     y: (visualArea.height - height) / 2
                                 }
                             }

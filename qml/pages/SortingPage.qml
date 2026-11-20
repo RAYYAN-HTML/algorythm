@@ -11,6 +11,7 @@ Item {
     property bool focusMode: false
     property bool assistantVisible: page.width >= 980
 
+
     SplitView {
         id: workspaceSplit
         anchors.fill: parent
@@ -80,6 +81,7 @@ Item {
                 }
             }
             Rectangle {
+                id: visualizationFrame
                 Layout.fillWidth: true
  Layout.fillHeight: true
  Layout.minimumHeight: page.width < 980 ? 190 : 270
@@ -119,20 +121,29 @@ Item {
  color: theme.muted
  font.pixelSize: 10 }
                     }
-                    Item { Layout.fillHeight: true
- Layout.fillWidth: true
+                    Item {
+                        id: visualizationArea
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: Math.max(1, visualizationFrame.width - 44)
                         Repeater {
                             model: playback.nodes
                             delegate: AlgorithmNode {
                                 required property int index
                                 required property int nodePosition
                                 required property int nodeValue
-                                animationDuration: theme.reducedMotion ? 0 : playback.animationDuration
+                                readonly property int displayPosition: playback.stepIndex === 0 ? index : nodePosition
+                                readonly property real traceWidth: Math.max(1, visualizationFrame.width - 44)
+                                readonly property real nodeDiameter: Math.min(62, Math.max(40, (traceWidth - 16 * Math.max(0, playback.values.length - 1)) / Math.max(1, playback.values.length)))
+                                readonly property real nodeGap: playback.values.length > 1 ? Math.min(100, (traceWidth - nodeDiameter) / (playback.values.length - 1)) : 0
+                                animationDuration: theme.reducedMotion || playback.stepIndex === 0 ? 0 : playback.animationDuration
+                                width: nodeDiameter
+                                height: nodeDiameter
                                 value: nodeValue
-                                state: playback.complete ? "done" : nodePosition === playback.activeA ? "active" : nodePosition === playback.activeB ? "compare" : "default"
-                                opacity: page.focusMode && playback.activeA >= 0 && nodePosition !== playback.activeA && nodePosition !== playback.activeB ? 0.25 : 1.0
-                                x: (parent.width - playback.values.length * Math.min(72, parent.width / playback.values.length) + Math.min(72, parent.width / playback.values.length)) / 2 + nodePosition * Math.min(72, parent.width / playback.values.length) - width / 2
-                                y: (parent.height - height) / 2
+                                state: playback.complete ? "done" : displayPosition === playback.activeA ? "active" : displayPosition === playback.activeB ? "compare" : "default"
+                                opacity: page.focusMode && playback.activeA >= 0 && displayPosition !== playback.activeA && displayPosition !== playback.activeB ? 0.25 : 1.0
+                                x: playback.values.length > 1 ? (traceWidth - (playback.values.length - 1) * nodeGap - width) / 2 + displayPosition * nodeGap : (traceWidth - width) / 2
+                                y: (visualizationArea.height - height) / 2
                                 Behavior on opacity { NumberAnimation { duration: theme.reducedMotion ? 0 : playback.animationDuration } }
                             }
                         }
@@ -186,12 +197,35 @@ Item {
             ColumnLayout {
                 width: assistantScroll.availableWidth
                 height: Math.max(implicitHeight, assistantScroll.availableHeight)
- spacing: 14
-            NarrationPanel { Layout.fillWidth: true }
-            PseudocodePanel { Layout.fillWidth: true }
-            StatisticsPanel { Layout.fillWidth: true }
-            VariablesPanel { Layout.fillWidth: true }
-            ComplexityPanel { theme: page.theme; controller: playback }
+                spacing: 12
+                TabBar {
+                    id: inspectorTabs
+                    Layout.fillWidth: true
+                    currentIndex: 0
+                    background: Rectangle { color: theme.secondary; radius: 10; border.color: theme.border }
+                    TabButton { text: "Learn"; Accessible.name: "Learning explanation and statistics" }
+                    TabButton { text: "Code"; Accessible.name: "Algorithm pseudocode" }
+                    TabButton { text: "State"; Accessible.name: "Variables and complexity" }
+                }
+                StackLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.minimumHeight: 300
+                    currentIndex: inspectorTabs.currentIndex
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+                        NarrationPanel { Layout.fillWidth: true }
+                        StatisticsPanel { Layout.fillWidth: true }
+                    }
+                    PseudocodePanel { Layout.fillWidth: true }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 12
+                        VariablesPanel { Layout.fillWidth: true }
+                        ComplexityPanel { theme: page.theme; controller: playback }
+                    }
+                }
             }
         }
     }

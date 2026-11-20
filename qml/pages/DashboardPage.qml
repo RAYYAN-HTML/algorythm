@@ -78,36 +78,55 @@ Item {
                         visible: page.width >= 900
                         Layout.preferredWidth: 190
                         Layout.fillHeight: true
+                        property var traceValues: [8, 3, 6, 1, 9, 4, 2]
+                        property var traceX: [0.08, 0.22, 0.36, 0.50, 0.64, 0.78, 0.92]
+                        property var traceY: [0.65, 0.28, 0.58, 0.38, 0.72, 0.33, 0.52]
                         Rectangle { anchors.fill: parent; radius: 16; color: "#100F1D"; border.color: "#33284D" }
-                        ColumnLayout {
+                        Label {
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            anchors.margins: 13
+                            text: "LIVE TRACE  ·  7 VALUES"
+                            color: page.theme.muted
+                            font.pixelSize: 8
+                            font.bold: true
+                            font.letterSpacing: 1.0
+                            z: 2
+                        }
+                        Canvas {
                             anchors.fill: parent
-                            anchors.margins: 16
-                            RowLayout {
-                                Label { text: "TRACE"; color: page.theme.muted; font.pixelSize: 8; font.bold: true; font.letterSpacing: 1.2 }
-                                Item { Layout.fillWidth: true }
-                                Label { text: "07 ITEMS"; color: page.theme.purple; font.pixelSize: 8; font.family: "Consolas" }
-                            }
-                            RowLayout {
-                                Layout.fillWidth: true
-                                Layout.fillHeight: true
-                                spacing: 6
-                                Repeater {
-                                    model: [38, 66, 48, 82, 56, 72, 44]
-                                    delegate: Rectangle {
-                                        required property int modelData
-                        required property int index
-                                        Layout.fillWidth: true
-                                        Layout.fillHeight: true
-                                        Layout.maximumHeight: 86
-                                        Layout.alignment: Qt.AlignBottom
-                                        height: modelData
-                                        radius: 5
-                                        color: index === 3 ? page.theme.purple : index % 2 ? "#5A42A2" : "#313B65"
-                                        opacity: index === 3 ? 1 : 0.72
-                                    }
+                            anchors.margins: 12
+                            onPaint: {
+                                const ctx = getContext("2d")
+                                ctx.clearRect(0, 0, width, height)
+                                ctx.beginPath()
+                                for (let i = 0; i < parent.traceValues.length; ++i) {
+                                    const x = parent.traceX[i] * width
+                                    const y = 24 + parent.traceY[i] * Math.max(1, height - 38)
+                                    if (i === 0) ctx.moveTo(x, y)
+                                    else ctx.lineTo(x, y)
                                 }
+                                ctx.strokeStyle = "#6D28D9"
+                                ctx.globalAlpha = 0.72
+                                ctx.lineWidth = 2
+                                ctx.stroke()
                             }
-                            Label { text: "COMPARE     ·     SWAP     ·     SORT"; color: page.theme.muted; font.pixelSize: 7; font.family: "Consolas"; Layout.alignment: Qt.AlignHCenter }
+                        }
+                        Repeater {
+                            model: parent.traceValues
+                            delegate: Rectangle {
+                                required property int modelData
+                                required property int index
+                                width: 25
+                                height: 25
+                                x: 12 + parent.traceX[index] * (parent.width - 24) - width / 2
+                                y: 12 + 24 + parent.traceY[index] * Math.max(1, parent.height - 62) - height / 2
+                                radius: width / 2
+                                color: index === 3 ? "#38245B" : "#1A1930"
+                                border.width: index === 3 ? 2 : 1
+                                border.color: index === 3 ? page.theme.purple : "#594477"
+                                Label { anchors.centerIn: parent; text: modelData; color: page.theme.text; font.pixelSize: 10; font.bold: true }
+                            }
                         }
                     }
                 }

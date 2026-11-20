@@ -24,22 +24,36 @@ This file tracks verified repository state. Items are marked complete only after
 | Sorting page component extraction and compact layout | Input bar, complexity summary, and prediction challenge are isolated reusable components; compact view stacks workspace and hides assistant by default | `qml/pages/SortingPage.qml`, `qml/components/AlgorithmInputBar.qml`, `qml/components/ComplexityPanel.qml`, `qml/components/PredictionChallenge.qml` | Release build and CTest pass; live compact view shows input, nodes, and playback controls without assistant overlap. Valid/invalid sorting input and Search target selection were interacted with. |
 | Sorting/search algorithm source separation | Replaced monolithic bubble-sort source unit with dedicated sorting and searching translation units and a shared sorting API header | `src/algorithms/sortingalgorithms.cpp`, `src/algorithms/searchalgorithms.cpp`, `src/algorithms/sortingalgorithms.h`, `CMakeLists.txt` | Release build and algorithm tests pass 1/1. |
 | Premium-purple Dashboard layout | Added a dashboard overview row, purple hero surface, truthful catalog counts (7 algorithms, 7 labs, 4 structure types), and reusable stat cards before the existing navigation cards | `qml/pages/DashboardPage.qml`, `qml/components/StatCard.qml`, `CMakeLists.txt` | Release build and CTest pass; live Dashboard screenshot confirms the counts, hierarchy, spacing, and all existing lab destinations. |
+| Dashboard algorithm trace accent | Replaced the generic hero decoration with an illustrative node-and-edge trace that reinforces the app's visualization identity | `qml/pages/DashboardPage.qml` | Release build/CTest pass; live Dashboard screenshot visually confirms the node links and active-node styling. |
+| Sorting inspector organization and node trace geometry | Grouped narration/statistics, pseudocode, and variable/complexity panels into three inspector tabs; sized circular nodes against the actual canvas and retained stable initial ordering | `qml/pages/SortingPage.qml` | Release build/CTest pass; runtime visually confirms centered seven-node trace, tab navigation labels, and active/compared semantic states during a step. |
+| Comparison first-frame node geometry | Distributed each comparison trace from the card viewport width and use stable sequence positions before the first algorithm step | `qml/pages/ComparisonPage.qml` | Release build/CTest pass; live desktop capture confirms both balanced traces spread across the card; Run Both starts both and updates comparison/swap counts. |
 | Purple visual foundation and algorithm node states | Centralized deep violet surfaces/accent/semantic tokens; applied purple selected navigation, purple focus nodes, amber comparison nodes, green completed nodes, and replaced the narration sparkle glyph with shared vector icon | `qml/Main.qml`, `qml/components/NavigationSidebar.qml`, `qml/components/AlgorithmNode.qml`, shared panels and page QML | Release build and CTest pass; Dashboard and Sorting runtime screenshots confirm the new theme and active purple node. Other page-specific states remain in visual review. |
 | Tree visualization depth boundary | BST controller rejects inserts deeper than the four-level visual canvas can display | `src/datastructures/structures.h`, `src/controllers/structurecontroller.cpp`, `tests/algorithm_tests.cpp` | Release test confirms a depth-4 insert is rejected without changing the visual model; in-range insert still succeeds. |
 
+## Current Phase and Implementation Plan
+
+Phase 0 audit is complete. Branch `main` began aligned with `origin/main` at `bd281d8`; the current working tree contains uncommitted UI changes. Existing Qt/QML navigation, controller models, algorithm snapshots, and the purple theme are retained.
+
+1. Stabilize visualization workspaces: explicit trace geometry, persistent identity positions, balanced Compare panels, and a tabbed Sorting inspector.
+2. Improve the Dashboard's algorithm identity and balance using truthful catalog data and native node visuals.
+3. Check Graph/Structure workspaces and responsive controls; fix concrete defects while preserving controller behavior.
+4. Finish settings, keyboard, compact-width, and playback regression checks; record exact verification status.
+5. Reconcile issues/history, then commit and push the verified overhaul.
+
 ## Currently Working
 
-- Cross-module visual overhaul continues from pushed `df6280f`; the current palette/dashboard batch is uncommitted and builds/tests successfully.
-- The new purple theme is runtime-inspected on Dashboard and Sorting. During the Compare inspection, nodes were seen stacked on the left; node positioning was changed to use the explicit canvas size and rebuilt, but it has not received a fresh runtime visual check.
-- Runtime coverage remains incomplete for Graph playback/edge flows, Settings reduced-motion and compact-sidebar toggles, Sorting challenge dialogs, keyboard navigation, splitter persistence, and Compare at compact width.
+- Phase 1: visualization workspace and Dashboard first-pass refinement; Graph, Tree, Sorting, Search, and Compare were inspected live at 1440×900.
+- Working changes: responsive Sorting trace and tabbed inspector, responsive Compare trace geometry and stable initial positions, Dashboard node-and-edge live trace, and immediate initial node placement that avoids an entrance pile-up.
+- Latest Release build/CTest pass in `out/neon-review`; runtime shows centered Sorting nodes, two distributed Compare traces, working Run Both counters/state, Graph traversal controls, stable Tree hierarchy after its entrance animation, and truthful Dashboard counts.
+- Runtime coverage still open: minimum-width Compare/Graph and keyboard navigation; Settings persistence after sidebar/reduced-motion interactions; Sorting prediction feedback; graph edge creation and all graph algorithm modes.
 - Tree insertion depth boundary is controller-tested; its user-facing rejection message has not yet been visually exercised. v1.2.0 remains the last published package; overhaul changes are unreleased.
 
 ## Remaining Work
 
 ### High priority
 
-- Recheck Compare node spread in a fresh runtime and at compact width; exercise Graph, Sorting dialogs, and Settings toggles.
-- Inspect splitter persistence, keyboard navigation, and reduced-motion behavior.
+- Finish compact-width and keyboard checks for Compare, Graph, and the app shell.
+- Verify Graph edge creation/errors, all traversal modes, Settings toggles/reset, splitter persistence, and Sorting prediction feedback.
 - Fix reproducible defects, rerun Release build/CTest, then commit and push the verified overhaul.
 
 ### Medium priority
@@ -57,7 +71,7 @@ This file tracks verified repository state. Items are marked complete only after
 
 ### High
 
-1. Confirm Compare node spacing fix at desktop and 780 px; test empty/over-limit input in addition to previously verified malformed/valid cases.
+1. Test Compare at compact width and exercise empty/over-limit input; desktop traces and synchronized Run Both progression are runtime verified.
 2. Check Graph speed, pause/resume, previous/next, restart, traversal, and edge insertion interactions.
 3. Exercise Sorting challenge/feedback dialogs; test reduced motion, compact-sidebar setting, and keyboard navigation.
 4. Verify workspace splitter persistence; fix discovered issues, rerun Release build/CTest, then commit/push.
@@ -83,14 +97,14 @@ This file tracks verified repository state. Items are marked complete only after
 | UI-05 | Playback timeline stretched across the entire workspace and ended at the far right on the final step. | `qml/components/PlaybackControls.qml` | Medium | Open an algorithm with a long trace or hide the assistant. | Resolved and verified in live app: timeline capped at 760 px, centered, with a step tooltip. It still correctly moves to the far right at the final step. |
 | UI-06 | Structure action controls or visualizations may overflow at the minimum supported width. | `qml/pages/StructurePage.qml` | Medium | Resize app to its 780 px minimum and open Linked Lists, Stacks, Queues, and Trees. | Resolved and verified in live captures: Linked List Position and operation controls wrap cleanly; Stack and Queue controls fit; Tree and mode selector remain legible, with all nodes/edges and status visible. |
 | UI-07 | BST nodes initially appeared stacked on the canvas edge; after positioning was fixed, the deepest row and status text overlapped. | `qml/pages/StructurePage.qml` tree canvas | High | At minimum width, open Trees. | Resolved and verified: the tree area is anchored to its parent, nodes use that area's width, narrow vertical spacing is synchronized with edges, the status moves below the canvas, and the mode selector has enough width. Screenshot confirms the full three-level sample tree and controls. |
-| UI-08 | Compare node layout has had both clipping and stacking regressions; malformed shared input also needed visible feedback. | `qml/pages/ComparisonPage.qml` | High | Open Compare at desktop and minimum width; inspect node spread, then submit empty, malformed, valid, and over-limit input. | Earlier valid/malformed input and layout checks passed, but the purple-theme visual pass exposed nodes stacked at the left. Latest fix uses explicit canvas dimensions and vertical centering; build/CTest pass, runtime recheck pending. |
+| UI-08 | Compare node layout has had both clipping and stacking regressions; malformed shared input also needed visible feedback. | `qml/pages/ComparisonPage.qml` | High | Open Compare at desktop and minimum width; inspect node spread, then submit empty, malformed, valid, and over-limit input. | Desktop first-frame positioning is resolved and visually verified after sizing each node trace from the actual scroll/card width; both panels distribute all seven nodes symmetrically. Compact-width and all input-boundary cases remain open. |
 | FUNC-01 | Graph traversal timer ignored the shared playback speed preference, so Settings appeared to work only in sorting/comparison. | `src/controllers/graphcontroller.*`, `qml/Main.qml` | Medium | Change playback speed in Settings and run graph playback. | Fixed in code: GraphController has bounded speed and Main synchronizes it with initial preference, changes, and reset. Controller bounds are tested; full UI playback-speed interaction remains pending.
 | FUNC-02 | Search target input reverted to the previous target after changing the array. | `qml/components/AlgorithmInputBar.qml`, search controller bridge in `qml/pages/SortingPage.qml` | High | Set a new target and submit/search while the array trace is regenerated. | Resolved and verified live: target is captured before accepted input updates the model; Search trace and assistant reflect target 1. |
-| UI-09 | Compare node positioning used implicit parent dimensions and did not reliably distribute nodes across the canvas. | `qml/pages/ComparisonPage.qml` | High | Open Compare and inspect node positions in both panels. | Consolidated into UI-08; retained here as the implicit-parent root cause. Explicit `visualArea.width/height` fix is built; runtime confirmation is pending. |
+| UI-09 | Compare node positioning used implicit parent dimensions and did not reliably distribute nodes across the canvas. | `qml/pages/ComparisonPage.qml` | High | Open Compare and inspect node positions in both panels. | Consolidated into UI-08; root cause retained. Desktop runtime confirms explicit card-width trace geometry; compact width remains pending. |
 | UI-10 | SVG image icon files did not render with the installed Qt image plugin set. | `qml/components/Icon.qml`, former `qml/icons/*.svg` | Medium | Launch app and inspect navigation and action icons. | Resolved and verified live: icons are drawn with Qt Quick Shapes vector paths; startup output is clean. |
 | UI-11 | Sorting assistant panel obscured/crowded the visualization in a compact window. | `qml/pages/SortingPage.qml` | High | Resize to compact width and open Sorting. | Resolved and verified live at 975×700: layout stacks vertically, assistant is closed by default, and nodes/input/playback remain visible. |
 
-High-priority Compare positioning remains open pending a runtime recheck of the latest fix. Graph playback and accessibility interactions also need coverage. The tree depth-boundary rejection message has controller coverage but not live visual verification. Prior package startup issue (bundled Qt Quick Controls imports) was fixed using a package-local `qt.conf`; retain as history below.
+High-priority compact Compare coverage remains open. Graph playback, accessibility interactions, and the tree depth-boundary rejection message still need targeted checks. Prior package startup issue (bundled Qt Quick Controls imports) was fixed using a package-local `qt.conf`; retain as history below.
 
 ## Failed Attempts & Blockers
 
@@ -123,7 +137,7 @@ No active external blocker is known.
 | High | Navigation | Confirm keyboard focus and collapsed-nav tooltips in addition to selected state and labels. | Visual hierarchy verified; keyboard/focus review pending |
 | High | Buttons | Review primary/secondary action consistency in every module. | Improved and verified in Dashboard, Sorting and Compare; full sweep pending |
 | High | Responsive layout | Keep nav and visualizer usable at narrow window sizes; avoid crowding and clipped controls. | Structure pages verified at 780 px and Sorting at 975×700; Compare positioning fix built but desktop/compact screenshots pending |
-| High | Comparison | Keep both node traces centered, legible, and distributed across balanced panels at all widths. | Latest explicit-area positioning fix built; runtime recheck pending |
+| High | Comparison | Keep both node traces centered, legible, and distributed across balanced panels at all widths. | Desktop runtime verified; compact-width test pending |
 | Medium | Accessibility | Verify keyboard operation, accessible names, and reduced-motion behavior in runtime. | Implemented in part; verification pending |
 | Medium | Animation | Check structure entrance/removal, tree repositioning, graph paths, and sorting motion in live playback. | Implemented; runtime check pending |
 | Medium | Layout | Validate saved splitter positions and hide/show behavior. | Implemented; runtime check pending |
@@ -141,7 +155,7 @@ No active external blocker is known.
 | 2026-11-20 | Fresh Release build/CTest after BST narrow-layout fixes | Passed: `algorithm_generators` 1/1; `git diff --check` returned only line-ending notices | Live captures at 780 px verified the complete Linked List, Stack, Queue, and BST views. BST nodes and connectors are centered, all three levels and status are visible, the selector label is no longer truncated, and action controls remain visible. |
 | 2026-11-20 | Main/sidebar and Dashboard refactor, vector icon system, Sorting component extraction, algorithm source split, and Compare playback synchronization | Passed: final Release build up to date; fresh CTest `algorithm_generators` 1/1 (1.24 sec); `git diff --check` had only line-ending notices | Runtime verified desktop/compact Dashboard, compact Sorting input and playback, valid/invalid Sorting input, Search target update, desktop Compare layout, valid/malformed Compare input, and Run Both from mixed running/completed states. Initial SVG decoder, delegate index, QML syntax and Flow width issues were corrected before this run. |
 | 2026-11-20 | Settings persistence runtime restart check | Passed: app restart retained a real 1.5× slider change; restored 1.0× after check | Confirms user-facing settings save/reload path; app left open with the default speed. |
-| 2026-11-20 | Purple visual foundation, Dashboard overview cards, distinct algorithm node states, Compare explicit-canvas layout fix | Passed: final Release build in `out/neon-review`; fresh CTest `algorithm_generators` 1/1 (1.11 sec); `git diff --check` only reported line-ending notices | Runtime visually confirmed purple Dashboard and Sorting. Compare runtime exposed nodes stacked on the left; explicit visualization-area sizing/centering and completed-state precedence were then implemented and built, but not visually rechecked after the app window received user input. |
+| 2026-11-20 | Purple visual foundation, Dashboard overview cards and node trace, Sorting inspector tabs and immediate first-frame trace placement, explicit canvas geometry for Sorting and Compare, balanced Compare card height | Passed: Release build in `out/neon-review`; fresh CTest `algorithm_generators` 1/1 (1.24 sec); `git diff --check` only reported line-ending notices | A first rebuilt runtime screenshot exposed Sorting nodes briefly stacked while the position animation caught up; initial-frame motion is now disabled and the fresh launch shows all seven nodes separated immediately. Runtime visually verified Dashboard, centered Sorting nodes and step-state colors, Search target/status, balanced first-frame Compare traces, Run Both progression/counters, graph canvas, and tree entrance settling. Compact Compare, accessibility and remaining playback cases are pending. |
 | Prior v1.1 work | Release algorithm tests and packaged app launch | Passed in prior session | v1.1.0 package published; exact current UI is newer and unverified. |
 | 2026-11-20 | Final v1.2 package dependency closure and smoke test | Passed: 25 transitive DLLs from the selected Qt/MinGW toolchain were staged; dependency scan found no unresolved non-system DLLs; isolated-path launch stayed open with empty stderr | `windeployqt` omitted compiler runtime and transitive MinGW dependencies. `qt.conf` and the copied dependency closure resolved launch-time imports. Release v1.2.0 was published with the 46,044,844-byte archive; GitHub API digest matches the local SHA-256. Interactive package checks remain pending. |
 
@@ -162,8 +176,8 @@ No active external blocker is known.
 
 ## NEXT PRIORITIES
 
-1. Reopen the latest build once the live app is available for verification; confirm both Compare traces distribute correctly, including 780 px, and cover empty/over-limit input.
-2. Exercise Graph traversal speed, pause/resume, previous/next, restart, and edge feedback; inspect tree depth rejection.
+1. Verify Compare traces and input validation at compact width; desktop first-frame positioning and Run Both are verified.
+2. Exercise Graph playback controls, algorithm modes, weighted-edge feedback, and tree depth rejection.
 3. Check Sorting prediction dialogs, Settings accessibility toggles, keyboard navigation and workspace splitter persistence.
 4. Rebuild/retest after any fixes, then commit and push the verified code plus `PROJECT_STATUS.md` to `main`.
 5. Package a new v1.3.0 release only after remaining runtime checks and package smoke test pass; v1.2.0 is already published and must remain unchanged.
