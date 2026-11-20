@@ -1,8 +1,8 @@
 # Algorythm — Product and Technical Audit
 
 **Audit date:** 2026-11-20  
-**Scope:** Repository snapshot at `7c19a50` plus pre-existing local edits in `PROJECT_STATUS.md` and `qml/pages/SortingPage.qml`. Those local edits were preserved.  
-**Method:** Source review of the app shell, pages, shared QML components, controllers, algorithm/structure code, CMake, tests, project status and Git history; whole-codebase Qt QML/C++ lint and review; fresh Release and profiling builds; CTest; live interaction/visual checks at 1440×900. UX findings are heuristic, not participant research.
+**Scope:** Repository snapshot and follow-up changes through the current audit pass. Pre-existing workspace edits were preserved.
+**Method:** Source review of the app shell, pages, shared QML components, controllers, algorithm/structure code, CMake, tests, project status and Git history; whole-codebase Qt QML/C++ lint and review; Release and profiling builds; CTest; live interaction/visual checks in the available desktop viewport. UX findings are heuristic, not participant research.
 
 ## Executive summary
 
@@ -73,6 +73,7 @@ No use of worker threads or concurrent model mutation was found in the reviewed 
 - **Build:** Release/Ninja build succeeded after typed theme and graph changes. Separate RelWithDebInfo profiling build with QML debugging also succeeded.
 - **Quick Test:** no `tst_*.qml` found; Qt Quick Test Runner cannot execute a QML suite as-is.
 - **Runtime/visual:** at 1440×900, live interaction confirmed Dashboard sample label; Sorting Next advanced step 1→2; Graph Next advanced step 1→2 with nodes/edges aligned; Linear Search completed on target 6 with matching narration; Compare Run Both completed both identical Bubble Sort traces with 21 comparisons and 13 swaps each. Dashboard, Search, Sort, Graph, Compare were visually inspected before the final typed-theme migration. After the migration and graph cap, the rebuilt app remained alive for four seconds under offscreen/software rendering with empty stdout/stderr and no QML error/binding-loop messages. This smoke does not provide visual proof at the four requested sizes.
+- **Current live interaction pass:** In the available desktop window, Sorting Next advanced step 1→2 and updated narration; Compare Run Both and Next Both advanced the two traces in sync through observed steps; Graph Next advanced step 1→2 and duplicate edge insertion showed a specific error; Linked List insert/delete updated size and status; Stack Push increased size; Queue Enqueue/Dequeue updated size and reported FIFO removal; BST insertion of 13 increased size to 8. Settings reduced-motion toggle remained ON after closing/reopening the popup and was restored OFF. This confirms only the interacted states, not full-run correctness, app-restart persistence, or the viewport matrix. The app was closed before final build verification.
 - **Profiler:** `profiler/traces/qmlprofiler-trace-Algorythm-2026-11-20-140000.qtd` parsed successfully. It contains only a short launch/transition sample; measurements and the limitation are listed above.
 
 ## UX and visual findings by journey
@@ -83,9 +84,9 @@ No use of worker threads or concurrent model mutation was found in the reviewed 
 4. **Understand graph traversal:** Graph page draws nodes/edges and has traversal playback. The status history records a node-position defect and a code fix, but post-fix visual confirmation and the complete graph interaction remain pending.
 5. **Experiment with structures:** Linked list, stack, queue and BST views expose direct operations and status feedback; the depth limit for BST and empty-state paths should remain visible and accessible.
 6. **Understand complexity:** Reusable complexity panels exist. Ensure complexity values are paired with explanations and do not let small metadata type become the only explanation.
-7. **Replay a step:** Sorting and graph controllers expose step/index/timer controls; visual snapshots are controller-owned. Sorting and Graph Next were exercised at 1440×900. Keyboard playback exists in Sorting; focus conflict was addressed in the pre-existing local edit, but runtime key injection was not verified.
+7. **Replay a step:** Sorting and graph controllers expose step/index/timer controls; visual snapshots are controller-owned. Sorting and Graph Next were exercised in the available desktop viewport. Keyboard playback exists in Sorting; focus conflict was addressed in a source fix, but runtime key injection was not verified.
 
-These are heuristic evaluations from source and the existing status log, not observed participant findings. No participant sessions or analytics were supplied.
+These are heuristic evaluations from source and the existing status log, supplemented by a live evaluator walkthrough of Sorting, Compare, Graph and structure operations. No participant sessions or analytics were supplied.
 
 ## Initial priorities
 

@@ -2,6 +2,14 @@
 
 Last reconciled: 2026-11-20
 
+## Current evaluator walkthrough (2026-11-20)
+
+- One Algorythm instance was opened in the available desktop viewport and closed before final build work. Sorting Next advanced step 1→2 with updated narration. Compare Run Both / Next Both advanced both traces together over observed steps. Graph Next advanced step 1→2; adding the default duplicate edge returned a specific duplicate-edge message.
+- Linked List insert-at-zero and delete-at-zero changed the displayed size/status; Stack Push increased size; Queue Enqueue/Dequeue increased/decreased size and reported removal from the front; BST insertion of 13 raised node count to 8.
+- Settings reduced-motion toggle remained ON after closing and reopening the popup; it was restored OFF before closing the app. This does not prove persistence across application restart or the actual motion behavior.
+- The viewport was not successfully resized. The target 800×600, 1024×768 and 1280×800 layouts were not verified during this walkthrough; screen reader, keyboard-only behavior, valid weighted-edge creation, error recovery across all inputs, and full Compare completion remain open. The available desktop capture itself did not provide a clean four-size matrix.
+- Final Release build reported no work to do; CTest passed `algorithm_generators` 1/1 in 1.23 seconds (1.25 seconds total). `git diff --check` passed after removing one documentation whitespace issue.
+
 ## Current verification snapshot (2026-11-20)
 
 - Installed project-local skills with `npx skills add TheQtCompanyRnD/agent-skills` (13 Qt skills) and `npx skills add https://github.com/cuellarfr/design-skills` (10 design/accessibility skills); `.agents/skills` and `skills-lock.json` retain the installed skill content and source revisions. The Qt QML review linter covered all 21 QML files and reported 153 findings across 26 rule/message pairs. `qmllint` ran but emitted broad type-resolution warnings for injected context properties/theme objects and unqualified access; these need QML module/type registration before they can be treated as actionable diagnostics. The deep review found a keyboard event propagation issue in Sorting and it is fixed below.
