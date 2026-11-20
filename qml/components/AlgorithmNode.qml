@@ -6,6 +6,8 @@ Item {
     property string state: "default"
     property color accent: "#A855F7"
     property int animationDuration: 380
+    Accessible.name: "Value " + root.value
+    Accessible.description: root.state === "compare" ? "Currently being compared" : root.state === "active" ? "Current algorithm element" : root.state === "done" ? "Completed element" : "Unprocessed element"
     implicitWidth: 62
     implicitHeight: 62
     scale: state === "active" || state === "compare" ? 1.08 : 1.0
@@ -13,7 +15,7 @@ Item {
  easing.type: Easing.InOutCubic } }
     Behavior on y { NumberAnimation { duration: root.animationDuration
  easing.type: Easing.InOutCubic } }
-    Behavior on scale { NumberAnimation { duration: 180
+    Behavior on scale { NumberAnimation { duration: root.animationDuration === 0 ? 0 : 180
  easing.type: Easing.OutCubic } }
     Rectangle {
         anchors.fill: parent

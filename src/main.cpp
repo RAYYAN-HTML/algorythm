@@ -6,10 +6,12 @@
 #include "engine/playbackcontroller.h"
 #include "controllers/structurecontroller.h"
 #include "controllers/graphcontroller.h"
+#include "controllers/settingscontroller.h"
 
 int main(int argc, char *argv[])
 {
-    QQuickStyle::setStyle("Fusion");
+    qputenv("QT_QUICK_CONTROLS_MATERIAL_VARIANT", "Dense");
+    QQuickStyle::setStyle("Material");
     QGuiApplication app(argc, argv);
     QPalette dark;
     dark.setColor(QPalette::Window, QColor("#080C17"));
@@ -30,12 +32,14 @@ int main(int argc, char *argv[])
     PlaybackController playbackB;
     StructureController structures;
     GraphController graph;
+    SettingsController settings;
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("playback", &playback);
     engine.rootContext()->setContextProperty("playbackA", &playbackA);
     engine.rootContext()->setContextProperty("playbackB", &playbackB);
     engine.rootContext()->setContextProperty("structures", &structures);
     engine.rootContext()->setContextProperty("graph", &graph);
+    engine.rootContext()->setContextProperty("appSettings", &settings);
     engine.loadFromModule("Algorythm", "Main");
     if (engine.rootObjects().isEmpty()) return -1;
     return app.exec();

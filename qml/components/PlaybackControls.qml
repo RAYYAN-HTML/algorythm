@@ -50,12 +50,18 @@ Rectangle {
  implicitWidth: 104
  onMoved: playback.speed = value }
         }
-        Slider { Layout.fillWidth: true
- from: 0
- to: Math.max(0, playback.stepCount - 1)
- stepSize: 1
- value: playback.stepIndex
- onMoved: playback.seek(value) }
+        Slider {
+            Layout.fillWidth: true
+            Layout.maximumWidth: 760
+            Layout.alignment: Qt.AlignHCenter
+            from: 0
+            to: Math.max(0, playback.stepCount - 1)
+            stepSize: 1
+            value: playback.stepIndex
+            ToolTip.visible: hovered
+            ToolTip.text: "Step " + (playback.stepIndex + 1) + " of " + playback.stepCount
+            onMoved: playback.seek(value)
+        }
     }
 }
 

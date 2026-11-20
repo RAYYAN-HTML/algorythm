@@ -35,7 +35,9 @@ Item {
                     radius: 15
                     color: hover.containsMouse ? "#1A2940" : theme.panel
                     border.color: hover.containsMouse ? theme.cyan : theme.border
+                    scale: hover.containsMouse ? 1.015 : 1
                     Behavior on color { ColorAnimation { duration: 160 } }
+                    Behavior on scale { NumberAnimation { duration: theme.reducedMotion ? 0 : 150; easing.type: Easing.OutCubic } }
                     ColumnLayout {
                         anchors.fill: parent
                         anchors.margins: 18
@@ -61,7 +63,27 @@ Item {
                 Label { text: "✦"; color: theme.cyan; font.pixelSize: 18 }
                 Label { text: "Start with Bubble Sort"; color: theme.text; font.bold: true }
                 Item { Layout.fillWidth: true }
-                Button { text: "Open sorting lab →"; onClicked: page.navigate("Sorting") }
+                Button {
+                    text: "Open sorting lab  →"
+                    highlighted: true
+                    onClicked: page.navigate("Sorting")
+                    background: Rectangle {
+                        radius: 10
+                        color: parent.down ? "#0891B2" : parent.hovered ? "#22D3EE" : "#06B6D4"
+                        border.color: "#67E8F9"
+                        Behavior on color { ColorAnimation { duration: 120 } }
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        color: "#06111F"
+                        font.pixelSize: 12
+                        font.bold: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        leftPadding: 14
+                        rightPadding: 14
+                    }
+                }
             }
         }
     }

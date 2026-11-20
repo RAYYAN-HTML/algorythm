@@ -84,7 +84,7 @@ Item {
                     target: edgeCanvas
                     property: "activeEdgeProgress"
                     from: 0; to: 1
-                    duration: 320
+                    duration: theme.reducedMotion ? 0 : 320
                     easing.type: Easing.OutCubic
                 }
             }
@@ -99,10 +99,10 @@ Item {
                     border.width: index === graph.active ? 3 : 1.5
                     border.color: index === graph.active ? theme.cyan : graph.visited.indexOf(index) >= 0 ? theme.green : theme.purple
                     scale: index === graph.active ? 1.12 : 1.0
-                    Behavior on x { NumberAnimation { duration: 260 } }
-                    Behavior on color { ColorAnimation { duration: 240 } }
-                    Behavior on border.color { ColorAnimation { duration: 240 } }
-                    Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutCubic } }
+                    Behavior on x { NumberAnimation { duration: theme.reducedMotion ? 0 : 260 } }
+                    Behavior on color { ColorAnimation { duration: theme.reducedMotion ? 0 : 240 } }
+                    Behavior on border.color { ColorAnimation { duration: theme.reducedMotion ? 0 : 240 } }
+                    Behavior on scale { NumberAnimation { duration: theme.reducedMotion ? 0 : 220; easing.type: Easing.OutCubic } }
                     Label { anchors.centerIn: parent; text: index; color: theme.text; font.bold: true; font.pixelSize: 16 }
                     Label { visible: graph.algorithm === "Dijkstra's Shortest Path"; anchors.top: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; text: graph.distances[index] || "∞"; color: theme.amber; font.pixelSize: 10 }
                 }
@@ -125,7 +125,7 @@ Item {
                 RowLayout {
                     Label { text: "Start"; color: theme.muted; font.pixelSize: 10 }
                     SpinBox { from: 0; to: 6; value: page.startNode; onValueModified: page.startNode = value }
-                    Button { text: "Run"; onClicked: graph.run(page.startNode) }
+                    Button { text: "Run"; highlighted: true; onClicked: graph.run(page.startNode) }
                     Button { text: "↶"; onClicked: graph.restart() }
                     Button { text: "◀"; onClicked: graph.previous() }
                     Button { text: graph.playing ? "Ⅱ" : "▶"; onClicked: graph.playPause() }

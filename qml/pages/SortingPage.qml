@@ -9,6 +9,7 @@ Item {
     property string userInput: "8, 3, 6, 1, 9, 4, 2"
     property string errorMessage: ""
     property bool focusMode: false
+    property bool assistantVisible: true
     property int challengeScore: 0
     property string challengeMessage: ""
 
@@ -33,13 +34,26 @@ Item {
         challengeFeedback.open()
     }
 
-    RowLayout {
+    SplitView {
+        id: workspaceSplit
         anchors.fill: parent
- anchors.margins: 22
- spacing: 18
+        anchors.margins: 22
+        orientation: Qt.Horizontal
+        handle: Rectangle {
+            implicitWidth: 6
+            color: SplitHandle.pressed ? theme.cyan : SplitHandle.hovered ? "#53647E" : "#26344D"
+            radius: 3
+            Behavior on color { ColorAnimation { duration: 140 } }
+        }
+        Component.onCompleted: {
+            var savedState = appSettings.workspaceState()
+            if (savedState) restoreState(savedState)
+        }
+        Component.onDestruction: appSettings.saveWorkspaceState(saveState())
         ColumnLayout {
-            Layout.fillWidth: true
- Layout.fillHeight: true
+            SplitView.minimumWidth: 420
+            SplitView.preferredWidth: page.width - 306
+            SplitView.fillWidth: true
  spacing: 16
             RowLayout {
                 ColumnLayout { spacing: 4
@@ -72,6 +86,11 @@ Item {
  font.pixelSize: 11
  horizontalAlignment: Text.AlignHCenter
  verticalAlignment: Text.AlignVCenter } }
+                Button { text: page.assistantVisible ? "Hide assistant" : "Show assistant"
+                    onClicked: page.assistantVisible = !page.assistantVisible
+                    background: Rectangle { radius: 8; color: theme.secondary; border.color: theme.border }
+                    contentItem: Text { text: parent.text; color: theme.muted; font.pixelSize: 10; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                }
             }
             Rectangle {
                 Layout.fillWidth: true
@@ -121,13 +140,13 @@ Item {
                                 required property int index
                                 required property int nodePosition
                                 required property int nodeValue
-                                animationDuration: playback.animationDuration
+                                animationDuration: theme.reducedMotion ? 0 : playback.animationDuration
                                 value: nodeValue
                                 state: nodePosition === playback.activeA || nodePosition === playback.activeB ? "compare" : playback.complete ? "done" : "default"
                                 opacity: page.focusMode && playback.activeA >= 0 && nodePosition !== playback.activeA && nodePosition !== playback.activeB ? 0.25 : 1.0
                                 x: (parent.width - playback.values.length * Math.min(72, parent.width / playback.values.length) + Math.min(72, parent.width / playback.values.length)) / 2 + nodePosition * Math.min(72, parent.width / playback.values.length) - width / 2
                                 y: (parent.height - height) / 2
-                                Behavior on opacity { NumberAnimation { duration: playback.animationDuration } }
+                                Behavior on opacity { NumberAnimation { duration: theme.reducedMotion ? 0 : playback.animationDuration } }
                             }
                         }
                     }
@@ -174,7 +193,8 @@ Item {
  background: Rectangle { radius: 6
  color: "#080C17"
  border.color: theme.border }
- placeholderText: "e.g. 8, 3, 6, 1" }
+ // The adjacent Input label already identifies this field; avoid Material's floating placeholder overlapping populated values.
+ }
                     ComboBox { model: ["Custom", "Random", "Sorted", "Reverse"]
  onActivated: page.applyPreset(index)
  implicitWidth: 100 }
@@ -189,6 +209,7 @@ Item {
  color: "#080C17"
  border.color: theme.border } }
                     Button { text: playback.algorithm.endsWith("Search") ? "Search" : "Apply input"
+ highlighted: true
  onClicked: { playback.sortInput(inputField.text)
  if (targetField.visible) playback.setSearchTarget(Number(targetField.text))
  page.errorMessage = "" } }
@@ -203,8 +224,11 @@ Item {
 
         ScrollView {
             id: assistantScroll
-            Layout.preferredWidth: page.width < 920 ? 208 : page.width < 1120 ? 240 : 284
-            Layout.fillHeight: true
+            visible: page.assistantVisible
+            SplitView.minimumWidth: page.width < 920 ? 208 : 230
+            SplitView.preferredWidth: page.width < 920 ? 230 : page.width < 1120 ? 250 : 284
+            SplitView.maximumWidth: 420
+            SplitView.fillHeight: true
             clip: true
             ScrollBar.vertical.policy: ScrollBar.AsNeeded
             ColumnLayout {

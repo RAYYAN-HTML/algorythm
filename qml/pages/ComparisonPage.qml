@@ -33,6 +33,7 @@ Item {
  color: theme.text
  placeholderText: "shared input" }
             Button { text: "Apply shared input"
+ highlighted: true
  onClicked: { page.inputValues = data.text
  playbackA.sortInput(data.text)
  playbackB.sortInput(data.text) } }
@@ -122,6 +123,7 @@ Item {
  onClicked: { playbackA.previous()
  playbackB.previous() } }
                 Button { text: "▶ Run both"
+ highlighted: true
  onClicked: { playbackA.playPause()
  playbackB.playPause() } }
                 Button { text: "Step ▶"

@@ -42,9 +42,17 @@ QVector<ExecutionStep> SortingAlgorithms::generate(const QString &name, const QV
             if (min != i) { int x=a[i], y=a[min]; qSwap(a[i],a[min]); qSwap(ids[i],ids[min]); ++swaps; writes+=2; record(i,min,4,"Place minimum",QString("Move the minimum %1 into position %2.").arg(y).arg(i),"Each pass places one minimum value at the beginning of the unsorted suffix.", {{"i", i}, {"minIndex", min}}); }
         }
     } else if (name == "Insertion Sort") {
-        for (int i=1;i<a.size();++i) { int key=a[i], keyId=ids[i], j=i-1;
-            while(j>=0) { ++comparisons; record(j,i,2,"Compare key",QString("Compare key %1 with %2.").arg(key).arg(a[j]),"The sorted prefix shifts larger values right to create a place for the key.", {{"i", i}, {"j", j}, {"key", key}}); if(a[j]<=key) break; a[j+1]=a[j]; ids[j+1]=ids[j]; ++writes; record(j,j+1,3,"Shift right",QString("Shift %1 one position right.").arg(a[j]),"Shifting preserves the order of equal elements and opens an insertion slot.", {{"i", i}, {"j", j}, {"key", key}}); --j; }
-            a[j+1]=key; ids[j+1]=keyId; ++writes; record(j+1,i,4,"Insert key",QString("Insert %1 at position %2.").arg(key).arg(j+1),"The key belongs immediately after the last value that is no greater than it.", {{"i", i}, {"j", j}, {"key", key}});
+        for (int i=1;i<a.size();++i) {
+            int j=i;
+            while(j>0) {
+                const int key=a[j];
+                ++comparisons;
+                record(j-1,j,2,"Compare key",QString("Compare key %1 with its preceding value %2.").arg(key).arg(a[j-1]),"Insertion Sort grows a sorted prefix by moving the next value left until it reaches its correct position.", {{"i", i}, {"j", j}, {"key", key}});
+                if(a[j-1]<=a[j]) break;
+                qSwap(a[j-1],a[j]); qSwap(ids[j-1],ids[j]); ++swaps; writes+=2;
+                record(j-1,j,3,"Swap key left",QString("Move %1 one position left past %2.").arg(a[j-1]).arg(a[j]),"The out-of-order adjacent pair swaps. This keeps each node visible and preserves the order of equal values.", {{"i", i}, {"j", j-1}, {"key", a[j-1]}});
+                --j;
+            }
         }
     } else {
         // Quick Sort uses the last element as pivot and Lomuto partitioning.
@@ -56,11 +64,39 @@ QVector<ExecutionStep> SortingAlgorithms::generate(const QString &name, const QV
         };
         if(name=="Quick Sort") quick(0,a.size()-1);
         else {
-            // Merge Sort recursively divides ranges, then writes a stable merge back.
-            std::function<void(int,int)> merge = [&](int lo,int hi) { if(hi-lo<2)return; int mid=(lo+hi)/2; merge(lo,mid); merge(mid,hi); QVector<int> left,leftIds; for(int k=lo;k<mid;++k){left<<a[k];leftIds<<ids[k];} QVector<int> right,rightIds;for(int k=mid;k<hi;++k){right<<a[k];rightIds<<ids[k];}int l=0,r=0,k=lo;
-                while(l<left.size()&&r<right.size()){++comparisons;record(lo+l,mid+r,3,"Merge compare",QString("Choose between %1 and %2.").arg(left[l]).arg(right[r]),"Merge Sort combines two sorted halves by repeatedly taking the smaller front value.", {{"lo", lo}, {"mid", mid}, {"hi", hi}, {"leftIndex", l}, {"rightIndex", r}, {"writeIndex", k}});if(left[l]<=right[r]){a[k]=left[l];ids[k++]=leftIds[l++];}else{a[k]=right[r];ids[k++]=rightIds[r++];}++writes;record(k-1,-1,4,"Write merged value",QString("Write %1 into the merged range.").arg(a[k-1]),"Writing the smaller next value keeps the merged range sorted.", {{"lo", lo}, {"mid", mid}, {"hi", hi}, {"leftIndex", l}, {"rightIndex", r}, {"writeIndex", k-1}});}
-                while(l<left.size()){a[k]=left[l];ids[k++]=leftIds[l++];++writes;record(k-1,-1,4,"Copy remainder",QString("Copy %1 into the merged range.").arg(a[k-1]),"The remaining half is already sorted, so its values can be copied in order.", {{"lo", lo}, {"mid", mid}, {"hi", hi}, {"leftIndex", l}, {"rightIndex", r}, {"writeIndex", k-1}});}
-                while(r<right.size()){a[k]=right[r];ids[k++]=rightIds[r++];++writes;record(k-1,-1,4,"Copy remainder",QString("Copy %1 into the merged range.").arg(a[k-1]),"The remaining half is already sorted, so its values can be copied in order.", {{"lo", lo}, {"mid", mid}, {"hi", hi}, {"leftIndex", l}, {"rightIndex", r}, {"writeIndex", k-1}});}
+            // Merge Sort recursively divides ranges, then records a stable, identity-preserving merge.
+            std::function<void(int,int)> merge = [&](int lo,int hi) {
+                if(hi-lo<2)return;
+                const int mid=(lo+hi)/2;
+                merge(lo,mid); merge(mid,hi);
+                QVector<int> left,leftIds,right,rightIds,merged,mergedIds;
+                for(int p=lo;p<mid;++p){left<<a[p];leftIds<<ids[p];}
+                for(int p=mid;p<hi;++p){right<<a[p];rightIds<<ids[p];}
+                int l=0,r=0,k=lo;
+                auto projectMergeState = [&] {
+                    int p=lo;
+                    for(int t=0;t<merged.size();++t){a[p]=merged[t];ids[p++]=mergedIds[t];}
+                    for(int t=l;t<left.size();++t){a[p]=left[t];ids[p++]=leftIds[t];}
+                    for(int t=r;t<right.size();++t){a[p]=right[t];ids[p++]=rightIds[t];}
+                };
+                while(l<left.size()&&r<right.size()){
+                    const int leftPosition=k;
+                    const int rightPosition=k+(left.size()-l);
+                    ++comparisons;
+                    record(leftPosition,rightPosition,4,"Merge compare",QString("Choose between %1 and %2.").arg(left[l]).arg(right[r]),"Merge Sort combines two sorted halves by repeatedly taking the smaller front value.", {{"lo", lo}, {"mid", mid}, {"hi", hi}, {"leftIndex", l}, {"rightIndex", r}, {"writeIndex", k}});
+                    if(left[l]<=right[r]){merged<<left[l];mergedIds<<leftIds[l];++l;}
+                    else{merged<<right[r];mergedIds<<rightIds[r];++r;}
+                    ++writes; ++k; projectMergeState();
+                    record(k-1,-1,5,"Write merged value",QString("Write %1 into the merged range.").arg(a[k-1]),"The next smallest node moves into the output prefix while every remaining node stays visible.", {{"lo", lo}, {"mid", mid}, {"hi", hi}, {"leftIndex", l}, {"rightIndex", r}, {"writeIndex", k-1}});
+                }
+                while(l<left.size()){
+                    merged<<left[l];mergedIds<<leftIds[l];++l;++writes;++k;projectMergeState();
+                    record(k-1,-1,6,"Copy remainder",QString("Copy %1 into the merged range.").arg(a[k-1]),"The remaining left-half values are already sorted, so they extend the merged output in order.", {{"lo", lo}, {"mid", mid}, {"hi", hi}, {"leftIndex", l}, {"rightIndex", r}, {"writeIndex", k-1}});
+                }
+                while(r<right.size()){
+                    merged<<right[r];mergedIds<<rightIds[r];++r;++writes;++k;projectMergeState();
+                    record(k-1,-1,6,"Copy remainder",QString("Copy %1 into the merged range.").arg(a[k-1]),"The remaining right-half values are already sorted, so they extend the merged output in order.", {{"lo", lo}, {"mid", mid}, {"hi", hi}, {"leftIndex", l}, {"rightIndex", r}, {"writeIndex", k-1}});
+                }
             }; merge(0,a.size());
         }
     }

@@ -3,8 +3,14 @@
 #include "datastructures/structures.h"
 #include "controllers/structurecontroller.h"
 #include "controllers/graphcontroller.h"
+#include "controllers/settingscontroller.h"
 #include <QCoreApplication>
+#include <QSettings>
+#include <QTemporaryDir>
 #include <algorithm>
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
 #include <cassert>
 #include <QEventLoop>
 #include <QTimer>
@@ -19,6 +25,36 @@ static void waitMs(int ms)
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
+    app.setOrganizationName("Algorythm Tests");
+    app.setApplicationName("Settings Controller Tests");
+    QSettings::setDefaultFormat(QSettings::IniFormat);
+    QTemporaryDir settingsDirectory;
+    assert(settingsDirectory.isValid());
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, settingsDirectory.path());
+
+    SettingsController settings;
+    assert(!settings.reducedMotion());
+    assert(qFuzzyCompare(settings.playbackSpeed(), 1.0));
+    assert(!settings.sidebarCollapsed());
+    settings.setPlaybackSpeed(0.1);
+    assert(qFuzzyCompare(settings.playbackSpeed(), 0.5));
+    settings.setPlaybackSpeed(4.0);
+    assert(qFuzzyCompare(settings.playbackSpeed(), 3.0));
+    settings.setPlaybackSpeed(1.5);
+    settings.setReducedMotion(true);
+    settings.setSidebarCollapsed(true);
+    settings.saveWorkspaceState(QVariantList{0.25, 0.75});
+    SettingsController restoredSettings;
+    assert(qFuzzyCompare(restoredSettings.playbackSpeed(), 1.5));
+    assert(restoredSettings.reducedMotion());
+    assert(restoredSettings.sidebarCollapsed());
+    assert(restoredSettings.workspaceState().toList().size() == 2);
+    settings.resetPreferences();
+    assert(!restoredSettings.reducedMotion());
+    assert(qFuzzyCompare(restoredSettings.playbackSpeed(), 1.0));
+    assert(!restoredSettings.sidebarCollapsed());
+    assert(!restoredSettings.workspaceState().isValid());
+
     const QStringList algorithms = SortingAlgorithms::names();
     const QVector<QVector<int>> cases = {
         {}, {5}, {2, 1}, {1, 2, 3, 4}, {4, 3, 2, 1}, {3, 1, 3, -2, 0, -2}
@@ -42,7 +78,9 @@ int main(int argc, char **argv)
                 sawAlgorithmState = sawAlgorithmState || step.variables.contains("i") || step.variables.contains("pivot") || step.variables.contains("key") || step.variables.contains("writeIndex");
                 auto ids = step.nodeIds;
                 std::sort(ids.begin(), ids.end());
-                for (int i = 0; i < ids.size(); ++i) assert(ids[i] == i);
+                for (int i = 0; i < ids.size(); ++i) {
+                    assert(ids[i] == i);
+                }
                 for (int i = 0; i < step.values.size(); ++i) assert(step.values[i] == input[step.nodeIds[i]]);
             }
         }
@@ -81,11 +119,21 @@ int main(int argc, char **argv)
     }
     StructureController controller;
     controller.reset();
+    assert(controller.visualModel()->rowCount()==0);
     controller.insert(4,0);controller.insert(2,1);assert(controller.values().size()==2);
-    controller.remove(9);assert(controller.status().contains("outside"));
-    controller.setKind("Stack");controller.remove();assert(controller.status().contains("empty"));
+    assert(controller.visualModel()->rowCount()==2);
+    assert(controller.visualModel()->data(controller.visualModel()->index(0),StructureVisualModel::ValueRole).toInt()==4);
+    controller.remove(9);assert(controller.status().contains("outside"));assert(controller.visualModel()->rowCount()==2);
+    controller.remove(0);assert(controller.visualModel()->rowCount()==1);
+    controller.setKind("Stack");assert(controller.visualModel()->rowCount()==3);controller.remove();assert(controller.visualModel()->rowCount()==2);
     controller.insert(42);controller.search(0);assert(controller.values().first().toInt()==42);
-    controller.setKind("Binary Search Tree");assert(controller.treeNodes().size()==7);
+    assert(controller.visualModel()->rowCount()==3&&controller.visualModel()->data(controller.visualModel()->index(0),StructureVisualModel::ValueRole).toInt()==42);
+    controller.remove();controller.remove();controller.remove();controller.remove();assert(controller.status().contains("empty"));
+    controller.setKind("Queue");controller.reset();controller.insert(6);controller.insert(7);assert(controller.visualModel()->rowCount()==2);
+    assert(controller.visualModel()->data(controller.visualModel()->index(1),StructureVisualModel::ValueRole).toInt()==7);
+    controller.remove();assert(controller.visualModel()->rowCount()==1);
+    controller.setKind("Binary Search Tree");assert(controller.treeNodes().size()==7);assert(controller.treeVisualModel()->rowCount()==7);
+    controller.insert(1);assert(controller.treeVisualModel()->rowCount()==8);
     GraphController graphController;
     graphController.setAlgorithm("Dijkstra's Shortest Path");
     while(graphController.stepIndex()+1<graphController.stepCount())graphController.next();

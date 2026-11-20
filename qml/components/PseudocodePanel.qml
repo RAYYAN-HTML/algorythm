@@ -28,7 +28,7 @@ Rectangle {
                 if (playback.algorithm === "Linear Search") return ["for i ← 0 to n − 1", "    if A[i] = target", "        return i", "return not found"]
                 if (playback.algorithm === "Binary Search") return ["low ← 0; high ← n − 1", "while low ≤ high", "    mid ← low + (high − low) / 2", "    if A[mid] = target: return mid", "    if A[mid] < target: low ← mid + 1", "    else: high ← mid − 1"]
                 if (playback.algorithm === "Selection Sort") return ["for i ← 0 to n − 1", "    min ← i", "    for j ← i + 1 to n − 1", "        if A[j] < A[min]: min ← j", "    swap A[i], A[min]"]
-                if (playback.algorithm === "Insertion Sort") return ["for i ← 1 to n − 1", "    key ← A[i]", "    while j ≥ 0 and A[j] > key", "        A[j + 1] ← A[j]", "    A[j + 1] ← key"]
+                if (playback.algorithm === "Insertion Sort") return ["for i ← 1 to n − 1", "    j ← i", "    while j > 0 and A[j − 1] > A[j]", "        swap(A[j − 1], A[j])", "        j ← j − 1"]
                 if (playback.algorithm === "Merge Sort") return ["split range into halves", "sort(left half)", "sort(right half)", "while both halves have values", "    write smaller front value", "copy remaining values"]
                 if (playback.algorithm === "Quick Sort") return ["pivot ← last value", "for each value before pivot", "    if value ≤ pivot", "        move value to left side", "place pivot between partitions", "sort both partitions"]
                 return ["for end ← n − 1 down to 1", "    swapped ← false", "    for i ← 0 to end − 1", "        if A[i] > A[i + 1]", "            swap(A[i], A[i + 1])", "            swapped ← true", "    if not swapped: stop"]

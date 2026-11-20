@@ -9,8 +9,8 @@ Item {
     property int position: 0
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 28
-        spacing: 18
+        anchors.margins: page.width < 880 ? 18 : 28
+        spacing: page.width < 880 ? 12 : 18
         RowLayout {
             ColumnLayout {
                 Label { text: "DATA STRUCTURES"
@@ -29,7 +29,8 @@ Item {
             Item { Layout.fillWidth: true }
             ComboBox { model: ["Linked List", "Stack", "Queue", "Binary Search Tree"]
  currentIndex: model.indexOf(structures.kind)
- onActivated: structures.kind = currentText }
+ onActivated: structures.kind = currentText
+ implicitWidth: page.width < 880 ? 180 : 210 }
         }
         Rectangle {
             Layout.fillWidth: true
@@ -55,39 +56,37 @@ Item {
                 }
                 Item { Layout.fillWidth: true
  Layout.fillHeight: true
- Layout.minimumHeight: 250
+ Layout.minimumHeight: page.width < 880 ? 150 : 250
+ Layout.maximumHeight: page.width < 880 ? 360 : 16777215
                     RowLayout {
                         visible: structures.kind === "Linked List" || structures.kind === "Queue"
                         anchors.centerIn: parent
                         spacing: 10
                         Label { visible: structures.values.length > 0; text: structures.kind === "Queue" ? "FRONT →" : "HEAD →"; color: theme.cyan; font.pixelSize: 9; font.bold: true }
-                        Repeater {
-                            model: structures.values
-                            delegate: RowLayout {
-                                required property var modelData
+                        ListView {
+                            visible: structures.visualModel.count > 0
+                            model: structures.visualModel
+                            orientation: ListView.Horizontal
+                            spacing: 3
+                            clip: true
+                            Layout.preferredWidth: Math.min(page.width - 250, Math.max(82, structures.visualModel.count * 82))
+                            Layout.preferredHeight: 68
+                            delegate: Item {
+                                required property int value
                                 required property int index
-                                spacing: 8
+                                width: 82; height: 68
                                 Rectangle {
-                                    width: 62
- height: 62
- radius: 31
-                                    color: "#211B39"
- border.width: 2
- border.color: index === 0 ? theme.cyan : theme.purple
-                                    scale: 1
-                                    Behavior on scale { NumberAnimation { duration: 220
- easing.type: Easing.OutBack } }
-                                    Label { anchors.centerIn: parent
- text: modelData
- color: theme.text
- font.pixelSize: 18
- font.bold: true }
+                                    width: 58; height: 58; radius: 29
+                                    anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
+                                    color: index === 0 ? "#183447" : "#211B39"
+                                    border.width: 2; border.color: index === 0 ? theme.cyan : theme.purple
+                                    Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 18; font.bold: true }
                                 }
-                                Label { visible: index < structures.values.length - 1
- text: "→"
- color: theme.cyan
- font.pixelSize: 20 }
+                                Label { visible: index < structures.visualModel.count - 1; anchors.left: parent.left; anchors.leftMargin: 61; anchors.verticalCenter: parent.verticalCenter; text: "→"; color: theme.cyan; font.pixelSize: 17 }
                             }
+                            add: Transition { NumberAnimation { properties: "opacity,scale"; from: 0.25; to: 1; duration: theme.reducedMotion ? 0 : 200; easing.type: Easing.OutCubic } }
+                            remove: Transition { NumberAnimation { properties: "opacity,scale"; to: 0.15; duration: theme.reducedMotion ? 0 : 170; easing.type: Easing.InCubic } }
+                            displaced: Transition { NumberAnimation { properties: "x,y"; duration: theme.reducedMotion ? 0 : 260; easing.type: Easing.InOutCubic } }
                         }
                         Label { visible: structures.values.length > 0; text: structures.kind === "Queue" ? "← REAR" : "TAIL"; color: theme.pink; font.pixelSize: 9; font.bold: true }
                     }
@@ -101,30 +100,35 @@ Item {
  color: theme.pink
  font.pixelSize: 10
  font.bold: true }
-                        Repeater {
-                            model: structures.values
-                            delegate: Rectangle {
-                                required property var modelData
-                                width: 116
- height: 47
- radius: 10
-                                color: index === 0 ? "#183447" : "#211B39"
-                                border.color: index === 0 ? theme.cyan : theme.purple
-                                Label { anchors.centerIn: parent
- text: modelData
- color: theme.text
- font.pixelSize: 16
- font.bold: true }
+                        ListView {
+                            model: structures.visualModel
+                            orientation: ListView.Vertical
+                            spacing: 8
+                            clip: true
+                            Layout.preferredWidth: 140
+                            Layout.preferredHeight: Math.min(320, Math.max(55, structures.visualModel.count * 55))
+                            delegate: Item {
+                                required property int value
+                                required property int index
+                                width: 116; height: 47
+                                Rectangle { anchors.fill: parent; radius: 10; color: index === 0 ? "#183447" : "#211B39"; border.color: index === 0 ? theme.cyan : theme.purple
+                                    Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 16; font.bold: true }
+                                }
                             }
+                            add: Transition { NumberAnimation { properties: "opacity,scale"; from: 0.2; to: 1; duration: theme.reducedMotion ? 0 : 200; easing.type: Easing.OutBack } }
+                            remove: Transition { NumberAnimation { properties: "opacity,scale"; to: 0.1; duration: theme.reducedMotion ? 0 : 170; easing.type: Easing.InCubic } }
+                            displaced: Transition { NumberAnimation { properties: "x,y"; duration: theme.reducedMotion ? 0 : 240; easing.type: Easing.OutCubic } }
                         }
                         Label { visible: structures.values.length === 0
  text: "Stack is empty"
  color: theme.muted }
                     }
                     Item {
+                        id: treeArea
+                        anchors.fill: parent
                         visible: structures.kind === "Binary Search Tree"
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                        readonly property real treeTop: page.width < 880 ? 34 : 54
+                        readonly property real treeRowSpacing: page.width < 880 ? 58 : 78
                         Canvas {
                             id: treeEdges
                             anchors.fill: parent
@@ -137,32 +141,48 @@ Item {
                                 for (var i = 1; i < nodes.length; ++i) {
                                     var n = nodes[i]
                                     ctx.beginPath()
-                                    ctx.moveTo(n.parentX * width, 54 + n.parentY * 78)
-                                    ctx.lineTo(n.x * width, 54 + n.y * 78)
+                                    ctx.moveTo(n.parentX * width, treeArea.treeTop + n.parentY * treeArea.treeRowSpacing)
+                                    ctx.lineTo(n.x * width, treeArea.treeTop + n.y * treeArea.treeRowSpacing)
                                     ctx.stroke()
                                 }
                             }
                             Connections { target: structures; function onChanged() { treeEdges.requestPaint() } }
                         }
                         Repeater {
-                            model: structures.treeNodes
+                            anchors.fill: parent
+                            model: structures.treeVisualModel
                             delegate: Rectangle {
-                                required property var modelData
+                                id: treeNode
+                                required property int value
+                                required property real posX
+                                required property real posY
+                                property bool entering: true
+                                opacity: entering ? 0 : 1
+                                scale: entering ? 0.65 : 1
                                 width: 52
                                 height: 52
                                 radius: 26
-                                x: modelData.x * parent.width - width / 2
-                                y: 54 + modelData.y * 78
+                                x: posX * treeArea.width - width / 2
+                                y: treeArea.treeTop + posY * treeArea.treeRowSpacing
                                 color: "#211B39"
                                 border.width: 2
                                 border.color: theme.purple
-                                Behavior on x { NumberAnimation { duration: 240 } }
-                                Label { anchors.centerIn: parent; text: modelData.value; color: theme.text; font.bold: true }
+                                Behavior on x { NumberAnimation { duration: theme.reducedMotion ? 0 : 240 } }
+                                Behavior on y { NumberAnimation { duration: theme.reducedMotion ? 0 : 240 } }
+                                Label { anchors.centerIn: parent; text: value; color: theme.text; font.bold: true }
+                                ParallelAnimation {
+                                    id: nodeEntrance
+                                    NumberAnimation { target: treeNode; property: "opacity"; to: 1; duration: theme.reducedMotion ? 0 : 220; easing.type: Easing.OutCubic }
+                                    NumberAnimation { target: treeNode; property: "scale"; to: 1; duration: theme.reducedMotion ? 0 : 260; easing.type: Easing.OutBack }
+                                    onFinished: treeNode.entering = false
+                                }
+                                Component.onCompleted: { if (theme.reducedMotion) entering = false; else nodeEntrance.start() }
                             }
                         }
                     }
                 }
                 Label { Layout.fillWidth: true
+ visible: structures.kind !== "Binary Search Tree"
  text: structures.status
  color: theme.text
  font.pixelSize: 13
@@ -175,12 +195,15 @@ Item {
             radius: 14
             color: theme.panel
             border.color: theme.border
-            implicitHeight: 104
+            implicitHeight: page.width < 880 ? 150 : 104
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 15
                 spacing: 12
-                RowLayout {
+                Flow {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: page.width < 880 ? 80 : 36
+                    spacing: 8
                     Label { text: "Value"
  color: theme.muted
  font.pixelSize: 11 }
@@ -197,22 +220,26 @@ Item {
  to: structures.size
  value: page.position
  onValueModified: page.position = value }
-                    Item { Layout.fillWidth: true }
                     Button { text: structures.kind === "Stack" ? "Push" : structures.kind === "Queue" ? "Enqueue" : "Insert"
+ highlighted: true
  onClicked: structures.insert(page.itemValue, page.position) }
                     Button { text: structures.kind === "Stack" ? "Pop" : structures.kind === "Queue" ? "Dequeue" : "Delete"
+ flat: true
  onClicked: structures.remove(page.position) }
                     Button { text: "Search / Peek"
+ flat: true
  onClicked: structures.search(page.itemValue) }
                     Button { text: "Traverse"
+ flat: true
  onClicked: structures.traverse(orderBox.currentText) }
                     ComboBox { id: orderBox
  visible: structures.kind === "Binary Search Tree"
  model: ["Inorder", "Preorder", "Postorder"] }
                     Button { text: "Reset"
+ flat: true
  onClicked: structures.reset() }
                 }
-                Label { text: "Linked list insertion and deletion use zero based positions. Stack and queue underflow produce a clear message."
+                Label { text: structures.kind === "Binary Search Tree" ? structures.status : "Linked list insertion and deletion use zero based positions. Stack and queue underflow produce a clear message."
  color: theme.muted
  font.pixelSize: 10 }
             }
