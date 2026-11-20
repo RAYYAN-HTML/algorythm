@@ -2,6 +2,14 @@
 
 Last reconciled: 2026-11-20
 
+## Current verification snapshot (2026-11-20)
+
+- GitHub Actions workflow: `.github/workflows/ci.yml` runs on every push and pull request (and manually), installs Qt 6.8.3 for Windows/MSVC 2022, configures a Release build with tests enabled, builds the application and test executable, then runs CTest with failure output and `--no-tests=error`. No hosted GitHub Actions run has been observed yet; CI is implemented, not remotely verified.
+- Local verification: fresh Release configure and build passed with CMake/Ninja, Qt 6.11.2 MinGW in `out/ci-release`; CTest passed `algorithm_generators` 1/1 in 1.17 s (1.21 s total). The app remained running through a 4-second offscreen/software-backend startup smoke; captured stdout/stderr were empty. This is a startup check, not interactive runtime or visual verification.
+- Platform limits: local verification used Windows x64/MinGW rather than the workflow's Windows x64/MSVC 2022 toolchain. The app declares a 780×560 minimum. 800×600 is within the supported range; 1024×768, 1280×800 and 1440×900 visual checks, packaged-app smoke after current changes, and interactive coverage remain unverified in this pass.
+- Automated coverage is one aggregate CTest executable (`algorithm_generators`) with controller/model/settings/playback assertions. It does not automate QML interaction, visual states, keyboard traversal, responsive rendering, or accessibility behavior.
+- This live review at the launched 1440×900 Dashboard visually inspected the hero, stats, and lab cards. Sorting showed separated values, current-step assistant narration and comparison count after Next Step. Searching showed its default array, target 6, and matching “look for 6” ready narration. Compare showed two balanced, separated seven-node traces at first frame. Graph exposed a concrete node placement defect: edges span the graph canvas, but node circles cluster and overlap at the left. Code now binds node x/y to explicit `graphPanel` dimensions and rebuilt, but the Windows UI helper then rejected further input with `coordinate input geometry is unavailable`; post-fix Graph visuals and the other requested interactive flows remain unverified.
+
 This file tracks verified repository state. Items are marked complete only after the stated checks have run.
 
 ## Completed Features
@@ -36,21 +44,22 @@ This file tracks verified repository state. Items are marked complete only after
 
 ## Current Phase and Implementation Plan
 
-Phase 0 audit is complete. Branch `main` is based on `5ce5b7a` (the successful-search highlight fix); the current working tree contains verified icon/logo refinements. Existing Qt/QML navigation, controller models, algorithm snapshots, and the purple theme are retained.
+Branch `main` started clean at `ade8a80` (`origin/main`), following `e4e10c0` and `5ce5b7a`. The existing Qt/QML navigation, controller models, algorithm snapshots, and purple theme are retained. Current uncommitted changes add GitHub CI, a CTest timeout, and a Graph node-position correction.
 
-1. Stabilize visualization workspaces: explicit trace geometry, persistent identity positions, balanced Compare panels, and a tabbed Sorting inspector.
-2. Improve the Dashboard's algorithm identity and balance using truthful catalog data and native node visuals.
-3. Check Graph/Structure workspaces and responsive controls; fix concrete defects while preserving controller behavior.
-4. Finish settings, keyboard, compact-width, and playback regression checks; record exact verification status.
-5. Reconcile issues/history, then commit and push the verified overhaul.
+1. Verify the rebuilt Graph node layout and graph interactions after the explicit panel-coordinate correction.
+2. Finish compact Compare/Graph and keyboard-navigation checks; exercise settings controls, prediction feedback, and playback edge cases.
+3. Inspect at 800×600, 1024×768, 1280×800, and 1440×900 where supported; run and visually inspect the packaged application.
+4. Confirm hosted GitHub Actions CI runs successfully; then reconcile the final verified state in this record.
 
 ## Currently Working
 
-- Phase 1: visualization workspace and Dashboard refinement; this session polished the vector icon family and sidebar brand mark.
-- Working changes: responsive Sorting trace and tabbed inspector, responsive Compare trace geometry and stable initial positions, Dashboard node-and-edge live trace, and immediate initial node placement that avoids an entrance pile-up.
-- Latest Release build/CTest pass in `out/neon-review`; runtime shows the new logo and icons in expanded/collapsed navigation, centered Sorting nodes, two distributed Compare traces, working Run Both counters/state, Graph traversal controls, stable Tree hierarchy after its entrance animation, and truthful Dashboard counts.
+- Current pass: GitHub CI added; live review found the Graph node positioning issue and an explicit panel-dimension correction was made. Existing visualizer and Dashboard refinements are historical implementation work.
+- This pass: fresh Release configure/build and CTest pass in `out/ci-release`; Qt 6.11.2 MinGW. Startup smoke with Qt offscreen/software backend remained alive for 4 seconds and produced no stdout/stderr. These checks do not verify interactive runtime or visuals.
+- Earlier recorded runtime checks remain historical evidence for the earlier tested build; they do not verify this fresh build at 800×600, 1024×768, 1280×800, or 1440×900.
 - Latest icon simplification and tooltip build/CTest pass; compact and expanded navigation, the A monogram, and the tooltip aligned beside Search were visually checked.
 - Runtime coverage still open: minimum-width Compare/Graph and keyboard navigation; Settings persistence after sidebar/reduced-motion interactions; Sorting prediction feedback; graph edge creation and all graph algorithm modes.
+- CI workflow has not yet run on GitHub; current local compiler differs from the workflow MSVC compiler. Packaged build smoke and requested size matrix are not completed.
+- New Graph node-position fix is implemented and compiled in `out/ci-release`; post-fix visual confirmation is pending due to the UI automation input error. Do not mark the Graph layout as runtime verified.
 - Tree insertion depth boundary is controller-tested; its user-facing rejection message has not yet been visually exercised. v1.2.0 remains the last published package; overhaul changes are unreleased.
 
 ## Remaining Work
@@ -154,7 +163,7 @@ No active external blocker is known.
 
 | Date | Build / test | Result | Notes |
 |---|---|---|---|
-| 2026-11-20 | Earlier Release CTest in `out/release-v1.2.0-ui` | Passed: `algorithm_generators` 1/1, 1.17 seconds | Recorded in `Testing/Temporary/LastTest.log` at 02:44 PKT. This run predates later UI edits; a fresh verification is recorded below. |
+| 2026-11-20 | Earlier Release CTest in `out/release-v1.2.0-ui` | Passed: `algorithm_generators` 1/1, 1.17 seconds | Recorded in `Testing/Temporary/LastTest.log` at 02:44 PKT. This run predates later UI edits; fresh verification is recorded below. |
 | 2026-11-20 | Fresh Release build and CTest after settings, sidebar, timeline, placeholder, and responsive structure changes | Passed: `algorithm_generators` 1/1; `git diff --check` reported only Git line-ending notices | Runtime screenshots verified the settings panel, expanded sidebar, populated sorting input, and capped timeline. A first StructurePage launch failed due to assigning read-only `Flow.implicitHeight`; after correction the app launched successfully. Narrow-width layout not yet checked. |
 | 2026-11-20 | Release build/CTest after BST depth guard and Graph feedback row | Passed: `algorithm_generators` 1/1; `git diff --check` reported only line-ending notices | An earlier QML compile failed due to a statement separator after the Graph click handler; after correction, a link attempt was blocked because the running Algorythm process locked the executable. Closed that instance, then build/CTest passed. Controller tree-boundary tests passed. UI Automation verified Graph valid/invalid feedback and Compare invalid/valid input. |
 | 2026-11-20 | Release build/CTest after graph speed preference, Compare card geometry/input validation, and explicit Sorting dialog widths | Passed: `algorithm_generators` 1/1; `git diff --check` reported only line-ending notices | Graph speed clamping test passed. The final rebuilt Windows package was launched with only Windows directories on `PATH`; the process remained open with the correct window title and captured stderr was empty. Dialog and Compare interactions remain unverified at runtime. |
@@ -167,6 +176,8 @@ No active external blocker is known.
 | 2026-11-20 | Vector icon and logo refinement | Passed: Release build, CTest `algorithm_generators` 1/1 (1.24 sec), and `git diff --check` (only Git line-ending notices) | Live app inspection confirmed the new algorithm-node monogram in expanded navigation and clear category icons in both sidebar states. |
 | 2026-11-20 | Simplified shared icon and logo shapes | Passed: incremental Release build, CTest `algorithm_generators` 1/1 (1.24 sec), and `git diff --check` (only Git line-ending notices) | Live Dashboard and expanded sidebar confirm simplified icons and the A monogram. |
 | 2026-11-20 | Sidebar tooltip alignment fix | Passed: incremental Release build, CTest `algorithm_generators` 1/1 (1.27 sec), and `git diff --check` (only Git line-ending notices) | Runtime hover confirms tooltip sits beside the icon without obscuring neighboring navigation rows. |
+| 2026-11-20 | New GitHub Actions Qt 6 CI and CTest timeout | Passed locally: fresh Release configure/build in `out/ci-release` using Qt 6.11.2 MinGW; CTest `algorithm_generators` 1/1 (1.17 sec); `git diff --check` clean apart from line-ending notice. Offscreen startup smoke remained alive 4 sec with empty stdout/stderr. | `.github/workflows/ci.yml` configures/builds Qt 6.8.3 on Windows/MSVC 2022 and runs CTest for pushes, pull requests, and manual dispatch. Hosted Actions has not run. No GUI interaction/visual verification or current-package smoke was done. |
+| 2026-11-20 | Graph node geometry correction found in live review | Release QML cache rebuild and app link passed; final CTest recorded below. Pre-fix live screenshot at 1440×900 confirmed node circles clustered at the graph's left edge while edges spanned the canvas. | `qml/pages/GraphPage.qml` now computes node x/y from explicitly identified `graphPanel` dimensions instead of delegate `parent`. App relaunch reached Dashboard, but post-fix Graph visual check was blocked when UI input began returning `coordinate input geometry is unavailable`; no runtime fix claim. |
 | Prior v1.1 work | Release algorithm tests and packaged app launch | Passed in prior session | v1.1.0 package published; exact current UI is newer and unverified. |
 | 2026-11-20 | Final v1.2 package dependency closure and smoke test | Passed: 25 transitive DLLs from the selected Qt/MinGW toolchain were staged; dependency scan found no unresolved non-system DLLs; isolated-path launch stayed open with empty stderr | `windeployqt` omitted compiler runtime and transitive MinGW dependencies. `qt.conf` and the copied dependency closure resolved launch-time imports. Release v1.2.0 was published with the 46,044,844-byte archive; GitHub API digest matches the local SHA-256. Interactive package checks remain pending. |
 
@@ -193,5 +204,5 @@ No active external blocker is known.
 1. Verify Compare traces and input validation at compact width; desktop first-frame positioning and Run Both are verified.
 2. Exercise Graph playback controls, algorithm modes, weighted-edge feedback, and tree depth rejection.
 3. Check Sorting prediction dialogs, Settings accessibility toggles, keyboard navigation and workspace splitter persistence.
-4. Rebuild/retest after any fixes, then commit and push the verified code plus `PROJECT_STATUS.md` to `main`.
-5. Package a new v1.3.0 release only after remaining runtime checks and package smoke test pass; v1.2.0 is already published and must remain unchanged.
+4. Complete remaining runtime/accessibility checks, verify all requested supported sizes, then rebuild and retest.
+5. Smoke-test the newly built package before considering a new release; v1.2.0 remains the last published release.

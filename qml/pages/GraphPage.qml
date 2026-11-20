@@ -34,6 +34,7 @@ Item {
             ComboBox { model: ["Breadth-First Search", "Depth-First Search", "Dijkstra's Shortest Path"]; currentIndex: model.indexOf(graph.algorithm); onActivated: graph.algorithm = currentText; implicitWidth: 210 }
         }
         Rectangle {
+            id: graphPanel
             Layout.fillWidth: true
             Layout.fillHeight: true
             radius: 17
@@ -102,8 +103,8 @@ Item {
                 delegate: Rectangle {
                     required property int index
                     width: 54; height: 54; radius: 27
-                    x: 18 + page.px[index] * (parent.width - 36) - width / 2
-                    y: 18 + page.py[index] * (parent.height - 36) - height / 2
+                    x: 18 + page.px[index] * (graphPanel.width - 36) - width / 2
+                    y: 18 + page.py[index] * (graphPanel.height - 36) - height / 2
                     color: index === graph.active ? "#38245B" : graph.visited.indexOf(index) >= 0 ? "#15382F" : "#1A1930"
                     border.width: index === graph.active ? 3 : 1.5
                     border.color: index === graph.active ? theme.purple : graph.visited.indexOf(index) >= 0 ? theme.green : theme.purple

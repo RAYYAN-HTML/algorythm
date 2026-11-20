@@ -57,5 +57,6 @@ if(BUILD_TESTING)
     target_include_directories(AlgorythmAlgorithmTests PRIVATE src)
     target_link_libraries(AlgorythmAlgorithmTests PRIVATE Qt6::Core)
     add_test(NAME algorithm_generators COMMAND AlgorythmAlgorithmTests)
+    set_tests_properties(algorithm_generators PROPERTIES TIMEOUT 30)
 endif()
 
