@@ -25,12 +25,28 @@ Item {
         playbackA.sortInput(text)
         playbackB.sortInput(text)
     }
+
+    function toggleBothPlayback() {
+        var shouldRun = !(playbackA.playing && playbackB.playing)
+        if (shouldRun) {
+            if (playbackA.complete) playbackA.restart()
+            if (playbackB.complete) playbackB.restart()
+            playbackA.startPlayback()
+            playbackB.startPlayback()
+        } else {
+            playbackA.pausePlayback()
+            playbackB.pausePlayback()
+        }
+    }
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 22
         spacing: 14
         RowLayout {
             ColumnLayout {
+                Layout.minimumWidth: 0
+                Layout.preferredWidth: Math.min(page.width < 900 ? 250 : 496, page.width * 0.42)
+                Layout.maximumWidth: page.width < 900 ? 250 : 496
                 Label { text: "ALGORITHM ARENA"
  color: theme.cyan
  font.pixelSize: 10
@@ -42,31 +58,40 @@ Item {
  font.bold: true }
                 Label { text: "Operation counts are the comparison. Animation time is only presentation pacing."
  color: theme.muted
- font.pixelSize: 11 }
+ font.pixelSize: 11
+ Layout.fillWidth: true
+ wrapMode: Text.WordWrap }
             }
             Item { Layout.fillWidth: true }
             TextField { id: data
  text: page.inputValues
- implicitWidth: 190
+ Layout.preferredWidth: page.width < 900 ? 140 : 190
+ Layout.minimumWidth: 120
  color: theme.text
  placeholderText: "shared input" }
-            Button { text: "Apply shared input"
+            Button { text: page.width < 900 ? "Apply input" : "Apply shared input"
  highlighted: true
  onClicked: page.applySharedInput() }
         }
         Label { Layout.fillWidth: true; visible: page.inputError !== ""; text: page.inputError; color: theme.pink; font.pixelSize: 11 }
-        RowLayout {
+        ScrollView {
+            id: cardsScroll
             Layout.fillWidth: true
             Layout.fillHeight: true
-            spacing: 14
-            Repeater {
-                model: [playbackA, playbackB]
-                delegate: Rectangle {
+            clip: true
+            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            Flow {
+                width: cardsScroll.availableWidth
+                height: childrenRect.height
+                spacing: 14
+                Repeater {
+                    model: [playbackA, playbackB]
+                    delegate: Rectangle {
                     id: card
                     required property var modelData
                     required property int index
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                    width: page.width < 900 ? cardsScroll.availableWidth : (cardsScroll.availableWidth - 14) / 2
+                    height: page.width < 900 ? 270 : 360
                     radius: 16
                     color: theme.secondary
                     border.color: index === 0 ? "#1A5264" : "#54356E"
@@ -83,11 +108,12 @@ Item {
                             ComboBox { model: ["Bubble Sort", "Selection Sort", "Insertion Sort", "Merge Sort", "Quick Sort"]
  currentIndex: model.indexOf(modelData.algorithm)
  onActivated: modelData.selectAlgorithm(currentText)
- implicitWidth: 140 }
+ implicitWidth: page.width < 900 ? 112 : 140 }
                         }
                         Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
+                            Layout.minimumHeight: 90
                             Repeater {
                                 model: modelData.nodes
                                 delegate: AlgorithmNode {
@@ -125,6 +151,7 @@ Item {
                     }
                 }
             }
+            }
         }
         Rectangle {
             Layout.fillWidth: true
@@ -135,19 +162,32 @@ Item {
             RowLayout {
                 anchors.fill: parent
                 anchors.margins: 12
-                Button { text: "↶ Restart"
- onClicked: { playbackA.restart()
- playbackB.restart() } }
-                Button { text: "◀ Step"
- onClicked: { playbackA.previous()
- playbackB.previous() } }
-                Button { text: "▶ Run both"
- highlighted: true
- onClicked: { playbackA.playPause()
- playbackB.playPause() } }
-                Button { text: "Step ▶"
- onClicked: { playbackA.next()
- playbackB.next() } }
+                Button { Accessible.name: "Restart both"; onClicked: { playbackA.restart(); playbackB.restart() }
+                    contentItem: RowLayout {
+                        Icon { name: "restart"; color: theme.muted; iconSize: 16 }
+                        Label { text: "Restart"; color: theme.text }
+                    }
+                }
+                Button { Accessible.name: "Previous step both"; onClicked: { playbackA.previous(); playbackB.previous() }
+                    contentItem: RowLayout {
+                        Icon { name: "previous"; color: theme.muted; iconSize: 16 }
+                        Label { text: "Step"; color: theme.text }
+                    }
+                }
+                Button { Accessible.name: playbackA.playing && playbackB.playing ? "Pause both" : "Run both"
+                    highlighted: true
+                    onClicked: page.toggleBothPlayback()
+                    contentItem: RowLayout {
+                        Icon { name: playbackA.playing && playbackB.playing ? "pause" : "play"; color: "#06111F"; iconSize: 15 }
+                        Label { text: playbackA.playing && playbackB.playing ? "Pause both" : "Run both"; color: "#06111F"; font.bold: true }
+                    }
+                }
+                Button { Accessible.name: "Next step both"; onClicked: { playbackA.next(); playbackB.next() }
+                    contentItem: RowLayout {
+                        Label { text: "Step"; color: theme.text }
+                        Icon { name: "next"; color: theme.muted; iconSize: 16 }
+                    }
+                }
                 Item { Layout.fillWidth: true }
                 Label { text: playbackA.complete && playbackB.complete ? "Comparison complete — compare the operation counts above." : "Both traces use the same starting input."
  color: theme.muted

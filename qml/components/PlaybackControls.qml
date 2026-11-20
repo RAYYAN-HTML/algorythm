@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../components"
 
 Rectangle {
     id: root
@@ -15,24 +16,24 @@ Rectangle {
  spacing: 10
         RowLayout {
             spacing: 8
-            Button { text: "↶"
+            Button { Accessible.name: "Restart"; ToolTip.visible: hovered; ToolTip.text: "Restart (R)"
  onClicked: playback.restart()
- ToolTip.visible: hovered
- ToolTip.text: "Restart (R)"
- flat: true }
-            Button { text: "◀"
+ flat: true; contentItem: Icon { name: "restart"; color: "#94A3B8"; iconSize: 18 } }
+            Button { Accessible.name: "Previous step"; ToolTip.visible: hovered; ToolTip.text: "Previous step (Left Arrow)"
  onClicked: playback.previous()
- ToolTip.visible: hovered
- ToolTip.text: "Previous step (←)"
- flat: true }
-            Button { text: playback.playing ? "Ⅱ  Pause" : "▶  Play"
- highlighted: true
- onClicked: playback.playPause() }
-            Button { text: "▶|"
+ flat: true; contentItem: Icon { name: "previous"; color: "#94A3B8"; iconSize: 18 } }
+            Button {
+                Accessible.name: playback.playing ? "Pause" : "Play"
+                highlighted: true
+                onClicked: playback.playPause()
+                contentItem: RowLayout {
+                    Icon { name: playback.playing ? "pause" : "play"; color: "#06111F"; iconSize: 15 }
+                    Text { text: playback.playing ? "Pause" : "Play"; color: "#06111F"; font.pixelSize: 12 }
+                }
+            }
+            Button { Accessible.name: "Next step"; ToolTip.visible: hovered; ToolTip.text: "Next step (Right Arrow)"
  onClicked: playback.next()
- ToolTip.visible: hovered
- ToolTip.text: "Next step (→)"
- flat: true }
+ flat: true; contentItem: Icon { name: "next"; color: "#94A3B8"; iconSize: 18 } }
             Label { Layout.leftMargin: 8
  text: playback.stepIndex + 1 + " / " + playback.stepCount
  color: "#94A3B8"

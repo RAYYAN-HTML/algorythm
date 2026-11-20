@@ -1,87 +1,130 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../components"
 
 Item {
     id: page
     property QtObject theme
     signal navigate(string section)
-    ColumnLayout {
+
+    ScrollView {
+        id: dashboardScroll
         anchors.fill: parent
-        anchors.margins: 30
-        spacing: 22
-        Label { text: "YOUR DSA WORKSPACE"; color: theme.cyan; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5 }
-        Label { text: "Make algorithms visible."; color: theme.text; font.pixelSize: 32; font.bold: true }
-        Label { text: "Choose a lab to explore an algorithm one operation at a time."; color: theme.muted; font.pixelSize: 14 }
-        GridLayout {
-            Layout.fillWidth: true
-            columns: page.width < 840 ? 1 : page.width < 1120 ? 2 : 3
-            rowSpacing: 16
-            columnSpacing: 16
-            Repeater {
-                model: [
-                    ["Sorting", "Compare, swap, and place values with animated circular nodes.", "01"],
-                    ["Searching", "Follow Linear and Binary Search as they inspect values.", "02"],
-                    ["Linked Lists", "Insert, remove, search, and traverse connected nodes.", "03"],
-                    ["Stacks", "Explore linked push, pop, and peek operations.", "04"],
-                    ["Queues", "Track front and rear as values enter and leave.", "05"],
-                    ["Trees", "Build a Binary Search Tree and inspect its traversals.", "06"],
-                    ["Graphs", "Study BFS, DFS, and nonnegative shortest paths.", "07"]
-                ]
-                delegate: Rectangle {
-                    required property var modelData
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 146
-                    radius: 15
-                    color: hover.containsMouse ? "#1A2940" : theme.panel
-                    border.color: hover.containsMouse ? theme.cyan : theme.border
-                    scale: hover.containsMouse ? 1.015 : 1
-                    Behavior on color { ColorAnimation { duration: 160 } }
-                    Behavior on scale { NumberAnimation { duration: theme.reducedMotion ? 0 : 150; easing.type: Easing.OutCubic } }
+        clip: true
+        ScrollBar.vertical.policy: ScrollBar.AsNeeded
+
+        ColumnLayout {
+            x: 30
+            y: 30
+            width: Math.max(0, dashboardScroll.availableWidth - 60)
+            height: implicitHeight + 30
+            spacing: 18
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: page.width < 900 ? 184 : 190
+                radius: 20
+                color: "#101C2E"
+                border.color: "#263B56"
+                clip: true
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: page.width < 900 ? 20 : 28
+                    spacing: 18
                     ColumnLayout {
-                        anchors.fill: parent
-                        anchors.margins: 18
-                        spacing: 8
-                        Label { text: modelData[2]; color: theme.purple; font.family: "Consolas"; font.pixelSize: 11 }
-                        Label { text: modelData[0]; color: theme.text; font.pixelSize: 17; font.bold: true }
-                        Label { Layout.fillWidth: true; text: modelData[1]; color: theme.muted; font.pixelSize: 11; wrapMode: Text.WordWrap }
+                        Layout.fillWidth: true
+                        Layout.minimumWidth: 0
+                        spacing: 9
+                        Label { text: "ALGORITHM STUDIO  /  DSA WORKSPACE"; color: page.theme.cyan; font.pixelSize: 9; font.bold: true; font.letterSpacing: 1.4 }
+                        Label { text: "See every step."; color: page.theme.text; font.pixelSize: page.width < 900 ? 27 : 34; font.bold: true }
+                        Label {
+                            Layout.fillWidth: true
+                            text: "Explore how an algorithm changes data, one operation at a time."
+                            color: page.theme.muted; font.pixelSize: 12; wrapMode: Text.WordWrap
+                        }
+                        Button {
+                            text: "Start with sorting"
+                            implicitHeight: 38
+                            onClicked: page.navigate("Sorting")
+                            background: Rectangle { radius: 9; color: parent.down ? "#0891B2" : parent.hovered ? "#22D3EE" : "#06B6D4"; border.color: "#67E8F9" }
+                            contentItem: RowLayout {
+                                Label { text: "Start with sorting"; color: "#06111F"; font.pixelSize: 11; font.bold: true; leftPadding: 12 }
+                                Icon { name: "arrow-right"; color: "#06111F"; iconSize: 15; Layout.rightMargin: 10 }
+                            }
+                        }
                     }
-                    MouseArea { id: hover; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: page.navigate(modelData[0]) }
+                    Item {
+                        visible: page.width >= 900
+                        Layout.preferredWidth: 190
+                        Layout.fillHeight: true
+                        Rectangle { anchors.fill: parent; radius: 16; color: "#0B1422"; border.color: "#1D3047" }
+                        ColumnLayout {
+                            anchors.fill: parent
+                            anchors.margins: 16
+                            RowLayout {
+                                Label { text: "TRACE"; color: page.theme.muted; font.pixelSize: 8; font.bold: true; font.letterSpacing: 1.2 }
+                                Item { Layout.fillWidth: true }
+                                Label { text: "07 ITEMS"; color: page.theme.cyan; font.pixelSize: 8; font.family: "Consolas" }
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                spacing: 6
+                                Repeater {
+                                    model: [38, 66, 48, 82, 56, 72, 44]
+                                    delegate: Rectangle {
+                                        required property int modelData
+                        required property int index
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+                                        Layout.maximumHeight: 86
+                                        Layout.alignment: Qt.AlignBottom
+                                        height: modelData
+                                        radius: 5
+                                        color: index === 3 ? page.theme.cyan : index % 2 ? "#5A42A2" : "#313B65"
+                                        opacity: index === 3 ? 1 : 0.72
+                                    }
+                                }
+                            }
+                            Label { text: "COMPARE     ·     SWAP     ·     SORT"; color: page.theme.muted; font.pixelSize: 7; font.family: "Consolas"; Layout.alignment: Qt.AlignHCenter }
+                        }
+                    }
                 }
             }
-        }
-        Item { Layout.fillHeight: true }
-        Rectangle {
-            Layout.fillWidth: true
-            height: 74
-            radius: 14
-            color: "#101827"
-            border.color: theme.border
+
             RowLayout {
-                anchors.fill: parent
-                anchors.margins: 18
-                Label { text: "✦"; color: theme.cyan; font.pixelSize: 18 }
-                Label { text: "Start with Bubble Sort"; color: theme.text; font.bold: true }
+                Layout.fillWidth: true
+                Label { text: "Choose a lab"; color: page.theme.text; font.pixelSize: 19; font.bold: true }
                 Item { Layout.fillWidth: true }
-                Button {
-                    text: "Open sorting lab  →"
-                    highlighted: true
-                    onClicked: page.navigate("Sorting")
-                    background: Rectangle {
-                        radius: 10
-                        color: parent.down ? "#0891B2" : parent.hovered ? "#22D3EE" : "#06B6D4"
-                        border.color: "#67E8F9"
-                        Behavior on color { ColorAnimation { duration: 120 } }
-                    }
-                    contentItem: Text {
-                        text: parent.text
-                        color: "#06111F"
-                        font.pixelSize: 12
-                        font.bold: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        leftPadding: 14
-                        rightPadding: 14
+                Label { text: "07 LEARNING MODULES"; color: page.theme.muted; font.pixelSize: 9; font.letterSpacing: 1 }
+            }
+
+            GridLayout {
+                Layout.fillWidth: true
+                columns: page.width < 820 ? 1 : page.width < 1120 ? 2 : 3
+                rowSpacing: 13
+                columnSpacing: 13
+                Repeater {
+                    model: [
+                        ["Sorting", "Compare and place values with real step-by-step traces.", "sorting"],
+                        ["Searching", "Follow inspections as a search narrows to its target.", "search"],
+                        ["Linked Lists", "Insert, remove, search, and traverse connected nodes.", "linked-list"],
+                        ["Stacks", "Explore push, pop, and peek using a linked stack.", "stack"],
+                        ["Queues", "Track the front and rear as values move through a queue.", "queue"],
+                        ["Trees", "Build a binary search tree and inspect its traversals.", "tree"],
+                        ["Graphs", "Study BFS, DFS, and nonnegative shortest paths.", "graph"]
+                    ]
+                    delegate: LabCard {
+                        required property var modelData
+                        required property int index
+                        Layout.preferredHeight: page.width < 900 ? 132 : 150
+                        theme: page.theme
+                        labName: modelData[0]
+                        description: modelData[1]
+                        iconName: modelData[2]
+                        indexLabel: (index + 1).toString().padStart(2, "0")
+                        onActivated: page.navigate(labName)
                     }
                 }
             }

@@ -1,4 +1,4 @@
-#include "algorithms/bubblesort.h"
+#include "algorithms/sortingalgorithms.h"
 #include "engine/playbackcontroller.h"
 #include "datastructures/structures.h"
 #include "controllers/structurecontroller.h"
@@ -147,6 +147,20 @@ int main(int argc, char **argv)
     PlaybackController playback;
     assert(playback.nodes()->rowCount() == 7);
     assert(playback.nodes()->data(playback.nodes()->index(0), AlgorithmNodeModel::ValueRole).toInt() == 8);
+    const auto acceptedValues = playback.values();
+    QString inputError;
+    QObject::connect(&playback, &PlaybackController::inputError, [&](const QString &message) { inputError = message; });
+    assert(!playback.sortInput("1, invalid, 3"));
+    assert(!inputError.isEmpty());
+    assert(playback.values() == acceptedValues);
+    assert(playback.sortInput("9, 3, 5"));
+    assert(playback.values().size() == 3);
+    PlaybackController searchPlayback;
+    searchPlayback.selectAlgorithm("Linear Search");
+    assert(searchPlayback.sortInput("9, 1, 5"));
+    searchPlayback.setSearchTarget(1);
+    assert(searchPlayback.variables().value("target").toInt() == 1);
+    assert(searchPlayback.narration().contains("look for 1"));
     playback.next(); assert(playback.stepIndex() == 1); assert(playback.variables().contains("i"));
     playback.previous(); assert(playback.stepIndex() == 0); assert(playback.variables().contains("n")); assert(!playback.variables().contains("i"));
     playback.seek(3); assert(playback.stepIndex() == 3);
@@ -154,12 +168,37 @@ int main(int argc, char **argv)
     playback.setSpeed(3.0); assert(playback.speed() == 3.0);
     playback.playPause(); assert(playback.playing());
     waitMs(260); const int pausedAt = playback.stepIndex(); assert(pausedAt > 0);
-    playback.playPause(); assert(!playback.playing());
+    playback.pausePlayback(); assert(!playback.playing());
     waitMs(260); assert(playback.stepIndex() == pausedAt);
-    playback.playPause(); waitMs(260); assert(playback.stepIndex() > pausedAt);
-    playback.playPause();
+    playback.startPlayback(); assert(playback.playing());
+    waitMs(260); assert(playback.stepIndex() > pausedAt);
+    playback.pausePlayback();
     playback.seek(playback.stepCount() - 2);
     playback.playPause(); waitMs(260);
     assert(playback.complete()); assert(!playback.playing());
+
+    PlaybackController comparisonA, comparisonB;
+    comparisonA.startPlayback();
+    comparisonB.pausePlayback();
+    assert(comparisonA.playing() && !comparisonB.playing());
+    // Run Both must promote the paused controller even when its peer is already running.
+    comparisonB.startPlayback();
+    assert(comparisonA.playing() && comparisonB.playing());
+    comparisonA.pausePlayback();
+    assert(!comparisonA.playing() && comparisonB.playing());
+    comparisonA.startPlayback();
+    assert(comparisonA.playing() && comparisonB.playing());
+    comparisonA.pausePlayback();
+    comparisonB.pausePlayback();
+    comparisonA.seek(comparisonA.stepCount() - 1);
+    comparisonB.seek(comparisonB.stepCount() - 1);
+    assert(comparisonA.complete() && comparisonB.complete());
+    comparisonA.restart();
+    comparisonB.restart();
+    comparisonA.startPlayback();
+    comparisonB.startPlayback();
+    assert(comparisonA.playing() && comparisonB.playing());
+    comparisonA.pausePlayback();
+    comparisonB.pausePlayback();
     return 0;
 }

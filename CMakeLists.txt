@@ -13,7 +13,8 @@ qt_policy(SET QTP0004 NEW)
 
 qt_add_executable(Algorythm
     src/main.cpp
-    src/algorithms/bubblesort.cpp
+    src/algorithms/sortingalgorithms.cpp
+    src/algorithms/searchalgorithms.cpp
     src/engine/playbackcontroller.cpp
     src/controllers/structurecontroller.cpp
     src/controllers/graphcontroller.cpp
@@ -31,6 +32,13 @@ qt_add_qml_module(Algorythm
         qml/components/NarrationPanel.qml
         qml/components/StatisticsPanel.qml
         qml/components/VariablesPanel.qml
+        qml/components/Icon.qml
+        qml/components/AlgorithmInputBar.qml
+        qml/components/ComplexityPanel.qml
+        qml/components/PredictionChallenge.qml
+        qml/components/LabCard.qml
+        qml/components/SettingsPopup.qml
+        qml/components/NavigationSidebar.qml
         qml/pages/DashboardPage.qml
         qml/pages/SortingPage.qml
         qml/pages/StructurePage.qml
@@ -43,7 +51,7 @@ target_link_libraries(Algorythm PRIVATE Qt6::Quick Qt6::QuickControls2)
 
 include(CTest)
 if(BUILD_TESTING)
-    add_executable(AlgorythmAlgorithmTests tests/algorithm_tests.cpp src/algorithms/bubblesort.cpp src/engine/playbackcontroller.cpp src/controllers/structurecontroller.cpp src/controllers/graphcontroller.cpp src/controllers/settingscontroller.h)
+    add_executable(AlgorythmAlgorithmTests tests/algorithm_tests.cpp src/algorithms/sortingalgorithms.cpp src/algorithms/searchalgorithms.cpp src/engine/playbackcontroller.cpp src/controllers/structurecontroller.cpp src/controllers/graphcontroller.cpp src/controllers/settingscontroller.h)
     target_include_directories(AlgorythmAlgorithmTests PRIVATE src)
     target_link_libraries(AlgorythmAlgorithmTests PRIVATE Qt6::Core)
     add_test(NAME algorithm_generators COMMAND AlgorythmAlgorithmTests)

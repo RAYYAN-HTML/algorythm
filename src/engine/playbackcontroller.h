@@ -66,13 +66,15 @@ public:
     int searchTarget() const { return m_searchTarget; }
     void setSpeed(double speed);
 
-    Q_INVOKABLE void sortInput(const QString &text);
+    Q_INVOKABLE bool sortInput(const QString &text);
     Q_INVOKABLE void selectAlgorithm(const QString &name);
     Q_INVOKABLE void setSearchTarget(int target);
     Q_INVOKABLE void next();
     Q_INVOKABLE void previous();
     Q_INVOKABLE void restart();
     Q_INVOKABLE void playPause();
+    Q_INVOKABLE void startPlayback();
+    Q_INVOKABLE void pausePlayback();
     Q_INVOKABLE void seek(int index);
 
 signals:

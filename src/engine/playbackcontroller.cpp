@@ -1,5 +1,5 @@
 #include "playbackcontroller.h"
-#include "algorithms/bubblesort.h"
+#include "algorithms/sortingalgorithms.h"
 
 #include <QRegularExpression>
 
@@ -64,16 +64,16 @@ void PlaybackController::setSpeed(double speed)
     emit stateChanged();
 }
 
-void PlaybackController::sortInput(const QString &text)
+bool PlaybackController::sortInput(const QString &text)
 {
     const QString trimmed = text.trimmed();
-    if (trimmed.isEmpty()) { emit inputError("Enter at least one integer."); return; }
+    if (trimmed.isEmpty()) { emit inputError("Enter at least one integer."); return false; }
     const auto parts = trimmed.split(QRegularExpression("[,\\s]+"), Qt::SkipEmptyParts);
-    if (parts.size() > 16) { emit inputError("Use 16 or fewer values to keep the nodes readable."); return; }
+    if (parts.size() > 16) { emit inputError("Use 16 or fewer values to keep the nodes readable."); return false; }
     QVector<int> input;
     for (const QString &part : parts) {
         bool ok = false; const int value = part.toInt(&ok);
-        if (!ok) { emit inputError("Use whole numbers separated by commas or spaces."); return; }
+        if (!ok) { emit inputError("Use whole numbers separated by commas or spaces."); return false; }
         input.push_back(value);
     }
     m_input = input;
@@ -85,6 +85,7 @@ void PlaybackController::sortInput(const QString &text)
     m_index = 0;
     m_nodes.setPositions(current().nodeIds);
     emit stateChanged();
+    return true;
 }
 
 void PlaybackController::selectAlgorithm(const QString &name)
@@ -116,5 +117,7 @@ void PlaybackController::next() { m_timer.stop(); if (m_index + 1 < m_steps.size
 void PlaybackController::previous() { m_timer.stop(); if (m_index > 0) --m_index; m_nodes.setPositions(current().nodeIds); emit stateChanged(); }
 void PlaybackController::restart() { m_timer.stop(); m_index = 0; m_nodes.setPositions(current().nodeIds); emit stateChanged(); }
 void PlaybackController::playPause() { if (m_timer.isActive()) m_timer.stop(); else if (!complete()) m_timer.start(); emit stateChanged(); }
+void PlaybackController::startPlayback() { if (!complete()) m_timer.start(); emit stateChanged(); }
+void PlaybackController::pausePlayback() { m_timer.stop(); emit stateChanged(); }
 void PlaybackController::seek(int index) { m_timer.stop(); m_index = qBound(0, index, qMax(0, m_steps.size() - 1)); m_nodes.setPositions(current().nodeIds); emit stateChanged(); }
 

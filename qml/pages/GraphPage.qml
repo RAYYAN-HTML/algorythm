@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../components"
 
 Item {
     id: page
@@ -11,7 +12,14 @@ Item {
     property int fromNode: 0
     property int toNode: 1
     property int weight: 1
-    property string errorMessage: ""
+    property string edgeFeedback: "Choose two different nodes to add an edge."
+
+    function addWeightedEdge() {
+        if (graph.addEdge(fromNode, toNode, weight))
+            edgeFeedback = "Added edge " + fromNode + " ↔ " + toNode + " with weight " + weight + "."
+        else
+            edgeFeedback = "Choose two different nodes and a nonnegative weight."
+    }
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 22
@@ -114,7 +122,7 @@ Item {
             radius: 13
             color: theme.panel
             border.color: theme.border
-            implicitHeight: 150
+            implicitHeight: 210
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 13
@@ -127,10 +135,10 @@ Item {
                     Label { text: "Start"; color: theme.muted; font.pixelSize: 10 }
                     SpinBox { from: 0; to: 6; value: page.startNode; onValueModified: page.startNode = value }
                     Button { text: "Run"; highlighted: true; onClicked: graph.run(page.startNode) }
-                    Button { text: "↶"; onClicked: graph.restart() }
-                    Button { text: "◀"; onClicked: graph.previous() }
-                    Button { text: graph.playing ? "Ⅱ" : "▶"; onClicked: graph.playPause() }
-                    Button { text: "▶|"; onClicked: graph.next() }
+                    Button { Accessible.name: "Restart graph"; onClicked: graph.restart(); contentItem: Icon { name: "restart"; color: theme.muted; iconSize: 16 } }
+                    Button { Accessible.name: "Previous graph step"; onClicked: graph.previous(); contentItem: Icon { name: "previous"; color: theme.muted; iconSize: 16 } }
+                    Button { Accessible.name: graph.playing ? "Pause graph" : "Play graph"; onClicked: graph.playPause(); contentItem: Icon { name: graph.playing ? "pause" : "play"; color: graph.playing ? theme.amber : theme.cyan; iconSize: 16 } }
+                    Button { Accessible.name: "Next graph step"; onClicked: graph.next(); contentItem: Icon { name: "next"; color: theme.muted; iconSize: 16 } }
                     Label { text: graph.stepIndex + 1 + " / " + graph.stepCount; color: theme.muted; font.pixelSize: 10 }
                     Item { Layout.fillWidth: true }
                 }
@@ -140,12 +148,12 @@ Item {
                     Label { text: "→"; color: theme.muted }
                     SpinBox { from: 0; to: 6; value: page.toNode; onValueModified: page.toNode = value }
                     SpinBox { from: 0; to: 999; value: page.weight; onValueModified: page.weight = value }
-                    Button { text: "Add edge"; onClicked: { page.errorMessage = ""; if (!graph.addEdge(page.fromNode, page.toNode, page.weight)) page.errorMessage = "Choose two different nodes and a nonnegative weight." } background: Rectangle { radius: 8; color: "#123244"; border.color: theme.cyan }
+                    Button { text: "Add edge"; onClicked: page.addWeightedEdge(); background: Rectangle { radius: 8; color: "#123244"; border.color: theme.cyan }
  contentItem: Text { text: parent.text; color: theme.cyan; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
                 }
-                Label { Layout.fillWidth: true; visible: page.errorMessage !== ""; text: page.errorMessage; color: theme.pink; font.pixelSize: 10; wrapMode: Text.WordWrap }
+                Label { Layout.fillWidth: true; text: page.edgeFeedback; color: page.edgeFeedback.startsWith("Added") ? theme.green : theme.muted; font.pixelSize: 10; wrapMode: Text.WordWrap }
             }
         }
     }
-    Connections { target: graph; function onError(message) { page.errorMessage = message } }
+    Connections { target: graph; function onError(message) { page.edgeFeedback = message } }
 }
