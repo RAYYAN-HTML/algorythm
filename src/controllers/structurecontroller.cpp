@@ -89,7 +89,11 @@ void StructureController::insert(int value,int position){
         m_status=ok?QString("Inserted %1 at position %2.").arg(value).arg(position):"Position is outside the list bounds.";
     }else if(m_kind=="Stack"){m_stack.push(value);m_visualModel.insertValue(0,value);m_status=QString("Pushed %1 onto the top.").arg(value);}
     else if(m_kind=="Queue"){m_queue.enqueue(value);m_visualModel.insertValue(m_visualModel.rowCount(),value);m_status=QString("Enqueued %1 at the rear.").arg(value);}
-    else {const bool inserted=m_tree.insert(value);if(inserted)m_treeVisualModel.syncNodes(treeNodes());m_status=inserted?QString("Inserted %1 into the BST.").arg(value):"Duplicate values are ignored in this BST.";}
+    else {
+        constexpr int maximumDepth=3;
+        if(m_tree.insertionDepth(value)>maximumDepth)m_status="Cannot insert: the tree visualizer supports at most four levels.";
+        else {const bool inserted=m_tree.insert(value);if(inserted)m_treeVisualModel.syncNodes(treeNodes());m_status=inserted?QString("Inserted %1 into the BST.").arg(value):"Duplicate values are ignored in this BST.";}
+    }
     emit changed();
 }
 void StructureController::remove(int position){

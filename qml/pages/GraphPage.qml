@@ -11,6 +11,7 @@ Item {
     property int fromNode: 0
     property int toNode: 1
     property int weight: 1
+    property string errorMessage: ""
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 22
@@ -139,11 +140,12 @@ Item {
                     Label { text: "→"; color: theme.muted }
                     SpinBox { from: 0; to: 6; value: page.toNode; onValueModified: page.toNode = value }
                     SpinBox { from: 0; to: 999; value: page.weight; onValueModified: page.weight = value }
-                    Button { text: "Add edge"; onClicked: graph.addEdge(page.fromNode, page.toNode, page.weight); background: Rectangle { radius: 8; color: "#123244"; border.color: theme.cyan }
+                    Button { text: "Add edge"; onClicked: { page.errorMessage = ""; if (!graph.addEdge(page.fromNode, page.toNode, page.weight)) page.errorMessage = "Choose two different nodes and a nonnegative weight." } background: Rectangle { radius: 8; color: "#123244"; border.color: theme.cyan }
  contentItem: Text { text: parent.text; color: theme.cyan; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
                 }
+                Label { Layout.fillWidth: true; visible: page.errorMessage !== ""; text: page.errorMessage; color: theme.pink; font.pixelSize: 10; wrapMode: Text.WordWrap }
             }
         }
     }
-    Connections { target: graph; function onError(message) { console.warn(message) } }
+    Connections { target: graph; function onError(message) { page.errorMessage = message } }
 }

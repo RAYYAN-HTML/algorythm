@@ -56,6 +56,7 @@ class BinarySearchTree {
     template<class F> static void walk(const Node*n,F visit,int order){if(!n)return;if(order==0)visit(n->value);walk(n->left.get(),visit,order);if(order==1)visit(n->value);walk(n->right.get(),visit,order);if(order==2)visit(n->value);}
 public:
     bool insert(int v){auto*link=&root;while(*link){if((*link)->value==v)return false;link=(v<(*link)->value)?&(*link)->left:&(*link)->right;}*link=std::make_unique<Node>(v);return true;}
+    int insertionDepth(int v)const{const Node*n=root.get();int depth=0;while(n){if(n->value==v)return depth;n=v<n->value?n->left.get():n->right.get();++depth;}return depth;}
     bool contains(int v)const{auto*n=root.get();while(n){if(n->value==v)return true;n=v<n->value?n->left.get():n->right.get();}return false;}
     std::vector<int> inorder()const{std::vector<int>o;walk(root.get(),[&](int v){o.push_back(v);},1);return o;}
     std::vector<int> preorder()const{std::vector<int>o;walk(root.get(),[&](int v){o.push_back(v);},0);return o;}
