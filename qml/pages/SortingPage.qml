@@ -42,7 +42,7 @@ Item {
                 RowLayout {
                     ColumnLayout { spacing: 4
                     Label { text: "SORTING LAB"
- color: theme.purple
+ color: theme.purpleText
  font.pixelSize: 10
  font.bold: true
  font.letterSpacing: 1.6 }
@@ -61,20 +61,21 @@ Item {
  currentIndex: model.indexOf(playback.algorithm)
  onActivated: playback.selectAlgorithm(currentText)
  implicitWidth: 145 }
-                    Button { text: "Focus mode"
+                    Button { id: focusModeButton; text: "Focus mode"
  checkable: true
  onToggled: page.focusMode = checked
  background: Rectangle { radius: 8
- color: parent.checked ? theme.highlightSurface : theme.secondary
- border.color: theme.border }
+ color: focusModeButton.checked ? theme.highlightSurface : focusModeButton.hovered || focusModeButton.visualFocus ? theme.elevated : theme.secondary
+ border.width: focusModeButton.visualFocus ? 2 : 1
+ border.color: focusModeButton.visualFocus ? theme.brightPurple : theme.border }
  contentItem: Text { text: parent.text
- color: parent.checked ? theme.purple : theme.muted
+ color: parent.checked ? theme.purpleText : theme.muted
  font.pixelSize: 11
  horizontalAlignment: Text.AlignHCenter
  verticalAlignment: Text.AlignVCenter } }
-                    Button { text: page.assistantVisible ? "Hide assistant" : "Show assistant"
+                    Button { id: assistantVisibilityButton; text: page.assistantVisible ? "Hide assistant" : "Show assistant"
                     onClicked: page.assistantVisible = !page.assistantVisible
-                    background: Rectangle { radius: 8; color: theme.secondary; border.color: theme.border }
+                    background: Rectangle { radius: 8; color: assistantVisibilityButton.hovered || assistantVisibilityButton.visualFocus ? theme.elevated : theme.secondary; border.width: assistantVisibilityButton.visualFocus ? 2 : 1; border.color: assistantVisibilityButton.visualFocus ? theme.brightPurple : theme.border }
                     contentItem: Text { text: parent.text; color: theme.muted; font.pixelSize: 10; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                 }
                     Item { Layout.fillWidth: true }
@@ -163,7 +164,7 @@ Item {
  text: "Predict"
  onClicked: challenge.openPrediction() }
                         Label { text: playback.complete ? "COMPLETE" : "RUNNING TRACE"
- color: playback.complete ? theme.green : theme.purple
+ color: playback.complete ? theme.green : theme.purpleText
  font.pixelSize: 9
  font.bold: true }
                     }

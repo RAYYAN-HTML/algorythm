@@ -54,7 +54,7 @@ The baseline QML linter examined 21 source files and emitted 567 finding instanc
 
 Confirmed deep-review finding: the Dashboard’s “LIVE TRACE” is static (H-01). Additional QML concerns are prioritized through the source and layout review; no broad rewrite is warranted based on lint volume alone.
 
-Scoped QML fixes: `AlgorithmNode` now names its visual state property `nodeState` instead of shadowing `QQuickItem.state`; Sorting and Comparison callers use the renamed property. The Dashboard sample label was corrected. A typed `AppTheme` is now registered in the QML module, and the shared panels/nodes consume its color roles. Focused lint no longer reports `QQuickItem.state` shadowing or missing theme members. The Release build, CTest and hidden runtime startup smoke passed after the theme migration.
+Scoped QML fixes: `AlgorithmNode` now names its visual state property `nodeState` instead of shadowing `QQuickItem.state`; Sorting and Comparison callers use the renamed property. The Dashboard sample label was corrected. A typed `AppTheme` is registered in the QML module, and shared panels/nodes consume its color roles. The latest whole-source lint reports 521 finding instances across 46 rule/message pairs on 22 QML files; these are not all defects, and include project type-resolution and Controls style warnings. Added visible focus treatments to primary navigation/actions and named graph/structure nodes with state descriptions; updated popup Escape handling. Static contrast pairs for selected text roles were checked against WCAG AA thresholds. Runtime keyboard, screen-reader, reduced-motion and full viewport verification remain outstanding.
 
 ## C++ review
 

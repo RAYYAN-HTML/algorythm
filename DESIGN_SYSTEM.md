@@ -23,7 +23,9 @@ The `AppTheme` object in `qml/components/AppTheme.qml` owns the runtime palette 
 | `content` | `#CBD5E1` | Supporting readable body copy |
 | `code` | `#C4B5FD` | Monospace values and active code |
 | `supportText` | `#94A3B8` | Graph labels and compact secondary data |
-| `textOnAccent` | `#06111F` | Foreground on bright accent fills |
+| `textOnAccent` | `#F8FAFC` | Foreground on primary action fills |
+| `action` | `#7C3AED` | Text-bearing primary action fill |
+| `purpleText` | `#B197FC` | Readable purple labels on dark surfaces |
 | `highlightSurface` | `#30204E` | Selected code line and highlighted actions |
 | `selectedSurface` | `#2B2042` | Selected structure node |
 | `activeNode` | `#38245B` | Current algorithm/graph node fill |
@@ -40,13 +42,15 @@ The `AppTheme` object in `qml/components/AppTheme.qml` owns the runtime palette 
 | `glowPurple` | `#9333EA` | Limited decorative highlight |
 | `text` | `#F8FAFC` | Primary text |
 | `muted` | `#A1A1B5` | Secondary text |
-| `subdued` | `#71718A` | Tertiary metadata |
+| `subdued` | `#8F8FA8` | Tertiary metadata |
 | `amber` | `#FBBF24` | Comparison/search-target distinction |
 | `green` | `#34D399` | Completed/visited state |
 | `error` | `#F87171` | Error state; pair with text |
 | `info` | `#38BDF8` | Informational state |
 
 Colors in page-local Canvas illustrations may stay local where semantic state is not represented. Repeated panel, border, text, and state colors use the shared palette. Do not communicate a state by color alone.
+
+The palette’s text-bearing roles were checked with WCAG relative-luminance contrast calculations against `panel` (`#17172A`): `subdued` 5.59:1 and `purpleText` 7.30:1. White text on `action` is 5.45:1 and on the pressed `deepPurple` fill is 6.79:1. These static color-pair checks do not establish full WCAG conformance; runtime keyboard and assistive-technology checks remain open.
 
 ### Typography
 

@@ -36,7 +36,7 @@ Button {
             Layout.fillWidth: true
             Icon { name: root.iconName; color: root.theme.purple; iconSize: 21 }
             Item { Layout.fillWidth: true }
-            Label { text: root.indexLabel; color: root.theme.purple; font.family: "Consolas"; font.pixelSize: 10 }
+            Label { text: root.indexLabel; color: root.theme.purpleText; font.family: "Consolas"; font.pixelSize: 10 }
         }
         Label { text: root.labName; color: root.theme.text; font.pixelSize: 16; font.bold: true }
         RowLayout {

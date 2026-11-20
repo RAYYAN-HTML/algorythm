@@ -14,7 +14,7 @@ Rectangle {
  anchors.margins: 16
  spacing: 10
         RowLayout { Label { text: "{ }"
- color: theme.brightPurple
+ color: theme.purpleText
  font.bold: true }
  Label { text: "Pseudocode"
  color: theme.text

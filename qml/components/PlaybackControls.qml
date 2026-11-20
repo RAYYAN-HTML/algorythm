@@ -41,7 +41,7 @@ Rectangle {
  font.pixelSize: 11 }
             Item { Layout.fillWidth: true }
             Label { text: playback.speed.toFixed(1) + "×"
- color: root.theme.purple
+ color: root.theme.purpleText
  font.bold: true
  font.pixelSize: 12 }
             Slider { id: speed

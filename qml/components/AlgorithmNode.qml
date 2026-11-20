@@ -43,7 +43,8 @@ Item {
  text: root.value
  color: root.theme.text
  font.pixelSize: 17
- font.bold: true }
+ font.bold: true
+ Accessible.ignored: true }
     }
 }
 

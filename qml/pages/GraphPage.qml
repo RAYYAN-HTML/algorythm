@@ -24,7 +24,7 @@ Item {
         spacing: 14
         RowLayout {
             ColumnLayout {
-                Label { text: "GRAPH LAB"; color: theme.purple; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5 }
+                Label { text: "GRAPH LAB"; color: theme.purpleText; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5 }
                 Label { text: graph.algorithm; color: theme.text; font.pixelSize: 25; font.bold: true }
                 Label { text: "Traverse the sample graph or add a nonnegative weighted edge."; color: theme.muted; font.pixelSize: 11 }
             }
@@ -104,6 +104,8 @@ Item {
                     x: 18 + page.px[index] * (graphPanel.width - 36) - width / 2
                     y: 18 + page.py[index] * (graphPanel.height - 36) - height / 2
                     color: index === graph.active ? theme.activeNode : graph.visited.indexOf(index) >= 0 ? theme.visitedNode : theme.elevated
+                    Accessible.name: "Graph node " + index
+                    Accessible.description: index === graph.active ? "Current node. " + (graph.algorithm === "Dijkstra's Shortest Path" ? "Distance " + (graph.distances[index] || "infinity") : "") : graph.visited.indexOf(index) >= 0 ? "Visited node. " + (graph.algorithm === "Dijkstra's Shortest Path" ? "Distance " + (graph.distances[index] || "infinity") : "") : "Not yet visited."
                     border.width: index === graph.active ? 3 : 1.5
                     border.color: index === graph.active ? theme.purple : graph.visited.indexOf(index) >= 0 ? theme.green : theme.purple
                     scale: index === graph.active ? 1.12 : 1.0
@@ -111,7 +113,7 @@ Item {
                     Behavior on color { ColorAnimation { duration: theme.reducedMotion ? 0 : 240 } }
                     Behavior on border.color { ColorAnimation { duration: theme.reducedMotion ? 0 : 240 } }
                     Behavior on scale { NumberAnimation { duration: theme.reducedMotion ? 0 : 220; easing.type: Easing.OutCubic } }
-                    Label { anchors.centerIn: parent; text: index; color: theme.text; font.bold: true; font.pixelSize: 16 }
+                    Label { anchors.centerIn: parent; text: index; color: theme.text; font.bold: true; font.pixelSize: 16; Accessible.ignored: true }
                     Label { visible: graph.algorithm === "Dijkstra's Shortest Path"; anchors.top: parent.bottom; anchors.horizontalCenter: parent.horizontalCenter; text: graph.distances[index] || "∞"; color: theme.amber; font.pixelSize: 10 }
                 }
             }
@@ -147,8 +149,8 @@ Item {
                     Label { text: "→"; color: theme.muted }
                     SpinBox { from: 0; to: 6; value: page.toNode; onValueModified: page.toNode = value }
                     SpinBox { from: 0; to: 999; value: page.weight; onValueModified: page.weight = value }
-                    Button { text: "Add edge"; onClicked: page.addWeightedEdge(); background: Rectangle { radius: 8; color: theme.highlightSurface; border.color: theme.purple }
- contentItem: Text { text: parent.text; color: theme.purple; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
+                    Button { id: addEdgeButton; text: "Add edge"; onClicked: page.addWeightedEdge(); background: Rectangle { radius: 8; color: addEdgeButton.hovered || addEdgeButton.visualFocus ? theme.activeNode : theme.highlightSurface; border.width: addEdgeButton.visualFocus ? 2 : 1; border.color: addEdgeButton.visualFocus ? theme.brightPurple : theme.purple }
+ contentItem: Text { text: parent.text; color: theme.purpleText; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
                 }
                 Label { Layout.fillWidth: true; text: page.edgeFeedback; color: page.edgeFeedback.startsWith("Added") ? theme.green : page.edgeFeedback.length ? theme.error : theme.muted; font.pixelSize: 10; wrapMode: Text.WordWrap }
             }

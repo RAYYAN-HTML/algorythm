@@ -230,3 +230,10 @@ No active external blocker is known.
 - Fresh Release build succeeded; CTest `algorithm_generators` passed 1/1 (1.40 sec; 1.44 sec total). Hidden offscreen/software startup remained alive for 4 seconds with empty stdout/stderr and no QML error/binding-loop message. App was closed before handoff.
 - Updated QML lint: 524 findings across 47 rule/message pairs on 22 QML files (baseline before this pass: 567 across 59 pairs); typed `AppTheme` eliminated theme-member `QObject` warnings. C++ lint now reports 23 instances in five groups (baseline: 24 in six), with the graph unbounded-growth warning resolved. Remaining lint details are in `AUDIT_REPORT.md`.
 - The short `.qtd` profile was collected before this final theme/graph follow-up. No visual comparison at 1280×800, 1024×768, or 800×600 was made after the migration. Keyboard-only navigation, reduced-motion runtime, all graph modes, data-structure edge cases, and participant testing remain pending.
+
+## Accessibility and contrast follow-up — 2026-11-20
+
+- Added visible focus indicators to the primary navigation and action controls, Escape/press-outside dismissal for Settings, and accessible names/descriptions for graph and structure nodes, including relevant algorithm state.
+- Checked selected text color pairs against the WCAG AA 4.5:1 threshold using static sRGB luminance calculations. Subdued metadata on the main panel is 5.59:1, purple labels 7.30:1, and white text on primary/pressed actions 5.45:1 / 6.79:1. This is a limited contrast check, not a full accessibility conformance audit.
+- Whole-source QML lint after focus-property fixes: 521 finding instances across 46 rule/message pairs on 22 files. No missing `visualFocus` properties remain; residual findings include style/type-resolution warnings.
+- Full runtime keyboard/screen-reader checks, reduced-motion behavior, all four target viewport sizes, and participant research remain open.

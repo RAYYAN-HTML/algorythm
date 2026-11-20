@@ -14,7 +14,7 @@ Item {
         RowLayout {
             ColumnLayout {
                 Label { text: "DATA STRUCTURES"
- color: theme.purple
+ color: theme.purpleText
  font.pixelSize: 10
  font.bold: true
  font.letterSpacing: 1.5 }
@@ -50,7 +50,7 @@ Item {
  font.letterSpacing: 1.2 }
                     Item { Layout.fillWidth: true }
                     Label { text: "SIZE  " + structures.size
- color: theme.purple
+ color: theme.purpleText
  font.pixelSize: 11
  font.bold: true }
                 }
@@ -62,7 +62,7 @@ Item {
                         visible: structures.kind === "Linked List" || structures.kind === "Queue"
                         anchors.centerIn: parent
                         spacing: 10
-                        Label { visible: structures.values.length > 0; text: structures.kind === "Queue" ? "FRONT →" : "HEAD →"; color: theme.purple; font.pixelSize: 9; font.bold: true }
+                        Label { visible: structures.values.length > 0; text: structures.kind === "Queue" ? "FRONT →" : "HEAD →"; color: theme.purpleText; font.pixelSize: 9; font.bold: true }
                         ListView {
                             visible: structures.visualModel.count > 0
                             model: structures.visualModel
@@ -79,10 +79,12 @@ Item {
                                     width: 58; height: 58; radius: 29
                                     anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
                                     color: index === 0 ? theme.selectedSurface : theme.elevated
+                                    Accessible.name: "Value " + value
+                                    Accessible.description: index === 0 ? (structures.kind === "Queue" ? "Front of queue" : "Head of linked list") : structures.kind === "Queue" ? "Queue position " + (index + 1) : "Linked-list position " + (index + 1)
                                     border.width: 2; border.color: index === 0 ? theme.purple : theme.purple
-                                    Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 18; font.bold: true }
+                                    Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 18; font.bold: true; Accessible.ignored: true }
                                 }
-                                Label { visible: index < structures.visualModel.count - 1; anchors.left: parent.left; anchors.leftMargin: 61; anchors.verticalCenter: parent.verticalCenter; text: "→"; color: theme.purple; font.pixelSize: 17 }
+                                Label { visible: index < structures.visualModel.count - 1; anchors.left: parent.left; anchors.leftMargin: 61; anchors.verticalCenter: parent.verticalCenter; text: "→"; color: theme.purpleText; font.pixelSize: 17 }
                             }
                             add: Transition { NumberAnimation { properties: "opacity,scale"; from: 0.25; to: 1; duration: theme.reducedMotion ? 0 : 200; easing.type: Easing.OutCubic } }
                             remove: Transition { NumberAnimation { properties: "opacity,scale"; to: 0.15; duration: theme.reducedMotion ? 0 : 170; easing.type: Easing.InCubic } }
@@ -112,7 +114,9 @@ Item {
                                 required property int index
                                 width: 116; height: 47
                                 Rectangle { anchors.fill: parent; radius: 10; color: index === 0 ? theme.selectedSurface : theme.elevated; border.color: theme.purple
-                                    Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 16; font.bold: true }
+                                    Accessible.name: "Value " + value
+                                    Accessible.description: index === 0 ? "Top of stack" : "Stack position " + (index + 1)
+                                    Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 16; font.bold: true; Accessible.ignored: true }
                                 }
                             }
                             add: Transition { NumberAnimation { properties: "opacity,scale"; from: 0.2; to: 1; duration: theme.reducedMotion ? 0 : 200; easing.type: Easing.OutBack } }
@@ -165,11 +169,13 @@ Item {
                                 x: posX * treeArea.width - width / 2
                                 y: treeArea.treeTop + posY * treeArea.treeRowSpacing
                                 color: theme.elevated
+                                Accessible.name: "Tree node " + value
+                                Accessible.description: "Binary search tree value " + value
                                 border.width: 2
                                 border.color: theme.purple
                                 Behavior on x { NumberAnimation { duration: theme.reducedMotion ? 0 : 240 } }
                                 Behavior on y { NumberAnimation { duration: theme.reducedMotion ? 0 : 240 } }
-                                Label { anchors.centerIn: parent; text: value; color: theme.text; font.bold: true }
+                                Label { anchors.centerIn: parent; text: value; color: theme.text; font.bold: true; Accessible.ignored: true }
                                 ParallelAnimation {
                                     id: nodeEntrance
                                     NumberAnimation { target: treeNode; property: "opacity"; to: 1; duration: theme.reducedMotion ? 0 : 220; easing.type: Easing.OutCubic }

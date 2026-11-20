@@ -15,7 +15,7 @@ ApplicationWindow {
     color: appColors.background
     Material.theme: Material.Dark
     Material.accent: appColors.purple
-    Material.primary: appColors.brightPurple
+    Material.primary: appColors.action
     Material.foreground: appColors.text
     Material.background: appColors.secondary
 

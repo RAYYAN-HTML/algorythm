@@ -19,7 +19,7 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            Label { text: "{ }"; color: theme.purple; font.bold: true }
+            Label { text: "{ }"; color: theme.purpleText; font.bold: true }
             Label { text: "Current variables"; color: theme.text; font.bold: true; font.pixelSize: 13 }
             Item { Layout.fillWidth: true }
             Label { text: "STEP STATE"; color: theme.muted; font.pixelSize: 8; font.letterSpacing: 0.8 }

@@ -48,7 +48,7 @@ Item {
                 Layout.preferredWidth: Math.min(page.width < 900 ? 250 : 496, page.width * 0.42)
                 Layout.maximumWidth: page.width < 900 ? 250 : 496
                 Label { text: "ALGORITHM ARENA"
- color: theme.purple
+ color: theme.purpleText
  font.pixelSize: 10
  font.bold: true
  font.letterSpacing: 1.5 }
@@ -101,7 +101,7 @@ Item {
                         spacing: 12
                         RowLayout {
                             Label { text: index === 0 ? "ALGORITHM A" : "ALGORITHM B"
- color: index === 0 ? theme.purple : "#D8B4FE"
+ color: index === 0 ? theme.purpleText : "#D8B4FE"
  font.pixelSize: 9
  font.bold: true }
                             Item { Layout.fillWidth: true }

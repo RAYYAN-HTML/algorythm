@@ -45,13 +45,13 @@ Rectangle {
             id: inputField
             Layout.fillWidth: true
             text: root.userInput
-            onActiveFocusChanged: root.inputFocused = activeFocus
+            onActiveFocusChanged: root.inputFocused = activeFocus || targetField.activeFocus
             selectByMouse: true
             Accessible.name: "Algorithm input values"
             color: root.theme.text
             font.family: "Consolas"
             font.pixelSize: 12
-            background: Rectangle { radius: 6; color: "#080812"; border.color: root.theme.border }
+            background: Rectangle { radius: 6; color: "#080812"; border.width: inputField.activeFocus ? 2 : 1; border.color: inputField.activeFocus ? root.theme.brightPurple : root.theme.border }
         }
         ComboBox {
             model: ["Custom", "Random", "Sorted", "Reverse"]
@@ -68,7 +68,8 @@ Rectangle {
             Accessible.name: "Search target"
             color: root.theme.text
             placeholderText: "Target"
-            background: Rectangle { radius: 6; color: "#080812"; border.color: root.theme.border }
+            onActiveFocusChanged: root.inputFocused = activeFocus || inputField.activeFocus
+            background: Rectangle { radius: 6; color: "#080812"; border.width: targetField.activeFocus ? 2 : 1; border.color: targetField.activeFocus ? root.theme.brightPurple : root.theme.border }
             onAccepted: root.applyInput()
         }
         Button {

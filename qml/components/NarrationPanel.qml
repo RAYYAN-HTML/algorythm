@@ -25,7 +25,7 @@ Rectangle {
  font.pixelSize: 9
  font.bold: true } }
         Label { text: playback.operation
- color: theme.purple
+ color: theme.purpleText
  font.pixelSize: 11
  font.bold: true }
         Label { Layout.fillWidth: true

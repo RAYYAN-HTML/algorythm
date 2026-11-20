@@ -19,7 +19,7 @@ Rectangle {
  font.pixelSize: 13 }
         RowLayout {
             Layout.fillWidth: true
-            Repeater { model: playback.algorithm.endsWith("Search") ? [["INSPECTED", playback.comparisons, theme.amber], ["COMPARISONS", playback.comparisons, theme.purple], ["TARGET", playback.searchTarget, theme.green]] : [["COMPARE", playback.comparisons, theme.amber], ["SWAPS", playback.swaps, theme.brightPurple], ["WRITES", playback.writes, theme.purple]]
+            Repeater { model: playback.algorithm.endsWith("Search") ? [["INSPECTED", playback.comparisons, theme.amber], ["COMPARISONS", playback.comparisons, theme.purpleText], ["TARGET", playback.searchTarget, theme.green]] : [["COMPARE", playback.comparisons, theme.amber], ["SWAPS", playback.swaps, theme.purpleText], ["WRITES", playback.writes, theme.purpleText]]
                 delegate: ColumnLayout { Layout.fillWidth: true
  spacing: 3
  Label { text: modelData[0]

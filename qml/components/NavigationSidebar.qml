@@ -60,6 +60,7 @@ Rectangle {
                 Label { Layout.fillWidth: true; text: "ALGORITHM STUDIO"; elide: Text.ElideRight; color: root.theme.muted; font.pixelSize: 9; font.letterSpacing: 1.0 }
             }
             Button {
+                id: collapseButton
                 implicitWidth: root.windowWidth < 980 || root.sidebarCollapsed ? 36 : 28
                 implicitHeight: 30
                 Layout.alignment: Qt.AlignVCenter
@@ -67,7 +68,7 @@ Rectangle {
                 ToolTip.visible: hovered
                 ToolTip.text: Accessible.name
                 onClicked: root.collapseRequested()
-                background: Rectangle { radius: 7; color: parent.hovered ? root.theme.elevated : "transparent" }
+                background: Rectangle { radius: 7; color: collapseButton.hovered || collapseButton.visualFocus ? root.theme.elevated : "transparent"; border.width: collapseButton.visualFocus ? 2 : 0; border.color: root.theme.brightPurple }
                 contentItem: Icon { name: "menu"; color: root.theme.muted; iconSize: 18 }
             }
         }
@@ -118,8 +119,9 @@ Rectangle {
                         onClicked: root.navigationRequested(modelData.name)
                         background: Rectangle {
                             radius: 10
-                            color: parent.selected ? "#35215A" : parent.hovered ? "#211B39" : "transparent"
-                            border.color: parent.selected ? root.theme.deepPurple : "transparent"
+                            color: navigationButton.selected ? "#35215A" : navigationButton.hovered || navigationButton.visualFocus ? "#211B39" : "transparent"
+                            border.width: navigationButton.visualFocus ? 2 : navigationButton.selected ? 1 : 0
+                            border.color: navigationButton.visualFocus ? root.theme.brightPurple : navigationButton.selected ? root.theme.deepPurple : "transparent"
                             gradient: parent.selected ? activeGradient : undefined
                             Behavior on color { ColorAnimation { duration: root.reducedMotion ? 0 : 140 } }
                             Rectangle { x: 0; y: 6; width: 3; height: parent.height - 12; radius: 2; color: root.theme.purple; visible: parent.parent.selected }
@@ -153,10 +155,10 @@ Rectangle {
                 }
             }
             onClicked: root.navigationRequested("Compare")
-            background: Rectangle { radius: 9; color: parent.checked ? root.theme.highlightSurface : parent.hovered ? root.theme.elevated : "transparent"; border.color: parent.checked ? root.theme.deepPurple : "transparent" }
+            background: Rectangle { radius: 9; color: compareButton.checked ? root.theme.highlightSurface : compareButton.hovered || compareButton.visualFocus ? root.theme.elevated : "transparent"; border.width: compareButton.visualFocus ? 2 : compareButton.checked ? 1 : 0; border.color: compareButton.visualFocus ? root.theme.brightPurple : compareButton.checked ? root.theme.deepPurple : "transparent" }
             contentItem: RowLayout {
                 Icon { name: "compare"; color: root.section === "Compare" ? root.theme.purple : root.theme.muted; iconSize: 17; Layout.leftMargin: 12 }
-                Label { text: "Compare Algorithms"; visible: root.windowWidth >= 980 && !root.sidebarCollapsed; color: root.section === "Compare" ? root.theme.purple : root.theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
+                Label { text: "Compare Algorithms"; visible: root.windowWidth >= 980 && !root.sidebarCollapsed; color: root.section === "Compare" ? root.theme.purpleText : root.theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
             }
         }
         Button {
@@ -174,7 +176,7 @@ Rectangle {
                 }
             }
             onClicked: settingsMenu.open()
-            background: Rectangle { radius: 8; color: parent.hovered ? root.theme.elevated : "transparent" }
+            background: Rectangle { radius: 8; color: settingsButton.hovered || settingsButton.visualFocus ? root.theme.elevated : "transparent"; border.width: settingsButton.visualFocus ? 2 : 0; border.color: root.theme.brightPurple }
             contentItem: RowLayout {
                 Icon { name: "settings"; color: root.theme.muted; iconSize: 17; Layout.leftMargin: 12 }
                 Label { text: "Settings"; visible: root.windowWidth >= 980 && !root.sidebarCollapsed; color: root.theme.muted; font.pixelSize: 11; Layout.fillWidth: true }

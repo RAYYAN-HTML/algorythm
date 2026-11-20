@@ -49,7 +49,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.minimumWidth: 0
                         spacing: 9
-                        Label { text: "ALGORITHM STUDIO  /  DSA WORKSPACE"; color: page.theme.purple; font.pixelSize: 9; font.bold: true; font.letterSpacing: 1.4 }
+                        Label { text: "ALGORITHM STUDIO  /  DSA WORKSPACE"; color: page.theme.purpleText; font.pixelSize: 9; font.bold: true; font.letterSpacing: 1.4 }
                         Label { text: "See every step."; color: page.theme.text; font.pixelSize: page.width < 900 ? 27 : 34; font.bold: true }
                         Label {
                             Layout.fillWidth: true
@@ -57,16 +57,18 @@ Item {
                             color: page.theme.muted; font.pixelSize: 12; wrapMode: Text.WordWrap
                         }
                         Button {
+                            id: startButton
                             text: "Start with sorting"
                             implicitHeight: 38
                             onClicked: page.navigate("Sorting")
                             background: Rectangle {
                                 radius: 10
                                 gradient: Gradient {
-                                    GradientStop { position: 0.0; color: parent.down ? page.theme.deepPurple : parent.hovered ? page.theme.brightPurple : page.theme.purple }
+                                    GradientStop { position: 0.0; color: parent.down ? page.theme.deepPurple : page.theme.action }
                                     GradientStop { position: 1.0; color: page.theme.deepPurple }
                                 }
-                                border.color: page.theme.brightPurple
+                                border.width: startButton.visualFocus ? 2 : 1
+                                border.color: startButton.visualFocus ? page.theme.text : page.theme.action
                             }
                             contentItem: RowLayout {
                                 Label { text: "Start with sorting"; color: page.theme.textOnAccent; font.pixelSize: 11; font.bold: true; leftPadding: 12 }

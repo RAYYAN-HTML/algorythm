@@ -32,7 +32,7 @@ Rectangle {
             Item { Layout.fillWidth: true }
             Label {
                 text: root.controller.algorithm === "Merge Sort" ? "O(n)" : root.controller.algorithm === "Quick Sort" ? "O(log n) avg" : "O(1)"
-                color: root.theme.purple; font.family: "Consolas"; font.pixelSize: 11
+                color: root.theme.purpleText; font.family: "Consolas"; font.pixelSize: 11
             }
         }
         RowLayout {
