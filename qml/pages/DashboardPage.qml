@@ -86,7 +86,7 @@ Item {
                             anchors.top: parent.top
                             anchors.left: parent.left
                             anchors.margins: 13
-                            text: "LIVE TRACE  ·  7 VALUES"
+                            text: "SAMPLE TRACE  ·  7 VALUES"
                             color: page.theme.muted
                             font.pixelSize: 8
                             font.bold: true

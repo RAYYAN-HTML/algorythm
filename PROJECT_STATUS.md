@@ -4,6 +4,8 @@ Last reconciled: 2026-11-20
 
 ## Current verification snapshot (2026-11-20)
 
+- Installed project-local skills with `npx skills add TheQtCompanyRnD/agent-skills` (13 Qt skills) and `npx skills add https://github.com/cuellarfr/design-skills` (10 design/accessibility skills); `.agents/skills` and `skills-lock.json` retain the installed skill content and source revisions. The Qt QML review linter covered all 21 QML files and reported 153 findings across 26 rule/message pairs. `qmllint` ran but emitted broad type-resolution warnings for injected context properties/theme objects and unqualified access; these need QML module/type registration before they can be treated as actionable diagnostics. The deep review found a keyboard event propagation issue in Sorting and it is fixed below.
+- Keyboard fix: Sorting's page shortcut handler now exits when a focused child already accepted a key event, in addition to leaving input-focused and auto-repeat events alone. This avoids taking keys intended for controls such as the algorithm ComboBox. Fresh Release incremental build passed after closing a stale app process that held the executable lock; CTest passed `algorithm_generators` 1/1 (1.12 s, 1.15 s total). The updated app remained running for a 4-second offscreen/software startup smoke with empty stdout/stderr. Keyboard focus behavior was verified by source tracing, not interactive key injection.
 - GitHub Actions workflow: `.github/workflows/ci.yml` runs on every push and pull request (and manually), installs Qt 6.8.3 for Windows/MSVC 2022, configures a Release build with tests enabled, builds the application and test executable, then runs CTest with failure output and `--no-tests=error`. Hosted run 1 for commit `f7e403c` was observed in progress after push; no hosted result has been confirmed yet.
 - Local verification: fresh Release configure and build passed with CMake/Ninja, Qt 6.11.2 MinGW in `out/ci-release`; CTest passed `algorithm_generators` 1/1 in 1.17 s (1.21 s total). The app remained running through a 4-second offscreen/software-backend startup smoke; captured stdout/stderr were empty. This is a startup check, not interactive runtime or visual verification.
 - Platform limits: local verification used Windows x64/MinGW rather than the workflow's Windows x64/MSVC 2022 toolchain. The app declares a 780×560 minimum. 800×600 is within the supported range; 1024×768, 1280×800 and 1440×900 visual checks, packaged-app smoke after current changes, and interactive coverage remain unverified in this pass.
@@ -44,7 +46,7 @@ This file tracks verified repository state. Items are marked complete only after
 
 ## Current Phase and Implementation Plan
 
-Branch `main` started clean at `ade8a80` (`origin/main`), following `e4e10c0` and `5ce5b7a`. The existing Qt/QML navigation, controller models, algorithm snapshots, and purple theme are retained. Current uncommitted changes add GitHub CI, a CTest timeout, and a Graph node-position correction.
+Branch `main` is tracking `origin/main`; the working tree now contains the QML keyboard propagation fix and installed project-local skills. The existing Qt/QML navigation, controller models, algorithm snapshots, and purple theme are retained. Recent committed work added GitHub CI and a Graph node-position correction.
 
 1. Verify the rebuilt Graph node layout and graph interactions after the explicit panel-coordinate correction.
 2. Finish compact Compare/Graph and keyboard-navigation checks; exercise settings controls, prediction feedback, and playback edge cases.
@@ -53,7 +55,7 @@ Branch `main` started clean at `ade8a80` (`origin/main`), following `e4e10c0` an
 
 ## Currently Working
 
-- Current pass: GitHub CI added; live review found the Graph node positioning issue and an explicit panel-dimension correction was made. Existing visualizer and Dashboard refinements are historical implementation work.
+- Current pass: GitHub CI added, Graph node positioning corrected, QML keyboard shortcut propagation fixed, and Qt/design review skills installed locally. Existing visualizer and Dashboard refinements are historical implementation work.
 - This pass: fresh Release configure/build and CTest pass in `out/ci-release`; Qt 6.11.2 MinGW. Startup smoke with Qt offscreen/software backend remained alive for 4 seconds and produced no stdout/stderr. These checks do not verify interactive runtime or visuals.
 - Earlier recorded runtime checks remain historical evidence for the earlier tested build; they do not verify this fresh build at 800×600, 1024×768, 1280×800, or 1440×900.
 - Latest icon simplification and tooltip build/CTest pass; compact and expanded navigation, the A monogram, and the tooltip aligned beside Search were visually checked.
@@ -206,3 +208,17 @@ No active external blocker is known.
 3. Check Sorting prediction dialogs, Settings accessibility toggles, keyboard navigation and workspace splitter persistence.
 4. Complete remaining runtime/accessibility checks, verify all requested supported sizes, then rebuild and retest.
 5. Smoke-test the newly built package before considering a new release; v1.2.0 remains the last published release.
+
+## Codex audit pass — 2026-11-20
+
+- Preserved pre-existing user edits in `PROJECT_STATUS.md`, `qml/pages/SortingPage.qml`, `.agents/`, and `skills-lock.json`.
+- Added `AUDIT_REPORT.md`, `UX_RESEARCH.md`, `DESIGN_SYSTEM.md`, and `IMPLEMENTATION_PLAN.md` with heuristic evidence, research limits, design roles, scope and remaining work.
+- Corrected Dashboard text from `LIVE TRACE · 7 VALUES` to `SAMPLE TRACE · 7 VALUES` because the illustration is static.
+- Renamed the `AlgorithmNode` visual-state property from inherited `state` to `nodeState`; updated its Sorting and Comparison bindings. Focused lint no longer reports the `QQuickItem.state` property override.
+- Verification after those edits: Release build succeeded; CTest `algorithm_generators` passed 1/1 (1.18 sec); `git diff --check` had only Git LF→CRLF notices.
+- Whole-source QML lint: 567 finding instances, 59 rule/message pairs. Scoped C++ lint: 24 instances in six rule groups. These include noisy project type-resolution warnings and modernization findings; see `AUDIT_REPORT.md` for triage.
+- Live runtime walkthrough at 1440×900: Dashboard, Sorting, Searching, Graphs and Compare inspected. Sorting Next advanced from step 1 to 2; Graph Next advanced from 1 to 2 with node/edge geometry aligned; Search found target 6 and showed matching narration; Compare Run Both completed both Bubble Sort traces on shared input with 21 comparisons and 13 swaps each.
+- No QML Quick Test files exist, so no QML suite was run. No participant UX study was conducted. Smaller requested window sizes, all modes/edge cases, keyboard-only navigation, reduced-motion behavior and several structure workflows remain unverified in this pass.
+- Qt 6.11.2 `RelWithDebInfo` profiling build with `-DQT_QML_DEBUG` succeeded. `qmlprofiler` exited cleanly and its trace was parsed; it is a short startup/transition sample, not sustained playback evidence.
+- Figma MCP and exported design tokens were unavailable in this session. Design documentation follows the existing QML theme/components; no Figma extraction is claimed.
+- Profiler follow-up: clean `qmlprofiler` exit produced a 3.59 MB trace at `profiler/traces/qmlprofiler-trace-Algorythm-2026-11-20-140000.qtd`. Parser measured a 4.23 s range, 31 animation frames, estimated 59.5 average FPS (58–62 min/max), 17.24 ms p50/p95/p99, no frame over 25 ms, and 1.68 MB peak QML heap. Startup creation/compilation dominated aggregate event time. This is a short startup/transition sample, not sustained playback; no optimization was inferred from it.
