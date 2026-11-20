@@ -48,7 +48,7 @@ Item {
                 Layout.preferredWidth: Math.min(page.width < 900 ? 250 : 496, page.width * 0.42)
                 Layout.maximumWidth: page.width < 900 ? 250 : 496
                 Label { text: "ALGORITHM ARENA"
- color: theme.cyan
+ color: theme.purple
  font.pixelSize: 10
  font.bold: true
  font.letterSpacing: 1.5 }
@@ -73,7 +73,7 @@ Item {
  highlighted: true
  onClicked: page.applySharedInput() }
         }
-        Label { Layout.fillWidth: true; visible: page.inputError !== ""; text: page.inputError; color: theme.pink; font.pixelSize: 11 }
+        Label { Layout.fillWidth: true; visible: page.inputError !== ""; text: page.inputError; color: theme.error; font.pixelSize: 11 }
         ScrollView {
             id: cardsScroll
             Layout.fillWidth: true
@@ -94,14 +94,14 @@ Item {
                     height: page.width < 900 ? 270 : 360
                     radius: 16
                     color: theme.secondary
-                    border.color: index === 0 ? "#1A5264" : "#54356E"
+                    border.color: theme.border
                     ColumnLayout {
                         anchors.fill: parent
                         anchors.margins: 16
                         spacing: 12
                         RowLayout {
                             Label { text: index === 0 ? "ALGORITHM A" : "ALGORITHM B"
- color: index === 0 ? theme.cyan : "#D8B4FE"
+ color: index === 0 ? theme.purple : "#D8B4FE"
  font.pixelSize: 9
  font.bold: true }
                             Item { Layout.fillWidth: true }
@@ -111,6 +111,7 @@ Item {
  implicitWidth: page.width < 900 ? 112 : 140 }
                         }
                         Item {
+                            id: visualArea
                             Layout.fillWidth: true
                             Layout.fillHeight: true
                             Layout.minimumHeight: 90
@@ -122,10 +123,10 @@ Item {
                                     required property int nodePosition
                                     required property int nodeValue
                                     value: nodeValue
-                                    state: nodePosition === card.modelData.activeA || nodePosition === card.modelData.activeB ? "compare" : card.modelData.complete ? "done" : "default"
-                                    readonly property real nodeGap: Math.min(68, Math.max(0, (parent.width - width) / Math.max(1, card.modelData.values.length - 1)))
-                                    x: card.modelData.values.length <= 1 ? (parent.width - width) / 2 : (parent.width - (card.modelData.values.length - 1) * nodeGap - width) / 2 + nodePosition * nodeGap
-                                    y: parent.height / 2
+                                    state: card.modelData.complete ? "done" : nodePosition === card.modelData.activeA ? "active" : nodePosition === card.modelData.activeB ? "compare" : "default"
+                                    readonly property real nodeGap: Math.min(68, Math.max(0, (visualArea.width - width) / Math.max(1, card.modelData.values.length - 1)))
+                                    x: card.modelData.values.length <= 1 ? (visualArea.width - width) / 2 : (visualArea.width - (card.modelData.values.length - 1) * nodeGap - width) / 2 + nodePosition * nodeGap
+                                    y: (visualArea.height - height) / 2
                                 }
                             }
                         }
@@ -141,7 +142,7 @@ Item {
  font.pixelSize: 11 }
                             Item { Layout.fillWidth: true }
                             Label { text: "Swaps  " + modelData.swaps
- color: theme.pink
+ color: theme.brightPurple
  font.pixelSize: 11 }
                         }
                         ProgressBar { Layout.fillWidth: true

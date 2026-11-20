@@ -3,10 +3,10 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Rectangle {
-    property color panelColor: "#151F32"
+    property color panelColor: "#17172A"
     color: panelColor
  radius: 14
- border.color: "#26344D"
+ border.color: "#29243E"
     implicitHeight: 112
     ColumnLayout {
         anchors.fill: parent
@@ -18,7 +18,7 @@ Rectangle {
  font.pixelSize: 13 }
         RowLayout {
             Layout.fillWidth: true
-            Repeater { model: playback.algorithm.endsWith("Search") ? [["INSPECTED", playback.comparisons, "#FBBF24"], ["COMPARISONS", playback.comparisons, "#22D3EE"], ["TARGET", playback.searchTarget, "#34D399"]] : [["COMPARE", playback.comparisons, "#FBBF24"], ["SWAPS", playback.swaps, "#EC4899"], ["WRITES", playback.writes, "#22D3EE"]]
+            Repeater { model: playback.algorithm.endsWith("Search") ? [["INSPECTED", playback.comparisons, "#FBBF24"], ["COMPARISONS", playback.comparisons, "#8B5CF6"], ["TARGET", playback.searchTarget, "#34D399"]] : [["COMPARE", playback.comparisons, "#FBBF24"], ["SWAPS", playback.swaps, "#A855F7"], ["WRITES", playback.writes, "#8B5CF6"]]
                 delegate: ColumnLayout { Layout.fillWidth: true
  spacing: 3
  Label { text: modelData[0]

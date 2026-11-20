@@ -11,6 +11,11 @@ Rectangle {
     property bool reducedMotion: false
     property int windowWidth: 1440
     property int windowHeight: 900
+    property real sidebarWidth: sidebarCollapsed || windowWidth < 980 ? 68 : windowWidth < 1180 ? 184 : 220
+    property Gradient activeGradient: Gradient {
+        GradientStop { position: 0.0; color: "#3C2465" }
+        GradientStop { position: 1.0; color: "#241A3B" }
+    }
 
     signal navigationRequested(string section)
     signal collapseRequested()
@@ -18,8 +23,11 @@ Rectangle {
     signal sidebarCollapsedToggled(bool enabled)
     signal defaultsRestored()
 
-    Layout.preferredWidth: sidebarCollapsed || windowWidth < 980 ? 68 : windowWidth < 1180 ? 184 : 220
+    Layout.preferredWidth: sidebarWidth
     Layout.fillHeight: true
+    Behavior on sidebarWidth {
+        NumberAnimation { duration: root.reducedMotion ? 0 : 220; easing.type: Easing.OutCubic }
+    }
     color: theme.secondary
     border.color: theme.border
 
@@ -36,8 +44,8 @@ Rectangle {
             Rectangle {
                 visible: root.windowWidth >= 980 && !root.sidebarCollapsed
                 width: 36; height: 36; radius: 11
-                color: "#183447"; border.color: root.theme.cyan
-                Label { anchors.centerIn: parent; text: "A"; color: root.theme.cyan; font.bold: true; font.pixelSize: 18 }
+                color: "#2B2042"; border.color: root.theme.purple
+                Label { anchors.centerIn: parent; text: "A"; color: root.theme.purple; font.bold: true; font.pixelSize: 18 }
             }
             ColumnLayout {
                 spacing: 0
@@ -57,7 +65,7 @@ Rectangle {
                 ToolTip.visible: hovered
                 ToolTip.text: Accessible.name
                 onClicked: root.collapseRequested()
-                background: Rectangle { radius: 7; color: parent.hovered ? "#182438" : "transparent" }
+                background: Rectangle { radius: 7; color: parent.hovered ? "#1A1930" : "transparent" }
                 contentItem: Icon { name: "menu"; color: root.theme.muted; iconSize: 18 }
             }
         }
@@ -101,20 +109,22 @@ Rectangle {
                         onClicked: root.navigationRequested(modelData.name)
                         background: Rectangle {
                             radius: 10
-                            color: parent.selected ? "#123244" : parent.hovered ? "#182438" : "transparent"
-                            border.color: parent.selected ? "#1A5264" : "transparent"
+                            color: parent.selected ? "#35215A" : parent.hovered ? "#211B39" : "transparent"
+                            border.color: parent.selected ? "#6D28D9" : "transparent"
+                            gradient: parent.selected ? activeGradient : undefined
                             Behavior on color { ColorAnimation { duration: root.reducedMotion ? 0 : 140 } }
-                            Rectangle { x: 0; y: 6; width: 3; height: parent.height - 12; radius: 2; color: root.theme.cyan; visible: parent.parent.selected }
+                            Rectangle { x: 0; y: 6; width: 3; height: parent.height - 12; radius: 2; color: root.theme.purple; visible: parent.parent.selected }
                         }
                         contentItem: RowLayout {
                             spacing: 11
-                            Icon { name: modelData.icon; color: selected ? root.theme.cyan : root.theme.muted; iconSize: 17; Layout.leftMargin: 12 }
+                            Icon { name: modelData.icon; color: selected ? root.theme.purple : root.theme.muted; iconSize: 17; Layout.leftMargin: 12 }
                             Label { text: modelData.name; visible: root.windowWidth >= 980 && !root.sidebarCollapsed; color: selected ? root.theme.text : root.theme.muted; font.pixelSize: 12; font.bold: selected; Layout.fillWidth: true; horizontalAlignment: Text.AlignLeft }
                         }
                     }
                 }
             }
         }
+
 
         Rectangle { Layout.fillWidth: true; height: 1; color: root.theme.border }
         Button {
@@ -127,10 +137,10 @@ Rectangle {
             ToolTip.visible: (root.sidebarCollapsed || root.windowWidth < 980) && hovered
             ToolTip.text: "Compare algorithms"
             onClicked: root.navigationRequested("Compare")
-            background: Rectangle { radius: 9; color: parent.checked ? "#123244" : parent.hovered ? "#182438" : "transparent"; border.color: parent.checked ? "#1A5264" : "transparent" }
+            background: Rectangle { radius: 9; color: parent.checked ? "#30204E" : parent.hovered ? "#1A1930" : "transparent"; border.color: parent.checked ? "#6D28D9" : "transparent" }
             contentItem: RowLayout {
-                Icon { name: "compare"; color: root.section === "Compare" ? root.theme.cyan : root.theme.muted; iconSize: 17; Layout.leftMargin: 12 }
-                Label { text: "Compare Algorithms"; visible: root.windowWidth >= 980 && !root.sidebarCollapsed; color: root.section === "Compare" ? root.theme.cyan : root.theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
+                Icon { name: "compare"; color: root.section === "Compare" ? root.theme.purple : root.theme.muted; iconSize: 17; Layout.leftMargin: 12 }
+                Label { text: "Compare Algorithms"; visible: root.windowWidth >= 980 && !root.sidebarCollapsed; color: root.section === "Compare" ? root.theme.purple : root.theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
             }
         }
         Button {
@@ -141,7 +151,7 @@ Rectangle {
             ToolTip.visible: (root.sidebarCollapsed || root.windowWidth < 980) && hovered
             ToolTip.text: "Settings"
             onClicked: settingsMenu.open()
-            background: Rectangle { radius: 8; color: parent.hovered ? "#182438" : "transparent" }
+            background: Rectangle { radius: 8; color: parent.hovered ? "#1A1930" : "transparent" }
             contentItem: RowLayout {
                 Icon { name: "settings"; color: root.theme.muted; iconSize: 17; Layout.leftMargin: 12 }
                 Label { text: "Settings"; visible: root.windowWidth >= 980 && !root.sidebarCollapsed; color: root.theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
@@ -152,10 +162,10 @@ Rectangle {
             Layout.fillWidth: true
             height: 66
             visible: root.windowWidth >= 980 && !root.sidebarCollapsed && root.windowHeight >= 700
-            radius: 12; color: "#111D30"; border.color: root.theme.border
+            radius: 12; color: "#17172A"; border.color: root.theme.border
             RowLayout {
                 anchors.fill: parent; anchors.margins: 11
-                Rectangle { width: 34; height: 34; radius: 17; color: "#34224C"; Label { anchors.centerIn: parent; text: "R"; color: "#D8B4FE"; font.bold: true } }
+                Rectangle { width: 34; height: 34; radius: 17; color: "#3A235F"; Label { anchors.centerIn: parent; text: "R"; color: "#D8B4FE"; font.bold: true } }
                 ColumnLayout {
                     spacing: 2
                     Label { text: "Student Mode"; color: root.theme.text; font.pixelSize: 12; font.bold: true }

@@ -21,13 +21,26 @@ Item {
             height: implicitHeight + 30
             spacing: 18
 
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: 2
+                Label { text: "YOUR DSA WORKSPACE"; color: page.theme.muted; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5 }
+                Item { Layout.fillWidth: true }
+                Label { text: "LEARN · EXPLORE · VISUALIZE"; color: page.theme.subdued; font.pixelSize: 9; font.letterSpacing: 1 }
+            }
+
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: page.width < 900 ? 184 : 190
                 radius: 20
-                color: "#101C2E"
-                border.color: "#263B56"
+                color: "#17132A"
+                border.color: "#3A2A59"
                 clip: true
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#211638" }
+                    GradientStop { position: 0.58; color: "#17152A" }
+                    GradientStop { position: 1.0; color: "#111321" }
+                }
                 RowLayout {
                     anchors.fill: parent
                     anchors.margins: page.width < 900 ? 20 : 28
@@ -36,7 +49,7 @@ Item {
                         Layout.fillWidth: true
                         Layout.minimumWidth: 0
                         spacing: 9
-                        Label { text: "ALGORITHM STUDIO  /  DSA WORKSPACE"; color: page.theme.cyan; font.pixelSize: 9; font.bold: true; font.letterSpacing: 1.4 }
+                        Label { text: "ALGORITHM STUDIO  /  DSA WORKSPACE"; color: page.theme.purple; font.pixelSize: 9; font.bold: true; font.letterSpacing: 1.4 }
                         Label { text: "See every step."; color: page.theme.text; font.pixelSize: page.width < 900 ? 27 : 34; font.bold: true }
                         Label {
                             Layout.fillWidth: true
@@ -47,7 +60,14 @@ Item {
                             text: "Start with sorting"
                             implicitHeight: 38
                             onClicked: page.navigate("Sorting")
-                            background: Rectangle { radius: 9; color: parent.down ? "#0891B2" : parent.hovered ? "#22D3EE" : "#06B6D4"; border.color: "#67E8F9" }
+                            background: Rectangle {
+                                radius: 10
+                                gradient: Gradient {
+                                    GradientStop { position: 0.0; color: parent.down ? "#6D28D9" : parent.hovered ? "#A855F7" : "#8B5CF6" }
+                                    GradientStop { position: 1.0; color: parent.down ? "#581C87" : "#6D28D9" }
+                                }
+                                border.color: "#A855F7"
+                            }
                             contentItem: RowLayout {
                                 Label { text: "Start with sorting"; color: "#06111F"; font.pixelSize: 11; font.bold: true; leftPadding: 12 }
                                 Icon { name: "arrow-right"; color: "#06111F"; iconSize: 15; Layout.rightMargin: 10 }
@@ -58,14 +78,14 @@ Item {
                         visible: page.width >= 900
                         Layout.preferredWidth: 190
                         Layout.fillHeight: true
-                        Rectangle { anchors.fill: parent; radius: 16; color: "#0B1422"; border.color: "#1D3047" }
+                        Rectangle { anchors.fill: parent; radius: 16; color: "#100F1D"; border.color: "#33284D" }
                         ColumnLayout {
                             anchors.fill: parent
                             anchors.margins: 16
                             RowLayout {
                                 Label { text: "TRACE"; color: page.theme.muted; font.pixelSize: 8; font.bold: true; font.letterSpacing: 1.2 }
                                 Item { Layout.fillWidth: true }
-                                Label { text: "07 ITEMS"; color: page.theme.cyan; font.pixelSize: 8; font.family: "Consolas" }
+                                Label { text: "07 ITEMS"; color: page.theme.purple; font.pixelSize: 8; font.family: "Consolas" }
                             }
                             RowLayout {
                                 Layout.fillWidth: true
@@ -82,7 +102,7 @@ Item {
                                         Layout.alignment: Qt.AlignBottom
                                         height: modelData
                                         radius: 5
-                                        color: index === 3 ? page.theme.cyan : index % 2 ? "#5A42A2" : "#313B65"
+                                        color: index === 3 ? page.theme.purple : index % 2 ? "#5A42A2" : "#313B65"
                                         opacity: index === 3 ? 1 : 0.72
                                     }
                                 }
@@ -93,9 +113,19 @@ Item {
                 }
             }
 
+            GridLayout {
+                Layout.fillWidth: true
+                columns: page.width < 820 ? 1 : 3
+                columnSpacing: 12
+                rowSpacing: 10
+                StatCard { theme: page.theme; iconName: "sorting"; value: "07"; caption: "ALGORITHMS TO EXPLORE"; detail: "Five sorting · two searching" }
+                StatCard { theme: page.theme; iconName: "dashboard"; value: "07"; caption: "LEARNING LABS"; detail: "Guided, interactive modules" }
+                StatCard { theme: page.theme; iconName: "tree"; value: "04"; caption: "STRUCTURE TYPES"; detail: "Lists · stacks · queues · trees" }
+            }
+
             RowLayout {
                 Layout.fillWidth: true
-                Label { text: "Choose a lab"; color: page.theme.text; font.pixelSize: 19; font.bold: true }
+                Label { text: "Explore a learning lab"; color: page.theme.text; font.pixelSize: 19; font.bold: true }
                 Item { Layout.fillWidth: true }
                 Label { text: "07 LEARNING MODULES"; color: page.theme.muted; font.pixelSize: 9; font.letterSpacing: 1 }
             }

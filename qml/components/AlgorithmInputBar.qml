@@ -51,7 +51,7 @@ Rectangle {
             color: root.theme.text
             font.family: "Consolas"
             font.pixelSize: 12
-            background: Rectangle { radius: 6; color: "#080C17"; border.color: root.theme.border }
+            background: Rectangle { radius: 6; color: "#080812"; border.color: root.theme.border }
         }
         ComboBox {
             model: ["Custom", "Random", "Sorted", "Reverse"]
@@ -68,7 +68,7 @@ Rectangle {
             Accessible.name: "Search target"
             color: root.theme.text
             placeholderText: "Target"
-            background: Rectangle { radius: 6; color: "#080C17"; border.color: root.theme.border }
+            background: Rectangle { radius: 6; color: "#080812"; border.color: root.theme.border }
             onAccepted: root.applyInput()
         }
         Button {

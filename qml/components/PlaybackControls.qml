@@ -5,10 +5,10 @@ import "../components"
 
 Rectangle {
     id: root
-    property color panelColor: "#151F32"
+    property color panelColor: "#17172A"
     color: panelColor
  radius: 14
- border.color: "#26344D"
+ border.color: "#29243E"
     implicitHeight: 88
     ColumnLayout {
         anchors.fill: parent
@@ -40,7 +40,7 @@ Rectangle {
  font.pixelSize: 11 }
             Item { Layout.fillWidth: true }
             Label { text: playback.speed.toFixed(1) + "×"
- color: "#22D3EE"
+ color: "#8B5CF6"
  font.bold: true
  font.pixelSize: 12 }
             Slider { id: speed

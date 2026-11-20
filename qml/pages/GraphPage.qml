@@ -26,7 +26,7 @@ Item {
         spacing: 14
         RowLayout {
             ColumnLayout {
-                Label { text: "GRAPH LAB"; color: theme.cyan; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5 }
+                Label { text: "GRAPH LAB"; color: theme.purple; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5 }
                 Label { text: graph.algorithm; color: theme.text; font.pixelSize: 25; font.bold: true }
                 Label { text: "Traverse the sample graph or add a nonnegative weighted edge."; color: theme.muted; font.pixelSize: 11 }
             }
@@ -66,8 +66,8 @@ Item {
                         var ex = page.px[graph.edgeTo] * width, ey = page.py[graph.edgeTo] * height
                         ctx.beginPath(); ctx.moveTo(sx, sy)
                         ctx.lineTo(sx + (ex - sx) * activeEdgeProgress, sy + (ey - sy) * activeEdgeProgress)
-                        ctx.strokeStyle = "#22D3EE"; ctx.lineWidth = 3
-                        ctx.shadowColor = "#22D3EE"; ctx.shadowBlur = 11
+                        ctx.strokeStyle = "#8B5CF6"; ctx.lineWidth = 3
+                        ctx.shadowColor = "#8B5CF6"; ctx.shadowBlur = 11
                         ctx.stroke(); ctx.shadowBlur = 0
                     }
                 }
@@ -104,9 +104,9 @@ Item {
                     width: 54; height: 54; radius: 27
                     x: 18 + page.px[index] * (parent.width - 36) - width / 2
                     y: 18 + page.py[index] * (parent.height - 36) - height / 2
-                    color: index === graph.active ? "#123B4B" : graph.visited.indexOf(index) >= 0 ? "#15382F" : "#211B39"
+                    color: index === graph.active ? "#38245B" : graph.visited.indexOf(index) >= 0 ? "#15382F" : "#1A1930"
                     border.width: index === graph.active ? 3 : 1.5
-                    border.color: index === graph.active ? theme.cyan : graph.visited.indexOf(index) >= 0 ? theme.green : theme.purple
+                    border.color: index === graph.active ? theme.purple : graph.visited.indexOf(index) >= 0 ? theme.green : theme.purple
                     scale: index === graph.active ? 1.12 : 1.0
                     Behavior on x { NumberAnimation { duration: theme.reducedMotion ? 0 : 260 } }
                     Behavior on color { ColorAnimation { duration: theme.reducedMotion ? 0 : 240 } }
@@ -137,7 +137,7 @@ Item {
                     Button { text: "Run"; highlighted: true; onClicked: graph.run(page.startNode) }
                     Button { Accessible.name: "Restart graph"; onClicked: graph.restart(); contentItem: Icon { name: "restart"; color: theme.muted; iconSize: 16 } }
                     Button { Accessible.name: "Previous graph step"; onClicked: graph.previous(); contentItem: Icon { name: "previous"; color: theme.muted; iconSize: 16 } }
-                    Button { Accessible.name: graph.playing ? "Pause graph" : "Play graph"; onClicked: graph.playPause(); contentItem: Icon { name: graph.playing ? "pause" : "play"; color: graph.playing ? theme.amber : theme.cyan; iconSize: 16 } }
+                    Button { Accessible.name: graph.playing ? "Pause graph" : "Play graph"; onClicked: graph.playPause(); contentItem: Icon { name: graph.playing ? "pause" : "play"; color: graph.playing ? theme.amber : theme.purple; iconSize: 16 } }
                     Button { Accessible.name: "Next graph step"; onClicked: graph.next(); contentItem: Icon { name: "next"; color: theme.muted; iconSize: 16 } }
                     Label { text: graph.stepIndex + 1 + " / " + graph.stepCount; color: theme.muted; font.pixelSize: 10 }
                     Item { Layout.fillWidth: true }
@@ -148,10 +148,10 @@ Item {
                     Label { text: "→"; color: theme.muted }
                     SpinBox { from: 0; to: 6; value: page.toNode; onValueModified: page.toNode = value }
                     SpinBox { from: 0; to: 999; value: page.weight; onValueModified: page.weight = value }
-                    Button { text: "Add edge"; onClicked: page.addWeightedEdge(); background: Rectangle { radius: 8; color: "#123244"; border.color: theme.cyan }
- contentItem: Text { text: parent.text; color: theme.cyan; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
+                    Button { text: "Add edge"; onClicked: page.addWeightedEdge(); background: Rectangle { radius: 8; color: "#30204E"; border.color: theme.purple }
+ contentItem: Text { text: parent.text; color: theme.purple; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter } }
                 }
-                Label { Layout.fillWidth: true; text: page.edgeFeedback; color: page.edgeFeedback.startsWith("Added") ? theme.green : theme.muted; font.pixelSize: 10; wrapMode: Text.WordWrap }
+                Label { Layout.fillWidth: true; text: page.edgeFeedback; color: page.edgeFeedback.startsWith("Added") ? theme.green : page.edgeFeedback.length ? theme.error : theme.muted; font.pixelSize: 10; wrapMode: Text.WordWrap }
             }
         }
     }

@@ -21,9 +21,9 @@ Button {
 
     background: Rectangle {
         radius: 15
-        color: root.down ? "#1C3048" : root.hovered || root.visualFocus ? "#1A2940" : root.theme.panel
+        color: root.down ? "#29213E" : root.hovered || root.visualFocus ? "#211B39" : root.theme.panel
         border.width: root.visualFocus ? 2 : 1
-        border.color: root.hovered || root.visualFocus ? root.theme.cyan : root.theme.border
+        border.color: root.hovered || root.visualFocus ? root.theme.purple : root.theme.border
         Behavior on color { ColorAnimation { duration: root.theme.reducedMotion ? 0 : 150 } }
         Behavior on border.color { ColorAnimation { duration: root.theme.reducedMotion ? 0 : 150 } }
     }
@@ -34,7 +34,7 @@ Button {
         spacing: 8
         RowLayout {
             Layout.fillWidth: true
-            Icon { name: root.iconName; color: root.theme.cyan; iconSize: 21 }
+            Icon { name: root.iconName; color: root.theme.purple; iconSize: 21 }
             Item { Layout.fillWidth: true }
             Label { text: root.indexLabel; color: root.theme.purple; font.family: "Consolas"; font.pixelSize: 10 }
         }

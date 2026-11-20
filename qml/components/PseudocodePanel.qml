@@ -3,10 +3,10 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Rectangle {
-    property color panelColor: "#151F32"
+    property color panelColor: "#17172A"
     color: panelColor
  radius: 14
- border.color: "#26344D"
+ border.color: "#29243E"
     implicitHeight: 258
     ColumnLayout {
         anchors.fill: parent
@@ -37,12 +37,12 @@ Rectangle {
                 Layout.fillWidth: true
  height: 21
  radius: 4
-                color: playback.pseudocodeLine === index + 1 ? "#26304A" : "transparent"
+                color: playback.pseudocodeLine === index + 1 ? "#30204E" : "transparent"
                 Text { anchors.fill: parent
  anchors.leftMargin: 8
  verticalAlignment: Text.AlignVCenter
  text: (index + 1).toString().padStart(2, "0") + "   " + modelData
- color: playback.pseudocodeLine === index + 1 ? "#67E8F9" : "#94A3B8"
+ color: playback.pseudocodeLine === index + 1 ? "#C4B5FD" : "#94A3B8"
  font.family: "Consolas"
  font.pixelSize: 10 }
             }

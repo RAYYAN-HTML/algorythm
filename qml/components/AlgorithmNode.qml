@@ -5,6 +5,10 @@ Item {
     property int value: 0
     property string state: "default"
     property color accent: "#A855F7"
+    property color activeFill: "#38245B"
+    property color compareFill: "#40351C"
+    property color doneFill: "#15382F"
+    property color idleFill: "#1A1930"
     property int animationDuration: 380
     Accessible.name: "Value " + root.value
     Accessible.description: root.state === "compare" ? "Currently being compared" : root.state === "active" ? "Current algorithm element" : root.state === "done" ? "Completed element" : "Unprocessed element"
@@ -20,9 +24,9 @@ Item {
     Rectangle {
         anchors.fill: parent
  radius: width / 2
-        color: root.state === "active" ? "#123B4B" : root.state === "compare" ? "#40351C" : root.state === "done" ? "#15382F" : "#211B39"
+        color: root.state === "active" ? root.activeFill : root.state === "compare" ? root.compareFill : root.state === "done" ? root.doneFill : root.idleFill
         border.width: root.state === "active" || root.state === "compare" ? 2 : 1
-        border.color: root.state === "active" ? "#22D3EE" : root.state === "compare" ? "#FBBF24" : root.state === "done" ? "#34D399" : "#8050C8"
+        border.color: root.state === "active" ? root.accent : root.state === "compare" ? "#FBBF24" : root.state === "done" ? "#34D399" : "#594477"
         Behavior on color { ColorAnimation { duration: root.animationDuration * 0.7 } }
         Behavior on border.color { ColorAnimation { duration: root.animationDuration * 0.7 } }
         Rectangle { anchors.fill: parent

@@ -39,6 +39,7 @@ qt_add_qml_module(Algorythm
         qml/components/LabCard.qml
         qml/components/SettingsPopup.qml
         qml/components/NavigationSidebar.qml
+        qml/components/StatCard.qml
         qml/pages/DashboardPage.qml
         qml/pages/SortingPage.qml
         qml/pages/StructurePage.qml

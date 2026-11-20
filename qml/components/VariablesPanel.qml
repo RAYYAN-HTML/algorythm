@@ -4,10 +4,10 @@ import QtQuick.Layouts
 
 Rectangle {
     id: panel
-    property color panelColor: "#151F32"
+    property color panelColor: "#17172A"
     color: panelColor
     radius: 14
-    border.color: "#26344D"
+    border.color: "#29243E"
     implicitHeight: content.implicitHeight + 30
 
     ColumnLayout {
@@ -18,7 +18,7 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            Label { text: "{ }"; color: "#22D3EE"; font.bold: true }
+            Label { text: "{ }"; color: "#8B5CF6"; font.bold: true }
             Label { text: "Current variables"; color: "#F8FAFC"; font.bold: true; font.pixelSize: 13 }
             Item { Layout.fillWidth: true }
             Label { text: "STEP STATE"; color: "#94A3B8"; font.pixelSize: 8; font.letterSpacing: 0.8 }

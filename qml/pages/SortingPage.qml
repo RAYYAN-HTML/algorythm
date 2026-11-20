@@ -19,7 +19,7 @@ Item {
         handle: Rectangle {
             implicitWidth: 6
             implicitHeight: 6
-            color: SplitHandle.pressed ? theme.cyan : SplitHandle.hovered ? "#53647E" : "#26344D"
+            color: SplitHandle.pressed ? theme.purple : SplitHandle.hovered ? "#53647E" : "#29243E"
             radius: 3
             Behavior on color { ColorAnimation { duration: 140 } }
         }
@@ -41,7 +41,7 @@ Item {
                 RowLayout {
                     ColumnLayout { spacing: 4
                     Label { text: "SORTING LAB"
- color: theme.cyan
+ color: theme.purple
  font.pixelSize: 10
  font.bold: true
  font.letterSpacing: 1.6 }
@@ -64,10 +64,10 @@ Item {
  checkable: true
  onToggled: page.focusMode = checked
  background: Rectangle { radius: 8
- color: parent.checked ? "#123244" : theme.secondary
+ color: parent.checked ? "#30204E" : theme.secondary
  border.color: theme.border }
  contentItem: Text { text: parent.text
- color: parent.checked ? theme.cyan : theme.muted
+ color: parent.checked ? theme.purple : theme.muted
  font.pixelSize: 11
  horizontalAlignment: Text.AlignHCenter
  verticalAlignment: Text.AlignVCenter } }
@@ -92,13 +92,13 @@ Item {
  delegate: Rectangle { x: index * 44
  width: 1
  height: parent.height
- color: "#182438"
+ color: "#1A1930"
  opacity: 0.48 } }
                 Repeater { model: Math.floor(parent.height / 44)
  delegate: Rectangle { y: index * 44
  height: 1
  width: parent.width
- color: "#182438"
+ color: "#1A1930"
  opacity: 0.48 } }
                 ColumnLayout {
                     anchors.fill: parent
@@ -114,7 +114,7 @@ Item {
                         Rectangle { width: 8
  height: 8
  radius: 4
- color: theme.cyan }
+ color: theme.purple }
                         Label { text: "Active step"
  color: theme.muted
  font.pixelSize: 10 }
@@ -129,7 +129,7 @@ Item {
                                 required property int nodeValue
                                 animationDuration: theme.reducedMotion ? 0 : playback.animationDuration
                                 value: nodeValue
-                                state: nodePosition === playback.activeA || nodePosition === playback.activeB ? "compare" : playback.complete ? "done" : "default"
+                                state: playback.complete ? "done" : nodePosition === playback.activeA ? "active" : nodePosition === playback.activeB ? "compare" : "default"
                                 opacity: page.focusMode && playback.activeA >= 0 && nodePosition !== playback.activeA && nodePosition !== playback.activeB ? 0.25 : 1.0
                                 x: (parent.width - playback.values.length * Math.min(72, parent.width / playback.values.length) + Math.min(72, parent.width / playback.values.length)) / 2 + nodePosition * Math.min(72, parent.width / playback.values.length) - width / 2
                                 y: (parent.height - height) / 2
@@ -151,7 +151,7 @@ Item {
  text: "Predict"
  onClicked: challenge.openPrediction() }
                         Label { text: playback.complete ? "COMPLETE" : "RUNNING TRACE"
- color: playback.complete ? theme.green : theme.cyan
+ color: playback.complete ? theme.green : theme.purple
  font.pixelSize: 9
  font.bold: true }
                     }
@@ -166,7 +166,7 @@ Item {
             }
             Label { visible: page.errorMessage !== ""
  text: page.errorMessage
- color: theme.pink
+ color: theme.error
  font.pixelSize: 11 }
             PlaybackControls { Layout.fillWidth: true }
         }
