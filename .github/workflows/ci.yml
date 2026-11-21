@@ -46,7 +46,7 @@ jobs:
             Write-Host "::group::Direct C++ test diagnostics"
             & .\build\AlgorythmAlgorithmTests.exe -functions
             Write-Host "Function-list process exit code: $LASTEXITCODE"
-            & .\build\AlgorythmAlgorithmTests.exe -v2
+            & .\build\AlgorythmAlgorithmTests.exe -v2 -o -,txt
             Write-Host "Direct test process exit code: $LASTEXITCODE"
             Write-Host "::endgroup::"
             exit 1
