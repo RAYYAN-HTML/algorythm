@@ -47,7 +47,7 @@ jobs:
             & .\build\AlgorythmAlgorithmTests.exe -functions
             Write-Host "Function-list process exit code: $LASTEXITCODE"
             $testOutputPath = Join-Path $env:RUNNER_TEMP 'algorithm-test-diagnostics.txt'
-            $diagnosticArguments = @('-v2', '-o', "$testOutputPath,txt")
+            $diagnosticArguments = @('-o', "$testOutputPath,junitxml")
             & .\build\AlgorythmAlgorithmTests.exe @diagnosticArguments
             if (Test-Path $testOutputPath) { Get-Content $testOutputPath }
             Write-Host "Direct test process exit code: $LASTEXITCODE"
