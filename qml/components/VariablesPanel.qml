@@ -34,7 +34,9 @@ Rectangle {
                 id: variableRow
                 required property string variableName
                 required property var variableValue
+                required property bool variableVisible
                 objectName: "variableRow_" + variableRow.variableName
+                visible: variableRow.variableVisible
                 Layout.fillWidth: true
                 spacing: 10
                 Label {

@@ -6,6 +6,7 @@
 #include <QVariantList>
 #include <QVariantMap>
 #include <QAbstractListModel>
+#include <QStringList>
 
 class AlgorithmNodeModel : public QAbstractListModel {
     Q_OBJECT
@@ -24,17 +25,19 @@ private:
 class PlaybackVariableModel final : public QAbstractListModel {
     Q_OBJECT
 public:
-    enum Role { VariableNameRole = Qt::UserRole + 1, VariableValueRole };
+    enum Role { VariableNameRole = Qt::UserRole + 1, VariableValueRole, VariableVisibleRole };
     explicit PlaybackVariableModel(QObject *parent = nullptr) : QAbstractListModel(parent) {}
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role) const override;
     QHash<int, QByteArray> roleNames() const override;
+    void setVariableNames(const QStringList &names);
     void setVariables(const QVariantMap &variables);
     Q_DISABLE_COPY_MOVE(PlaybackVariableModel)
 private:
     struct Entry {
         QString name;
         QVariant value;
+        bool visible = false;
     };
     QVector<Entry> m_entries;
 };
@@ -113,6 +116,7 @@ private:
     AlgorithmNodeModel m_nodes;
     PlaybackVariableModel m_variableEntries;
     void publishState();
+    void resetVariableNames();
     const ExecutionStep &current() const;
 };
 

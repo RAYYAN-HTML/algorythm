@@ -2,6 +2,7 @@
 #include "algorithms/sortingalgorithms.h"
 
 #include <QRegularExpression>
+#include <QSet>
 
 QVariant AlgorithmNodeModel::data(const QModelIndex &index, int role) const
 {
@@ -36,17 +37,18 @@ QVariant PlaybackVariableModel::data(const QModelIndex &index, int role) const
     const Entry &entry = m_entries.at(index.row());
     if (role == VariableNameRole) return entry.name;
     if (role == VariableValueRole) return entry.value;
+    if (role == VariableVisibleRole) return entry.visible;
     return {};
 }
 
 QHash<int, QByteArray> PlaybackVariableModel::roleNames() const
 {
-    return {{VariableNameRole, "variableName"}, {VariableValueRole, "variableValue"}};
+    return {{VariableNameRole, "variableName"}, {VariableValueRole, "variableValue"},
+            {VariableVisibleRole, "variableVisible"}};
 }
 
-void PlaybackVariableModel::setVariables(const QVariantMap &variables)
+void PlaybackVariableModel::setVariableNames(const QStringList &names)
 {
-    const QStringList names = variables.keys();
     bool keysChanged = names.size() != m_entries.size();
     if (!keysChanged) {
         for (qsizetype i = 0; i < names.size(); ++i) {
@@ -61,22 +63,28 @@ void PlaybackVariableModel::setVariables(const QVariantMap &variables)
         beginResetModel();
         m_entries.clear();
         m_entries.reserve(names.size());
-        for (const QString &name : names) m_entries.push_back({name, variables.value(name)});
+        for (const QString &name : names) m_entries.push_back({name, {}, false});
         endResetModel();
-        return;
     }
+}
 
+void PlaybackVariableModel::setVariables(const QVariantMap &variables)
+{
     int firstChanged = -1;
     int lastChanged = -1;
-    for (qsizetype i = 0; i < names.size(); ++i) {
-        const QVariant nextValue = variables.value(names.at(i));
-        if (m_entries[i].value == nextValue) continue;
-        m_entries[i].value = nextValue;
+    for (qsizetype i = 0; i < m_entries.size(); ++i) {
+        Entry &entry = m_entries[i];
+        const bool nextVisible = variables.contains(entry.name);
+        const QVariant nextValue = nextVisible ? variables.value(entry.name) : QVariant();
+        if (entry.value == nextValue && entry.visible == nextVisible) continue;
+        entry.value = nextValue;
+        entry.visible = nextVisible;
         if (firstChanged < 0) firstChanged = static_cast<int>(i);
         lastChanged = static_cast<int>(i);
     }
     if (firstChanged >= 0)
-        emit dataChanged(index(firstChanged, 0), index(lastChanged, 0), {VariableValueRole});
+        emit dataChanged(index(firstChanged, 0), index(lastChanged, 0),
+                         {VariableValueRole, VariableVisibleRole});
 }
 
 PlaybackController::PlaybackController(QObject *parent) : QObject(parent)
@@ -103,6 +111,17 @@ void PlaybackController::publishState()
 {
     m_variableEntries.setVariables(current().variables);
     emit stateChanged();
+}
+void PlaybackController::resetVariableNames()
+{
+    QSet<QString> names;
+    for (const ExecutionStep &step : m_steps) {
+        for (auto it = step.variables.cbegin(); it != step.variables.cend(); ++it)
+            names.insert(it.key());
+    }
+    QStringList orderedNames = names.values();
+    orderedNames.sort();
+    m_variableEntries.setVariableNames(orderedNames);
 }
 QString PlaybackController::operation() const { return current().operation; }
 QString PlaybackController::narration() const { return current().narration; }
@@ -141,6 +160,7 @@ bool PlaybackController::sortInput(const QString &text)
     m_steps = (m_algorithm == "Linear Search" || m_algorithm == "Binary Search")
                   ? SortingAlgorithms::search(m_algorithm, input, m_searchTarget)
                   : SortingAlgorithms::generate(m_algorithm, input);
+    resetVariableNames();
     m_index = 0;
     m_nodes.setPositions(current().nodeIds);
     publishState();
@@ -154,6 +174,7 @@ void PlaybackController::selectAlgorithm(const QString &name)
     m_steps = (m_algorithm == "Linear Search" || m_algorithm == "Binary Search")
                   ? SortingAlgorithms::search(m_algorithm, m_input, m_searchTarget)
                   : SortingAlgorithms::generate(m_algorithm, m_input);
+    resetVariableNames();
     m_index = 0;
     m_timer.stop();
     m_nodes.setPositions(current().nodeIds);
@@ -165,6 +186,7 @@ void PlaybackController::setSearchTarget(int target)
     m_searchTarget = target;
     if (m_algorithm == "Linear Search" || m_algorithm == "Binary Search") {
         m_steps = SortingAlgorithms::search(m_algorithm, m_input, m_searchTarget);
+        resetVariableNames();
         m_index = 0;
         m_timer.stop();
         m_nodes.setPositions(current().nodeIds);

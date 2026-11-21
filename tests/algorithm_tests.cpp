@@ -340,6 +340,7 @@ private slots:
     const auto variableRoles = variableEntries->roleNames();
     QVERIFY(variableRoles.values().contains("variableName"));
     QVERIFY(variableRoles.values().contains("variableValue"));
+    QVERIFY(variableRoles.values().contains("variableVisible"));
     QSignalSpy variableResetSpy(variableEntries, &QAbstractItemModel::modelReset);
     QSignalSpy variableChangedSpy(variableEntries, &QAbstractItemModel::dataChanged);
     variableModelPlayback.selectAlgorithm("Merge Sort");
@@ -366,6 +367,40 @@ private slots:
     QVERIFY(variableChangedSpy.count() > 0);
     variableModelPlayback.selectAlgorithm("Linear Search");
     QCOMPARE(variableResetSpy.count(), 1);
+
+    variableModelPlayback.selectAlgorithm("Bubble Sort");
+    variableResetSpy.clear();
+    variableChangedSpy.clear();
+    int optionalVariableStep = -1;
+    for (int step = 1; step < variableModelPlayback.stepCount(); ++step) {
+        variableModelPlayback.seek(step - 1);
+        const QVariantMap previous = variableModelPlayback.variables();
+        variableModelPlayback.seek(step);
+        const QVariantMap current = variableModelPlayback.variables();
+        if (!previous.contains("left") && current.contains("left")) {
+            optionalVariableStep = step - 1;
+            break;
+        }
+    }
+    QVERIFY(optionalVariableStep >= 0);
+    variableModelPlayback.seek(optionalVariableStep);
+    int leftRow = -1;
+    for (int row = 0; row < variableEntries->rowCount(); ++row) {
+        if (variableEntries->data(variableEntries->index(row, 0), PlaybackVariableModel::VariableNameRole).toString() == "left") {
+            leftRow = row;
+            break;
+        }
+    }
+    QVERIFY(leftRow >= 0);
+    const QPersistentModelIndex optionalVariableIndex(variableEntries->index(leftRow, 0));
+    QVERIFY(!variableEntries->data(optionalVariableIndex, PlaybackVariableModel::VariableVisibleRole).toBool());
+    variableResetSpy.clear();
+    variableChangedSpy.clear();
+    variableModelPlayback.next();
+    QCOMPARE(variableResetSpy.count(), 0);
+    QVERIFY(optionalVariableIndex.isValid());
+    QVERIFY(variableEntries->data(optionalVariableIndex, PlaybackVariableModel::VariableVisibleRole).toBool());
+    QVERIFY(variableChangedSpy.count() > 0);
 
     QVERIFY(playback.nodes()->rowCount() == 7);
     QVERIFY(playback.nodes()->data(playback.nodes()->index(0), AlgorithmNodeModel::ValueRole).toInt() == 8);

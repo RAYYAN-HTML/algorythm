@@ -16,9 +16,10 @@ Item {
     QtObject {
         id: fakeController
         property var variableEntries: variablesModel
+        property var stableVariableNames: []
 
         function publish(nextVariables) {
-            const names = Object.keys(nextVariables)
+            const names = stableVariableNames.length ? stableVariableNames : Object.keys(nextVariables)
             let keysChanged = names.length !== variablesModel.count
             if (!keysChanged) {
                 for (let i = 0; i < names.length; ++i) {
@@ -31,11 +32,17 @@ Item {
 
             if (keysChanged) {
                 variablesModel.clear()
-                for (const name of names)
-                    variablesModel.append({ variableName: name, variableValue: nextVariables[name] })
+                for (const name of names) {
+                    const present = Object.prototype.hasOwnProperty.call(nextVariables, name)
+                    variablesModel.append({ variableName: name, variableValue: present ? nextVariables[name] : "",
+                                            variableVisible: present })
+                }
             } else {
-                for (let i = 0; i < names.length; ++i)
-                    variablesModel.setProperty(i, "variableValue", nextVariables[names[i]])
+                for (let i = 0; i < names.length; ++i) {
+                    const present = Object.prototype.hasOwnProperty.call(nextVariables, names[i])
+                    variablesModel.setProperty(i, "variableValue", present ? nextVariables[names[i]] : "")
+                    variablesModel.setProperty(i, "variableVisible", present)
+                }
             }
         }
     }
@@ -54,6 +61,7 @@ Item {
         when: windowShown
 
         function init() {
+            fakeController.stableVariableNames = []
             fakeController.publish({ n: 3, comparisons: 0, swaps: 0, array: "3, 2, 1" })
         }
 
@@ -83,6 +91,25 @@ Item {
             tryCompare(variablesModel, "count", 3)
             verify(!!findChild(panel, "variableRow_low"), "New variable row exists")
             verify(!findChild(panel, "variableRow_comparisons"), "Removed variable row is destroyed")
+        }
+
+        function test_optionalVariablesHideWithoutReplacingRows() {
+            fakeController.stableVariableNames = ["comparisons", "left", "right"]
+            fakeController.publish({ comparisons: 1, left: 4 })
+            const panel = createTemporaryObject(panelComponent, root)
+            verify(!!panel, "Variables panel is created")
+            const leftRow = findChild(panel, "variableRow_left")
+            const rightRow = findChild(panel, "variableRow_right")
+            verify(!!leftRow, "Optional left variable row exists")
+            verify(!!rightRow, "Optional right variable row exists")
+            compare(leftRow.visible, true)
+            compare(rightRow.visible, false)
+
+            fakeController.publish({ comparisons: 2, right: 3 })
+            tryCompare(leftRow, "visible", false)
+            tryCompare(rightRow, "visible", true)
+            compare(findChild(panel, "variableRow_left"), leftRow,
+                    "An absent optional variable keeps its delegate instance")
         }
     }
 }
