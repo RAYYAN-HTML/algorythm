@@ -39,7 +39,15 @@ jobs:
         run: cmake --build build --config ${{ matrix.build_type }} --parallel
 
       - name: Run CTest
-        run: ctest --test-dir build --build-config ${{ matrix.build_type }} --output-on-failure --no-tests=error
+        shell: pwsh
+        run: |
+          ctest --test-dir build --build-config ${{ matrix.build_type }} --output-on-failure --no-tests=error
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::group::Direct C++ test diagnostics"
+            & .\build\AlgorythmAlgorithmTests.exe
+            Write-Host "::endgroup::"
+            exit 1
+          }
 
       - name: Run QML lint
         shell: pwsh
