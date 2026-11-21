@@ -46,8 +46,10 @@ jobs:
             Write-Host "::group::Direct C++ test diagnostics"
             & .\build\AlgorythmAlgorithmTests.exe -functions
             Write-Host "Function-list process exit code: $LASTEXITCODE"
-            $diagnosticArguments = @('-v2', '-o', '-,txt')
+            $testOutputPath = Join-Path $env:RUNNER_TEMP 'algorithm-test-diagnostics.txt'
+            $diagnosticArguments = @('-v2', '-o', "$testOutputPath,txt")
             & .\build\AlgorythmAlgorithmTests.exe @diagnosticArguments
+            if (Test-Path $testOutputPath) { Get-Content $testOutputPath }
             Write-Host "Direct test process exit code: $LASTEXITCODE"
             Write-Host "::endgroup::"
             exit 1
