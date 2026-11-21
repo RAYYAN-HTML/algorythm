@@ -67,7 +67,7 @@ if(BUILD_TESTING)
         COMMAND ${QMLTESTRUNNER_EXECUTABLE} -input ${CMAKE_CURRENT_SOURCE_DIR}/tests -platform offscreen)
     set_tests_properties(qml_component_tests PROPERTIES
         TIMEOUT 60
-        ENVIRONMENT "QT_QUICK_CONTROLS_STYLE=Basic"
+        ENVIRONMENT "QT_QUICK_CONTROLS_STYLE=Basic;QT_QUICK_BACKEND=software;QT_QPA_PLATFORM=offscreen;QT_OPENGL=software"
     )
 endif()
 
