@@ -11,6 +11,7 @@
 #include <QSignalSpy>
 #include <QEventLoop>
 #include <QTimer>
+#include <cstdio>
 
 static void waitMs(int ms)
 {
@@ -419,6 +420,11 @@ int main(int argc, char **argv)
     application.setOrganizationName("Algorythm Tests");
     application.setApplicationName("Settings Controller Tests");
     AlgorithmTests tests;
-    return QTest::qExec(&tests, argc, argv);
+    std::fputs("AlgorithmTests: entering Qt Test runner.\n", stderr);
+    std::fflush(stderr);
+    const int result = QTest::qExec(&tests, argc, argv);
+    std::fprintf(stderr, "AlgorithmTests: Qt Test returned %d.\n", result);
+    std::fflush(stderr);
+    return result;
 }
 #include "algorithm_tests.moc"
