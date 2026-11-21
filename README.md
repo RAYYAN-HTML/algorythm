@@ -11,6 +11,7 @@
 - Algorithm comparison, custom inputs, presets, pseudocode, narration, operation counters, complexity summaries, and synchronized replay controls.
 - Predict-the-next-step challenges for all five sorting algorithms, Linear Search, and Binary Search, with feedback tied to each algorithm's actual trace decision.
 - BFS and DFS challenges that ask learners to predict whether an examined neighbor is new or already discovered.
+- Structure challenges that predict the next Stack/Queue removal or the selected BST traversal sequence before showing the operation.
 - A local recent-activity list lets learners resume sorting and searching with the same algorithm, input, and target, or reopen a graph with its edited nodes, weighted edges, start node, destination, and algorithm.
 
 Sorting and searching steps are generated from the C++ algorithm traces. Each element keeps its original identity while it changes position, so Qt Quick animates real swaps, shifts, merge writes, and binary-search preparation. Playback speed controls the pacing, with each automatic step spaced to let its transition complete.
@@ -22,6 +23,10 @@ Insertion Sort uses stable adjacent exchanges so every visual node keeps one ide
 The workspace splitter remembers its preferred size. Navigation and the learning assistant can be collapsed, and Settings persists playback speed, reduced motion, and compact-sidebar preference locally, with a restore-defaults action. Graph traversal uses the same saved playback speed as the sorting and comparison traces.
 
 The desktop controls use a dense dark theme with cyan/violet highlights, semantic navigation buttons, selected-state indicators, and clear primary/secondary action emphasis.
+
+## Download
+
+The current Windows x64 release is [Algorythm v1.3.0](https://github.com/RAYYAN-HTML/algorythm/releases/tag/v1.3.0). The release includes a deployable ZIP and `SHA256SUMS.txt` for checksum verification.
 
 ## Build
 

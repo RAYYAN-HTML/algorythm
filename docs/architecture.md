@@ -10,6 +10,8 @@ Graphs use a dedicated `GraphController` and `GraphStep` snapshots. Traversal st
 
 QML playback controls receive their controller and settings object as explicit properties. Comparison playback has a separate reusable footer that keeps both traces at one speed and persists that preference. Prediction prompts are selected from the current trace operation, allowing each sorting implementation and the search algorithms to ask questions that match the next recorded decision.
 
+`StructurePredictionChallenge` reuses `StructureController` state for stack and queue removal questions. For BST questions it asks the controller to build the selected traversal, stops before the next timed visit, and only restarts the traversal after the learner answers.
+
 `SettingsController` stores up to ten recently explored labs in `QSettings`. Sorting and searching history includes the selected algorithm, input, and search target. Graph history includes the selected algorithm, node count, weighted undirected edges, start node, and destination. `GraphController::restoreConfiguration` validates the complete graph before replacing the active graph; the dashboard routes resume actions through normal section navigation before restoring the configuration.
 
 ## Main classes

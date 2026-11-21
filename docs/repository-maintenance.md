@@ -14,6 +14,6 @@ The repository uses a matrix job whose displayed check names include the build c
 
 ## Releases
 
-Push a version tag such as `v1.2.0` to run the Windows release workflow. It builds and tests Release, lints QML, deploys Qt runtime libraries and QML modules, smoke-starts the executable offscreen, creates a ZIP, and publishes a SHA-256 checksum. A rerun for an existing release replaces the archive and checksum assets.
+Push a version tag matching the CMake project version, such as `v1.3.0`, to run the Windows release workflow. It builds and tests Release, lints QML, deploys Qt runtime libraries and QML modules, smoke-starts the executable offscreen with only packaged runtime paths, creates a ZIP, and publishes a SHA-256 checksum. A rerun for an existing release replaces the archive and checksum assets.
 
 Update `project(Algorythm VERSION ...)` in `CMakeLists.txt` before tagging. Release automation currently packages Windows x64 only; other platforms need their own deployment and startup checks before they are advertised as release targets.
