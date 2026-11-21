@@ -44,7 +44,8 @@ jobs:
           ctest --test-dir build --build-config ${{ matrix.build_type }} --output-on-failure --no-tests=error
           if ($LASTEXITCODE -ne 0) {
             Write-Host "::group::Direct C++ test diagnostics"
-            & .\build\AlgorythmAlgorithmTests.exe
+            & .\build\AlgorythmAlgorithmTests.exe -v2
+            Write-Host "Direct test process exit code: $LASTEXITCODE"
             Write-Host "::endgroup::"
             exit 1
           }
