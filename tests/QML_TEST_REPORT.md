@@ -21,7 +21,7 @@
 - Sorting playback controls now receive their controller and settings explicitly, and QML tests exercise play/pause, next/previous, restart, seek, and saved speed changes.
 - The navigation sidebar exposes stable names for lab buttons; a QML test verifies sorting and searching navigation requests and the screen-reader label.
 - Recent sorting/searching activity stores the selected algorithm, input, and search target locally; the dashboard can resume that configuration. Graph history stores the selected algorithm, node count, weighted edges, start node, and destination; validated restoration and persistence are covered by Qt Test.
-- Whole-project `qmllint -I build` exited successfully with zero `missing-property` or layout-positioning warnings. Unqualified-access warnings remain for a broader cleanup pass.
+- Whole-project `qmllint -I build` on Qt 6.11.2 exited successfully with no `missing-property` or layout-positioning warnings. It reported 523 `unqualified` warnings across QML and tests; those remain for a broader cleanup pass. The two dynamic `Loader.item` property diagnostics in `Main.qml` are now represented through `var` page references.
 - CI now discovers and lints every `tests/tst_*.qml` file instead of linting only the original component test.
 - The dashboard and sorting lab were visually inspected at the available 1442×864 window size.
 - A Qt 6.11.2 QML startup profile is documented in `profiler/reports/qml-profiler-startup-2026-11-21.md`. It records startup/control creation and memory events; sustained sorting playback was not successfully driven during profiling, and the trace contains no frame-time data.

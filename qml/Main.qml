@@ -23,6 +23,10 @@ ApplicationWindow {
     property QtObject settingsController: appSettings
     property bool sidebarCollapsed: appSettings.sidebarCollapsed
     property bool reducedMotion: appSettings.reducedMotion
+    // Loader.item is exposed as QObject to the QML type checker; these aliases
+    // retain the concrete page interface for the dynamic resume path below.
+    property var loadedSortingPage: sortingPage.item
+    property var loadedGraphPage: graphPage.item
 
     function navigateSection(destination, recordActivity) {
         section = destination
@@ -44,7 +48,7 @@ ApplicationWindow {
             navigateSection(activity.section, false)
             if (sortingPage.item === null) sortingPage.active = true
             if (sortingPage.item === null) return
-            sortingPage.item.userInput = activity.input || sortingPage.item.userInput
+            loadedSortingPage.userInput = activity.input || loadedSortingPage.userInput
             playback.selectAlgorithm(activity.algorithm)
             if (activity.input && playback.sortInput(activity.input) && activity.algorithm.endsWith("Search") && activity.target !== undefined)
                 playback.setSearchTarget(activity.target)
@@ -54,8 +58,8 @@ ApplicationWindow {
             graph.algorithm = activity.algorithm
             if (activity.graph) {
                 graph.restoreConfiguration(activity.graph)
-                graphPage.item.startNode = activity.graph.startNode
-                graphPage.item.destinationNode = Math.max(0, Math.min(activity.graph.destinationNode === undefined ? graphPage.item.destinationNode : activity.graph.destinationNode, graph.nodeCount - 1))
+                loadedGraphPage.startNode = activity.graph.startNode
+                loadedGraphPage.destinationNode = Math.max(0, Math.min(activity.graph.destinationNode === undefined ? loadedGraphPage.destinationNode : activity.graph.destinationNode, graph.nodeCount - 1))
             }
         }
     }
