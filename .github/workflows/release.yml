@@ -63,12 +63,21 @@ jobs:
           New-Item -ItemType Directory -Force -Path $packageDirectory | Out-Null
           Copy-Item "build/Algorythm.exe" $packageDirectory
           windeployqt --dir $packageDirectory --qmldir qml --compiler-runtime (Join-Path $packageDirectory "Algorythm.exe")
+          $platformDirectory = Join-Path $packageDirectory "platforms"
+          New-Item -ItemType Directory -Force -Path $platformDirectory | Out-Null
+          Copy-Item -Force (Join-Path $env:QT_ROOT_DIR "plugins/platforms/qoffscreen.dll") $platformDirectory
 
       - name: Smoke test packaged application
         shell: pwsh
         run: |
-          $env:QT_QPA_PLATFORM = "offscreen"
           $packageDirectory = Join-Path $env:RUNNER_TEMP "algorythm-release"
+          $env:QT_PLUGIN_PATH = $packageDirectory
+          $env:QT_QPA_PLATFORM_PLUGIN_PATH = Join-Path $packageDirectory "platforms"
+          $env:QT_QPA_PLATFORM = "offscreen"
+          $env:QT_QUICK_BACKEND = "software"
+          $env:QT_OPENGL = "software"
+          $env:QML_IMPORT_PATH = $null
+          $env:QML2_IMPORT_PATH = $null
           $stdoutLog = Join-Path $env:RUNNER_TEMP "algorythm-startup.stdout.log"
           $stderrLog = Join-Path $env:RUNNER_TEMP "algorythm-startup.stderr.log"
           $process = Start-Process -FilePath (Join-Path $packageDirectory "Algorythm.exe") `
