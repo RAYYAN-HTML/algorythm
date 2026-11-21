@@ -26,7 +26,7 @@ The desktop controls use a dense dark theme with cyan/violet highlights, semanti
 
 ## Download
 
-The current Windows x64 release is [Algorythm v1.3.0](https://github.com/RAYYAN-HTML/algorythm/releases/tag/v1.3.0). The release includes a deployable ZIP and `SHA256SUMS.txt` for checksum verification.
+The current Windows x64 release is [Algorythm v1.3.1](https://github.com/RAYYAN-HTML/algorythm/releases/tag/v1.3.1). The release includes a deployable ZIP and `SHA256SUMS.txt` for checksum verification.
 
 ## Build
 

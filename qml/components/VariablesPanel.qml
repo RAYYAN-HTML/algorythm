@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,6 +7,7 @@ import QtQuick.Layouts
 Rectangle {
     id: panel
     required property AppTheme theme
+    required property var controller
     property color panelColor: theme.panel
     color: panelColor
     radius: 14
@@ -19,30 +22,34 @@ Rectangle {
 
         RowLayout {
             Layout.fillWidth: true
-            Label { text: "{ }"; color: theme.purpleText; font.bold: true }
-            Label { text: "Current variables"; color: theme.text; font.bold: true; font.pixelSize: 13 }
+            Label { text: "{ }"; color: panel.theme.purpleText; font.bold: true }
+            Label { text: "Current variables"; color: panel.theme.text; font.bold: true; font.pixelSize: 13 }
             Item { Layout.fillWidth: true }
-            Label { text: "STEP STATE"; color: theme.muted; font.pixelSize: 8; font.letterSpacing: 0.8 }
+            Label { text: "STEP STATE"; color: panel.theme.muted; font.pixelSize: 8; font.letterSpacing: 0.8 }
         }
 
         Repeater {
-            model: Object.keys(playback.variables)
+            model: panel.controller.variableEntries
             delegate: RowLayout {
-                required property string modelData
+                id: variableRow
+                required property string variableName
+                required property var variableValue
+                objectName: "variableRow_" + variableRow.variableName
                 Layout.fillWidth: true
                 spacing: 10
                 Label {
                     Layout.preferredWidth: 78
-                    text: modelData
-                    color: theme.muted
+                    text: variableRow.variableName
+                    color: panel.theme.muted
                     font.family: "Consolas"
                     font.pixelSize: 10
                     elide: Text.ElideRight
                 }
                 Label {
+                    objectName: "variableValue_" + variableRow.variableName
                     Layout.fillWidth: true
-                    text: String(playback.variables[modelData])
-                    color: theme.code
+                    text: String(variableRow.variableValue)
+                    color: panel.theme.code
                     font.family: "Consolas"
                     font.pixelSize: 10
                     elide: Text.ElideRight

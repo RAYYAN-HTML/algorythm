@@ -25,6 +25,60 @@ void AlgorithmNodeModel::setPositions(const QVector<int> &ids)
     if (!m_positions.isEmpty()) emit dataChanged(index(0), index(m_positions.size()-1), {PositionRole});
 }
 
+int PlaybackVariableModel::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_entries.size();
+}
+
+QVariant PlaybackVariableModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid() || index.parent().isValid() || index.row() < 0 || index.row() >= m_entries.size()) return {};
+    const Entry &entry = m_entries.at(index.row());
+    if (role == VariableNameRole) return entry.name;
+    if (role == VariableValueRole) return entry.value;
+    return {};
+}
+
+QHash<int, QByteArray> PlaybackVariableModel::roleNames() const
+{
+    return {{VariableNameRole, "variableName"}, {VariableValueRole, "variableValue"}};
+}
+
+void PlaybackVariableModel::setVariables(const QVariantMap &variables)
+{
+    const QStringList names = variables.keys();
+    bool keysChanged = names.size() != m_entries.size();
+    if (!keysChanged) {
+        for (qsizetype i = 0; i < names.size(); ++i) {
+            if (names.at(i) != m_entries.at(i).name) {
+                keysChanged = true;
+                break;
+            }
+        }
+    }
+
+    if (keysChanged) {
+        beginResetModel();
+        m_entries.clear();
+        m_entries.reserve(names.size());
+        for (const QString &name : names) m_entries.push_back({name, variables.value(name)});
+        endResetModel();
+        return;
+    }
+
+    int firstChanged = -1;
+    int lastChanged = -1;
+    for (qsizetype i = 0; i < names.size(); ++i) {
+        const QVariant nextValue = variables.value(names.at(i));
+        if (m_entries[i].value == nextValue) continue;
+        m_entries[i].value = nextValue;
+        if (firstChanged < 0) firstChanged = static_cast<int>(i);
+        lastChanged = static_cast<int>(i);
+    }
+    if (firstChanged >= 0)
+        emit dataChanged(index(firstChanged, 0), index(lastChanged, 0), {VariableValueRole});
+}
+
 PlaybackController::PlaybackController(QObject *parent) : QObject(parent)
 {
     m_timer.setInterval(650);
@@ -32,7 +86,7 @@ PlaybackController::PlaybackController(QObject *parent) : QObject(parent)
         if (m_index + 1 < m_steps.size()) ++m_index;
         else m_timer.stop();
         m_nodes.setPositions(current().nodeIds);
-        emit stateChanged();
+        publishState();
         if (complete()) m_timer.stop();
     });
     sortInput("8, 3, 6, 1, 9, 4, 2");
@@ -45,6 +99,11 @@ const ExecutionStep &PlaybackController::current() const
 }
 
 QVariantList PlaybackController::values() const { QVariantList out; for (int v : current().values) out << v; return out; }
+void PlaybackController::publishState()
+{
+    m_variableEntries.setVariables(current().variables);
+    emit stateChanged();
+}
 QString PlaybackController::operation() const { return current().operation; }
 QString PlaybackController::narration() const { return current().narration; }
 QString PlaybackController::why() const { return current().why; }
@@ -61,7 +120,7 @@ void PlaybackController::setSpeed(double speed)
 {
     m_speed = qBound(0.5, speed, 3.0);
     m_timer.setInterval(qMax(100, int(650 / m_speed)));
-    emit stateChanged();
+    publishState();
 }
 
 bool PlaybackController::sortInput(const QString &text)
@@ -84,7 +143,7 @@ bool PlaybackController::sortInput(const QString &text)
                   : SortingAlgorithms::generate(m_algorithm, input);
     m_index = 0;
     m_nodes.setPositions(current().nodeIds);
-    emit stateChanged();
+    publishState();
     return true;
 }
 
@@ -98,7 +157,7 @@ void PlaybackController::selectAlgorithm(const QString &name)
     m_index = 0;
     m_timer.stop();
     m_nodes.setPositions(current().nodeIds);
-    emit stateChanged();
+    publishState();
 }
 
 void PlaybackController::setSearchTarget(int target)
@@ -109,15 +168,15 @@ void PlaybackController::setSearchTarget(int target)
         m_index = 0;
         m_timer.stop();
         m_nodes.setPositions(current().nodeIds);
-        emit stateChanged();
+        publishState();
     }
 }
 
-void PlaybackController::next() { m_timer.stop(); if (m_index + 1 < m_steps.size()) ++m_index; m_nodes.setPositions(current().nodeIds); emit stateChanged(); }
-void PlaybackController::previous() { m_timer.stop(); if (m_index > 0) --m_index; m_nodes.setPositions(current().nodeIds); emit stateChanged(); }
-void PlaybackController::restart() { m_timer.stop(); m_index = 0; m_nodes.setPositions(current().nodeIds); emit stateChanged(); }
-void PlaybackController::playPause() { if (m_timer.isActive()) m_timer.stop(); else if (!complete()) m_timer.start(); emit stateChanged(); }
-void PlaybackController::startPlayback() { if (!complete()) m_timer.start(); emit stateChanged(); }
-void PlaybackController::pausePlayback() { m_timer.stop(); emit stateChanged(); }
-void PlaybackController::seek(int index) { m_timer.stop(); m_index = qBound(0, index, qMax(0, m_steps.size() - 1)); m_nodes.setPositions(current().nodeIds); emit stateChanged(); }
+void PlaybackController::next() { m_timer.stop(); if (m_index + 1 < m_steps.size()) ++m_index; m_nodes.setPositions(current().nodeIds); publishState(); }
+void PlaybackController::previous() { m_timer.stop(); if (m_index > 0) --m_index; m_nodes.setPositions(current().nodeIds); publishState(); }
+void PlaybackController::restart() { m_timer.stop(); m_index = 0; m_nodes.setPositions(current().nodeIds); publishState(); }
+void PlaybackController::playPause() { if (m_timer.isActive()) m_timer.stop(); else if (!complete()) m_timer.start(); publishState(); }
+void PlaybackController::startPlayback() { if (!complete()) m_timer.start(); publishState(); }
+void PlaybackController::pausePlayback() { m_timer.stop(); publishState(); }
+void PlaybackController::seek(int index) { m_timer.stop(); m_index = qBound(0, index, qMax(0, m_steps.size() - 1)); m_nodes.setPositions(current().nodeIds); publishState(); }
 

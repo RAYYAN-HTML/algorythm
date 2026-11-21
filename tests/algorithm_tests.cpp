@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <QTest>
 #include <QSignalSpy>
+#include <QPersistentModelIndex>
 #include <QEventLoop>
 #include <QTimer>
 #include <initializer_list>
@@ -333,6 +334,39 @@ private slots:
     QVERIFY(!editableGraph.removeNode(0));
 
     PlaybackController playback;
+    PlaybackController variableModelPlayback;
+    QAbstractListModel *variableEntries = variableModelPlayback.variableEntries();
+    QVERIFY(variableEntries->rowCount() > 0);
+    const auto variableRoles = variableEntries->roleNames();
+    QVERIFY(variableRoles.values().contains("variableName"));
+    QVERIFY(variableRoles.values().contains("variableValue"));
+    QSignalSpy variableResetSpy(variableEntries, &QAbstractItemModel::modelReset);
+    QSignalSpy variableChangedSpy(variableEntries, &QAbstractItemModel::dataChanged);
+    variableModelPlayback.selectAlgorithm("Merge Sort");
+    int stableStep = -1;
+    QVariantMap previousVariables;
+    for (int step = 0; step < variableModelPlayback.stepCount(); ++step) {
+        variableModelPlayback.seek(step);
+        const QVariantMap currentVariables = variableModelPlayback.variables();
+        if (step > 0 && currentVariables.keys() == previousVariables.keys() && currentVariables != previousVariables) {
+            stableStep = step - 1;
+            break;
+        }
+        previousVariables = currentVariables;
+    }
+    QVERIFY(stableStep >= 0);
+    variableModelPlayback.seek(stableStep);
+    variableResetSpy.clear();
+    variableChangedSpy.clear();
+    QPersistentModelIndex stableVariableIndex(variableEntries->index(0, 0));
+    variableModelPlayback.next();
+    QCOMPARE(variableResetSpy.count(), 0);
+    QVERIFY(stableVariableIndex.isValid());
+    QVERIFY(!variableEntries->data(stableVariableIndex, PlaybackVariableModel::VariableNameRole).toString().isEmpty());
+    QVERIFY(variableChangedSpy.count() > 0);
+    variableModelPlayback.selectAlgorithm("Linear Search");
+    QCOMPARE(variableResetSpy.count(), 1);
+
     QVERIFY(playback.nodes()->rowCount() == 7);
     QVERIFY(playback.nodes()->data(playback.nodes()->index(0), AlgorithmNodeModel::ValueRole).toInt() == 8);
     playback.previous();

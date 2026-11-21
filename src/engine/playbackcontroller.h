@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTimer>
 #include <QVariantList>
+#include <QVariantMap>
 #include <QAbstractListModel>
 
 class AlgorithmNodeModel : public QAbstractListModel {
@@ -20,10 +21,29 @@ private:
     QVector<int> m_values, m_positions;
 };
 
+class PlaybackVariableModel final : public QAbstractListModel {
+    Q_OBJECT
+public:
+    enum Role { VariableNameRole = Qt::UserRole + 1, VariableValueRole };
+    explicit PlaybackVariableModel(QObject *parent = nullptr) : QAbstractListModel(parent) {}
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role) const override;
+    QHash<int, QByteArray> roleNames() const override;
+    void setVariables(const QVariantMap &variables);
+    Q_DISABLE_COPY_MOVE(PlaybackVariableModel)
+private:
+    struct Entry {
+        QString name;
+        QVariant value;
+    };
+    QVector<Entry> m_entries;
+};
+
 class PlaybackController : public QObject {
     Q_OBJECT
     Q_PROPERTY(QVariantList values READ values NOTIFY stateChanged)
     Q_PROPERTY(QAbstractListModel* nodes READ nodes CONSTANT)
+    Q_PROPERTY(QAbstractListModel* variableEntries READ variableEntries CONSTANT FINAL)
     Q_PROPERTY(int animationDuration READ animationDuration NOTIFY stateChanged)
     Q_PROPERTY(QString operation READ operation NOTIFY stateChanged)
     Q_PROPERTY(QString narration READ narration NOTIFY stateChanged)
@@ -46,6 +66,7 @@ public:
     explicit PlaybackController(QObject *parent = nullptr);
     QVariantList values() const;
     QAbstractListModel *nodes() { return &m_nodes; }
+    QAbstractListModel *variableEntries() { return &m_variableEntries; }
     int animationDuration() const { return qMax(90, int(380 / m_speed)); }
     QString operation() const;
     QString narration() const;
@@ -90,6 +111,8 @@ private:
     int m_searchTarget = 6;
     QTimer m_timer;
     AlgorithmNodeModel m_nodes;
+    PlaybackVariableModel m_variableEntries;
+    void publishState();
     const ExecutionStep &current() const;
 };
 

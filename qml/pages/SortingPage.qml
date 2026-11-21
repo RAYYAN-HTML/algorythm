@@ -264,7 +264,7 @@ Item {
                     ColumnLayout {
                         Layout.fillWidth: true
                         spacing: 12
-                        VariablesPanel { theme: page.theme; Layout.fillWidth: true }
+                        VariablesPanel { theme: page.theme; controller: playback; Layout.fillWidth: true }
                         ComplexityPanel { theme: page.theme; controller: playback }
                     }
                 }
