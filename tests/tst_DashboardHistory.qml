@@ -28,6 +28,8 @@ Item {
         when: windowShown
 
         function init() {
+            root.width = 1000
+            root.height = 800
             root.activities = []
             resumeSpy.target = null
             resumeSpy.clear()
@@ -83,6 +85,21 @@ Item {
             tryCompare(stats, "columns", 2)
             root.width = 1500
             tryCompare(stats, "columns", 3)
+        }
+
+        function test_dashboardReflowsAtRequestedWindowWidths() {
+            const dashboard = createTemporaryObject(dashboardComponent, root)
+            verify(!!dashboard, "Dashboard is created")
+            const stats = findChild(dashboard, "dashboardStatsGrid")
+            verify(!!stats, "Dashboard statistics grid exists")
+            const widths = [800, 1024, 1280, 1366, 1920]
+            const expectedColumns = [1, 2, 2, 2, 3]
+            for (let i = 0; i < widths.length; ++i) {
+                root.width = widths[i]
+                tryCompare(stats, "columns", expectedColumns[i])
+                tryVerify(function() { return stats.width <= dashboard.width }, 1000,
+                          "Statistics grid stays within the page at " + widths[i] + " px")
+            }
         }
     }
 }
