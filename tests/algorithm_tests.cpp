@@ -11,7 +11,17 @@
 #include <QSignalSpy>
 #include <QEventLoop>
 #include <QTimer>
-#include <cstdio>
+#include <initializer_list>
+
+static bool variantListMatchesInts(const QVariantList &actual, std::initializer_list<int> expected)
+{
+    if (actual.size() != static_cast<qsizetype>(expected.size())) return false;
+    auto value = expected.begin();
+    for (const QVariant &entry : actual) {
+        if (entry.toInt() != *value++) return false;
+    }
+    return true;
+}
 
 static void waitMs(int ms)
 {
@@ -27,15 +37,12 @@ class AlgorithmTests : public QObject
 private slots:
     void initTestCase()
     {
-        std::fputs("AlgorithmTests: initTestCase entered.\n", stderr);
-        std::fflush(stderr);
         QCoreApplication::setOrganizationName("Algorythm Tests");
         QCoreApplication::setApplicationName("Settings Controller Tests");
     }
 
     void allAlgorithmsControllersAndPlayback()
     {
-    std::fputs("AlgorithmTests: settings section.\n", stderr); std::fflush(stderr);
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QTemporaryDir settingsDirectory;
     QVERIFY(settingsDirectory.isValid());
@@ -77,7 +84,6 @@ private slots:
     QVERIFY(restoredSettings.recentActivities().isEmpty());
 
     const QStringList algorithms = SortingAlgorithms::names();
-    std::fputs("AlgorithmTests: sorting generators section.\n", stderr); std::fflush(stderr);
     const QVector<QVector<int>> cases = {
         {}, {5}, {2, 1}, {1, 2, 3, 4}, {4, 3, 2, 1}, {3, 1, 3, -2, 0, -2},
         {16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}
@@ -115,7 +121,6 @@ private slots:
         QVERIFY(sawAlgorithmState);
     }
     SinglyLinkedList list;
-    std::fputs("AlgorithmTests: structures section.\n", stderr); std::fflush(stderr);
     QVERIFY(list.insertAt(0, 5)); QVERIFY(list.insertAt(1, 8)); QVERIFY(list.insertAt(1, 6));
     QVERIFY((list.values() == std::vector<int>{5,6,8})); QVERIFY(list.find(6)==1); QVERIFY(!list.insertAt(5,4));
     QVERIFY(list.eraseAt(1)); QVERIFY(!list.eraseAt(5)); QVERIFY((list.values()==std::vector<int>{5,8}));
@@ -134,7 +139,6 @@ private slots:
     QVERIFY((tree.inorder()==std::vector<int>{4,6,7,8}));
     QVERIFY(!tree.erase(99));
     WeightedGraph graph(5);QVERIFY(graph.addEdge(0,1,4));QVERIFY(graph.addEdge(0,2,1));QVERIFY(graph.addEdge(2,1,2));QVERIFY(graph.addEdge(1,3,1));
-    std::fputs("AlgorithmTests: graph algorithms section.\n", stderr); std::fflush(stderr);
     QVERIFY((graph.bfs(0)==std::vector<int>{0,1,2,3}));QVERIFY((graph.dfs(0)==std::vector<int>{0,1,2,3}));
     const auto distances=graph.dijkstra(0);QVERIFY(distances[0]==0&&distances[1]==3&&distances[2]==1&&distances[3]==4);QVERIFY(distances[4]>1000000);
     QVERIFY(!graph.addEdge(0,4,-1));QVERIFY(graph.dijkstra(9).empty());
@@ -167,7 +171,6 @@ private slots:
         QVERIFY(singleTrace.last().operation == "Target found");
     }
     StructureController controller;
-    std::fputs("AlgorithmTests: structure controller section.\n", stderr); std::fflush(stderr);
     controller.reset();
     QVERIFY(controller.visualModel()->rowCount()==0);
     controller.insert(4,0);controller.insert(2,1);QVERIFY(controller.values().size()==2);
@@ -211,7 +214,6 @@ private slots:
     controller.remove(99);
     QVERIFY(controller.status().contains("not in the tree"));
     GraphController graphController;
-    std::fputs("AlgorithmTests: graph controller section.\n", stderr); std::fflush(stderr);
     QString invalidStartError;
     QObject::connect(&graphController,&GraphController::error,[&](const QString&message){invalidStartError=message;});
     const int graphStepCountBeforeInvalidRun=graphController.stepCount();
@@ -225,7 +227,7 @@ private slots:
     graphController.setAlgorithm("Dijkstra's Shortest Path");
     QVERIFY(graphController.priorityQueue() == QStringList({"0:0"}));
     QVERIFY(graphController.visited().isEmpty());
-    QVERIFY(graphController.discovered() == QVariantList({0}));
+    QVERIFY(variantListMatchesInts(graphController.discovered(), {0}));
     while(graphController.distances()[1] == "∞" && graphController.stepIndex()+1<graphController.stepCount())graphController.next();
     QVERIFY(graphController.distances()[1] == "4");
     QVERIFY(!graphController.priorityQueue().isEmpty());
@@ -237,7 +239,7 @@ private slots:
     QVERIFY(graphController.distances().size()==7&&graphController.distances()[6]=="8");
     QVERIFY(graphController.previousNodes()[6] == "5");
     const QVariantList shortestPath = graphController.shortestPathTo(6);
-    QVERIFY(shortestPath == QVariantList({0, 2, 3, 5, 6}));
+    QVERIFY(variantListMatchesInts(shortestPath, {0, 2, 3, 5, 6}));
     QVERIFY(graphController.shortestPathTo(7).isEmpty());
     graphController.run(1);
     while(graphController.stepIndex()+1<graphController.stepCount())graphController.next();
@@ -252,14 +254,14 @@ private slots:
     QVERIFY(!graphController.removeEdge(0,4));
     QVERIFY(graphController.edgeList().size() == graphEdgesWithAddedEdge);
     while(graphController.stepIndex() + 1 < graphController.stepCount()) graphController.next();
-    QVERIFY(graphController.shortestPathTo(6) == QVariantList({1, 0, 6}));
+    QVERIFY(variantListMatchesInts(graphController.shortestPathTo(6), {1, 0, 6}));
     QVERIFY(graphController.removeEdge(6,0));
     QVERIFY(graphController.edgeList().size() == graphEdgesWithAddedEdge - 1);
     while(graphController.stepIndex() + 1 < graphController.stepCount()) graphController.next();
-    QVERIFY(graphController.shortestPathTo(6) == QVariantList({1, 3, 5, 6}));
+    QVERIFY(variantListMatchesInts(graphController.shortestPathTo(6), {1, 3, 5, 6}));
     QVERIFY(!graphController.removeEdge(0,9));
     GraphController discoveryGraph;
-    QVERIFY(discoveryGraph.discovered() == QVariantList({0}));
+    QVERIFY(variantListMatchesInts(discoveryGraph.discovered(), {0}));
     while(discoveryGraph.discovered().size()<3&&discoveryGraph.stepIndex()+1<discoveryGraph.stepCount())discoveryGraph.next();
     QVERIFY(discoveryGraph.discovered().contains(1));
     QVERIFY(discoveryGraph.discovered().contains(2));
@@ -310,13 +312,13 @@ private slots:
     editableGraph.run(1);
     QVERIFY(editableGraph.addEdge(1,7,5));
     while(editableGraph.stepIndex()+1<editableGraph.stepCount())editableGraph.next();
-    QVERIFY(editableGraph.shortestPathTo(7) == QVariantList({1,7}));
+    QVERIFY(variantListMatchesInts(editableGraph.shortestPathTo(7), {1,7}));
     QSignalSpy nodeRemovalSpy(&editableGraph,&GraphController::nodeRemoved);
     QVERIFY(editableGraph.removeNode(2));
     QVERIFY(nodeRemovalSpy.count()==1&&nodeRemovalSpy.takeFirst().at(0).toInt()==2);
     QVERIFY(editableGraph.nodeCount() == 7);
     while(editableGraph.stepIndex()+1<editableGraph.stepCount())editableGraph.next();
-    QVERIFY(editableGraph.shortestPathTo(6) == QVariantList({1,6}));
+    QVERIFY(variantListMatchesInts(editableGraph.shortestPathTo(6), {1,6}));
     for(const QVariant &edgeValue:editableGraph.edgeList()){
         const QVariantMap edge=edgeValue.toMap();
         QVERIFY(edge.value("from").toInt()<editableGraph.nodeCount());
@@ -331,7 +333,6 @@ private slots:
     QVERIFY(!editableGraph.removeNode(0));
 
     PlaybackController playback;
-    std::fputs("AlgorithmTests: playback controller section.\n", stderr); std::fflush(stderr);
     QVERIFY(playback.nodes()->rowCount() == 7);
     QVERIFY(playback.nodes()->data(playback.nodes()->index(0), AlgorithmNodeModel::ValueRole).toInt() == 8);
     playback.previous();
@@ -422,11 +423,6 @@ int main(int argc, char **argv)
     application.setOrganizationName("Algorythm Tests");
     application.setApplicationName("Settings Controller Tests");
     AlgorithmTests tests;
-    std::fputs("AlgorithmTests: entering Qt Test runner.\n", stderr);
-    std::fflush(stderr);
-    const int result = QTest::qExec(&tests, argc, argv);
-    std::fprintf(stderr, "AlgorithmTests: Qt Test returned %d.\n", result);
-    std::fflush(stderr);
-    return result;
+    return QTest::qExec(&tests, argc, argv);
 }
 #include "algorithm_tests.moc"
