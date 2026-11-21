@@ -1,0 +1,110 @@
+name: Windows Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  package-windows:
+    name: Package and verify Windows release
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install Qt 6
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.3"
+          host: windows
+          target: desktop
+          arch: win64_msvc2022_64
+          cache: true
+
+      - name: Set up MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Check tag matches application version
+        shell: pwsh
+        run: |
+          $cmakeText = Get-Content CMakeLists.txt -Raw
+          if ($cmakeText -notmatch 'project\(Algorythm VERSION ([^ )]+)') {
+            throw "Could not find the Algorythm project version in CMakeLists.txt."
+          }
+          $expectedTag = "v$($Matches[1])"
+          if ($env:GITHUB_REF_NAME -ne $expectedTag) {
+            throw "Release tag $env:GITHUB_REF_NAME does not match project version $expectedTag."
+          }
+
+      - name: Configure Release build
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+
+      - name: Build application and tests
+        run: cmake --build build --config Release --parallel
+
+      - name: Run tests
+        run: ctest --test-dir build --build-config Release --output-on-failure --no-tests=error
+
+      - name: Run QML lint
+        shell: pwsh
+        run: |
+          $qmlFiles = Get-ChildItem qml -Recurse -Filter *.qml | ForEach-Object FullName
+          $qmlTests = Get-ChildItem tests -Filter tst_*.qml | ForEach-Object FullName
+          qmllint -I build @qmlFiles @qmlTests
+
+      - name: Bundle Qt runtime dependencies
+        shell: pwsh
+        run: |
+          $packageDirectory = Join-Path $env:RUNNER_TEMP "algorythm-release"
+          New-Item -ItemType Directory -Force -Path $packageDirectory | Out-Null
+          Copy-Item "build/Algorythm.exe" $packageDirectory
+          windeployqt --dir $packageDirectory --qmldir qml --compiler-runtime (Join-Path $packageDirectory "Algorythm.exe")
+
+      - name: Smoke test packaged application
+        shell: pwsh
+        run: |
+          $env:QT_QPA_PLATFORM = "offscreen"
+          $packageDirectory = Join-Path $env:RUNNER_TEMP "algorythm-release"
+          $stdoutLog = Join-Path $env:RUNNER_TEMP "algorythm-startup.stdout.log"
+          $stderrLog = Join-Path $env:RUNNER_TEMP "algorythm-startup.stderr.log"
+          $process = Start-Process -FilePath (Join-Path $packageDirectory "Algorythm.exe") `
+            -WorkingDirectory $packageDirectory -WindowStyle Hidden -PassThru `
+            -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog
+          Start-Sleep -Seconds 8
+          if ($process.HasExited) {
+            Get-Content $stdoutLog, $stderrLog -ErrorAction SilentlyContinue
+            throw "The packaged application exited during startup with code $($process.ExitCode)."
+          }
+          Stop-Process -Id $process.Id
+          if (Select-String -Path $stdoutLog, $stderrLog -Pattern "failed to load|ReferenceError|TypeError" -Quiet) {
+            Get-Content $stdoutLog, $stderrLog
+            throw "The packaged application logged a QML startup error."
+          }
+
+      - name: Create archive and checksum
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $archive = "Algorythm-$tag-windows-x64.zip"
+          $packageDirectory = Join-Path $env:RUNNER_TEMP "algorythm-release"
+          Compress-Archive -Path (Join-Path $packageDirectory "*") -DestinationPath $archive
+          $hash = (Get-FileHash -Algorithm SHA256 $archive).Hash.ToLowerInvariant()
+          "$hash  $archive" | Set-Content -Path SHA256SUMS.txt
+
+      - name: Publish release assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $archive = "Algorythm-$tag-windows-x64.zip"
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag $archive SHA256SUMS.txt --clobber
+          } else {
+            gh release create $tag $archive SHA256SUMS.txt --generate-notes
+          }

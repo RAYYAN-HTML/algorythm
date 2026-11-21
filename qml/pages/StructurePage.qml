@@ -1,12 +1,17 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../components"
 
 Item {
     id: page
     property AppTheme theme
     property int itemValue: 12
     property int position: 0
+
+    function announceStructureStatus() {
+        page.theme.announce(structures.status)
+    }
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: page.width < 880 ? 18 : 28
@@ -83,6 +88,7 @@ Item {
                                     Accessible.description: index === 0 ? (structures.kind === "Queue" ? "Front of queue" : "Head of linked list") : structures.kind === "Queue" ? "Queue position " + (index + 1) : "Linked-list position " + (index + 1)
                                     border.width: 2; border.color: index === 0 ? theme.purple : theme.purple
                                     Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 18; font.bold: true; Accessible.ignored: true }
+                                    Label { anchors.bottom: parent.top; anchors.horizontalCenter: parent.horizontalCenter; text: structures.kind === "Queue" ? "FRONT" : "HEAD"; visible: index === 0; color: theme.code; font.pixelSize: 8; font.bold: true; Accessible.ignored: true }
                                 }
                                 Label { visible: index < structures.visualModel.count - 1; anchors.left: parent.left; anchors.leftMargin: 61; anchors.verticalCenter: parent.verticalCenter; text: "→"; color: theme.purpleText; font.pixelSize: 17 }
                             }
@@ -117,6 +123,7 @@ Item {
                                     Accessible.name: "Value " + value
                                     Accessible.description: index === 0 ? "Top of stack" : "Stack position " + (index + 1)
                                     Label { anchors.centerIn: parent; text: value; color: theme.text; font.pixelSize: 16; font.bold: true; Accessible.ignored: true }
+                                    Label { anchors.left: parent.right; anchors.verticalCenter: parent.verticalCenter; anchors.leftMargin: 5; text: "TOP"; visible: index === 0; color: theme.code; font.pixelSize: 8; font.bold: true; Accessible.ignored: true }
                                 }
                             }
                             add: Transition { NumberAnimation { properties: "opacity,scale"; from: 0.2; to: 1; duration: theme.reducedMotion ? 0 : 200; easing.type: Easing.OutBack } }
@@ -168,11 +175,11 @@ Item {
                                 radius: 26
                                 x: posX * treeArea.width - width / 2
                                 y: treeArea.treeTop + posY * treeArea.treeRowSpacing
-                                color: theme.elevated
+                                color: structures.traversalValue === value ? theme.activeNode : structures.traversalIndex >= 0 && structures.traversal.map(String).indexOf(String(value)) >= 0 && structures.traversalIndex >= structures.traversal.indexOf(value) ? theme.visitedNode : theme.elevated
                                 Accessible.name: "Tree node " + value
-                                Accessible.description: "Binary search tree value " + value
+                                Accessible.description: structures.traversalValue === value ? "Current traversal node, position " + (structures.traversalIndex + 1) : "Binary search tree value " + value
                                 border.width: 2
-                                border.color: theme.purple
+                                border.color: structures.traversalValue === value ? theme.amber : structures.traversalIndex >= 0 && structures.traversal.indexOf(value) >= 0 && structures.traversalIndex >= structures.traversal.indexOf(value) ? theme.green : theme.purple
                                 Behavior on x { NumberAnimation { duration: theme.reducedMotion ? 0 : 240 } }
                                 Behavior on y { NumberAnimation { duration: theme.reducedMotion ? 0 : 240 } }
                                 Label { anchors.centerIn: parent; text: value; color: theme.text; font.bold: true; Accessible.ignored: true }
@@ -213,7 +220,7 @@ Item {
                     Label { text: "Value"
  color: theme.muted
  font.pixelSize: 11 }
-                    SpinBox { from: -9999
+                    SpinBox { Accessible.name: "Value to insert or search"; from: -9999
  to: 9999
  value: page.itemValue
  onValueModified: page.itemValue = value }
@@ -221,33 +228,38 @@ Item {
  text: "Position"
  color: theme.muted
  font.pixelSize: 11 }
-                    SpinBox { visible: structures.kind === "Linked List"
+                    SpinBox { Accessible.name: "Linked-list position"; visible: structures.kind === "Linked List"
  from: 0
  to: structures.size
  value: page.position
  onValueModified: page.position = value }
                     Button { text: structures.kind === "Stack" ? "Push" : structures.kind === "Queue" ? "Enqueue" : "Insert"
  highlighted: true
- onClicked: structures.insert(page.itemValue, page.position) }
+  onClicked: { structures.insert(page.itemValue, page.position); page.announceStructureStatus() } }
                     Button { text: structures.kind === "Stack" ? "Pop" : structures.kind === "Queue" ? "Dequeue" : "Delete"
  flat: true
- onClicked: structures.remove(page.position) }
+  onClicked: { structures.remove(page.position); page.announceStructureStatus() } }
                     Button { text: "Search / Peek"
  flat: true
- onClicked: structures.search(page.itemValue) }
+  onClicked: { structures.search(page.itemValue); page.announceStructureStatus() } }
                     Button { text: "Traverse"
  flat: true
- onClicked: structures.traverse(orderBox.currentText) }
+  onClicked: { structures.traverse(orderBox.currentText); page.announceStructureStatus() } }
+                    Button { visible: structures.kind === "Binary Search Tree" && structures.traversalCount > 0; text: "Restart visits"; flat: true; onClicked: { structures.restartTraversal(); page.announceStructureStatus() } }
+                    Button { visible: structures.kind === "Binary Search Tree" && structures.traversalCount > 0; text: "Previous visit"; flat: true; enabled: structures.traversalIndex > 0; onClicked: { structures.previousTraversalStep(); page.announceStructureStatus() } }
+                    Button { visible: structures.kind === "Binary Search Tree" && structures.traversalCount > 0; text: "Next visit"; flat: true; enabled: structures.traversalIndex + 1 < structures.traversalCount; onClicked: { structures.nextTraversalStep(); page.announceStructureStatus() } }
                     ComboBox { id: orderBox
+ Accessible.name: "Tree traversal order"
  visible: structures.kind === "Binary Search Tree"
- model: ["Inorder", "Preorder", "Postorder"] }
+ model: ["Inorder", "Preorder", "Postorder", "Level-order"] }
                     Button { text: "Reset"
  flat: true
- onClicked: structures.reset() }
+  onClicked: { structures.reset(); page.announceStructureStatus() } }
                 }
                 Label { text: structures.kind === "Binary Search Tree" ? structures.status : "Linked list insertion and deletion use zero based positions. Stack and queue underflow produce a clear message."
  color: theme.muted
- font.pixelSize: 10 }
+ font.pixelSize: 10
+ Accessible.name: structures.status }
             }
         }
     }

@@ -38,6 +38,28 @@ Item {
             playbackB.pausePlayback()
         }
     }
+
+    Keys.onPressed: event => {
+        if (event.isAutoRepeat || data.activeFocus || event.accepted) return
+        if (event.key === Qt.Key_Space) {
+            page.toggleBothPlayback()
+            event.accepted = true
+        } else if (event.key === Qt.Key_Right) {
+            playbackA.next()
+            playbackB.next()
+            event.accepted = true
+        } else if (event.key === Qt.Key_Left) {
+            playbackA.previous()
+            playbackB.previous()
+            event.accepted = true
+        } else if (event.key === Qt.Key_R) {
+            playbackA.restart()
+            playbackB.restart()
+            event.accepted = true
+        }
+    }
+
+    focus: true
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 22
@@ -155,51 +177,22 @@ Item {
  from: 0
  to: Math.max(1, modelData.stepCount - 1)
  value: modelData.stepIndex }
+                        ComplexityPanel {
+                            theme: page.theme
+                            controller: modelData
+                            compact: true
+                        }
                     }
                 }
             }
             }
         }
-        Rectangle {
-            Layout.fillWidth: true
-            height: 76
-            radius: 13
-            color: theme.panel
-            border.color: theme.border
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: 12
-                Button { Accessible.name: "Restart both"; onClicked: { playbackA.restart(); playbackB.restart() }
-                    contentItem: RowLayout {
-                        Icon { name: "restart"; color: theme.muted; iconSize: 16 }
-                        Label { text: "Restart"; color: theme.text }
-                    }
-                }
-                Button { Accessible.name: "Previous step both"; onClicked: { playbackA.previous(); playbackB.previous() }
-                    contentItem: RowLayout {
-                        Icon { name: "previous"; color: theme.muted; iconSize: 16 }
-                        Label { text: "Step"; color: theme.text }
-                    }
-                }
-                Button { Accessible.name: playbackA.playing && playbackB.playing ? "Pause both" : "Run both"
-                    highlighted: true
-                    onClicked: page.toggleBothPlayback()
-                    contentItem: RowLayout {
-                        Icon { name: playbackA.playing && playbackB.playing ? "pause" : "play"; color: theme.textOnAccent; iconSize: 15 }
-                        Label { text: playbackA.playing && playbackB.playing ? "Pause both" : "Run both"; color: theme.textOnAccent; font.bold: true }
-                    }
-                }
-                Button { Accessible.name: "Next step both"; onClicked: { playbackA.next(); playbackB.next() }
-                    contentItem: RowLayout {
-                        Label { text: "Step"; color: theme.text }
-                        Icon { name: "next"; color: theme.muted; iconSize: 16 }
-                    }
-                }
-                Item { Layout.fillWidth: true }
-                Label { text: playbackA.complete && playbackB.complete ? "Comparison complete — compare the operation counts above." : "Both traces use the same starting input."
- color: theme.muted
- font.pixelSize: 11 }
-            }
+        ComparisonPlaybackControls {
+            theme: page.theme
+            controllerA: playbackA
+            controllerB: playbackB
+            settingsController: appSettings
+            onPlayPauseRequested: page.toggleBothPlayback()
         }
     }
 }

@@ -9,7 +9,7 @@ Rectangle {
     property string userInput: ""
     property bool inputFocused: false
 
-    signal inputApplied()
+    signal inputApplied(string values, int target)
 
     Layout.fillWidth: true
     implicitHeight: 52
@@ -29,10 +29,10 @@ Rectangle {
     }
 
     function applyInput() {
-        inputApplied()
         var requestedTarget = Number(targetField.text)
-        if (controller.sortInput(inputField.text) && controller.algorithm.endsWith("Search"))
-            controller.setSearchTarget(requestedTarget)
+        if (!controller.sortInput(inputField.text)) return
+        if (controller.algorithm.endsWith("Search")) controller.setSearchTarget(requestedTarget)
+        inputApplied(inputField.text, requestedTarget)
     }
 
     RowLayout {

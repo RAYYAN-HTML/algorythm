@@ -42,7 +42,7 @@ Rectangle {
                 Text { anchors.fill: parent
  anchors.leftMargin: 8
  verticalAlignment: Text.AlignVCenter
- text: (index + 1).toString().padStart(2, "0") + "   " + modelData
+ text: String(index + 1).padStart(2, "0") + "   " + modelData
  color: playback.pseudocodeLine === index + 1 ? theme.code : theme.muted
  font.family: "Consolas"
  font.pixelSize: 10 }

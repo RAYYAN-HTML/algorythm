@@ -6,7 +6,9 @@ import "../components"
 Item {
     id: page
     property AppTheme theme
+    property var recentActivities: []
     signal navigate(string section)
+    signal resumeRecent(var activity)
 
     ScrollView {
         id: dashboardScroll
@@ -26,7 +28,7 @@ Item {
                 Layout.topMargin: 2
                 Label { text: "YOUR DSA WORKSPACE"; color: page.theme.muted; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.5 }
                 Item { Layout.fillWidth: true }
-                Label { text: "LEARN · EXPLORE · VISUALIZE"; color: page.theme.subdued; font.pixelSize: 9; font.letterSpacing: 1 }
+                Label { visible: dashboardScroll.availableWidth >= 760; text: "LEARN · EXPLORE · VISUALIZE"; color: page.theme.subdued; font.pixelSize: 9; font.letterSpacing: 1 }
             }
 
             Rectangle {
@@ -77,6 +79,7 @@ Item {
                         }
                     }
                     Item {
+                        id: traceContainer
                         visible: page.width >= 900
                         Layout.preferredWidth: 190
                         Layout.fillHeight: true
@@ -103,8 +106,8 @@ Item {
                                 ctx.clearRect(0, 0, width, height)
                                 ctx.beginPath()
                                 for (let i = 0; i < parent.traceValues.length; ++i) {
-                                    const x = parent.traceX[i] * width
-                                    const y = 24 + parent.traceY[i] * Math.max(1, height - 38)
+                                    const x = traceContainer.traceX[i] * width
+                                    const y = 24 + traceContainer.traceY[i] * Math.max(1, height - 38)
                                     if (i === 0) ctx.moveTo(x, y)
                                     else ctx.lineTo(x, y)
                                 }
@@ -115,14 +118,14 @@ Item {
                             }
                         }
                         Repeater {
-                            model: parent.traceValues
+                            model: traceContainer.traceValues
                             delegate: Rectangle {
                                 required property int modelData
                                 required property int index
                                 width: 25
                                 height: 25
-                                x: 12 + parent.traceX[index] * (parent.width - 24) - width / 2
-                                y: 12 + 24 + parent.traceY[index] * Math.max(1, parent.height - 62) - height / 2
+                                x: 12 + traceContainer.traceX[index] * (traceContainer.width - 24) - width / 2
+                                y: 12 + 24 + traceContainer.traceY[index] * Math.max(1, traceContainer.height - 62) - height / 2
                                 radius: width / 2
                                 color: index === 3 ? page.theme.activeNode : page.theme.elevated
                                 border.width: index === 3 ? 2 : 1
@@ -135,13 +138,63 @@ Item {
             }
 
             GridLayout {
+                objectName: "dashboardStatsGrid"
                 Layout.fillWidth: true
-                columns: page.width < 820 ? 1 : 3
+                columns: dashboardScroll.availableWidth < 820 ? 1 : dashboardScroll.availableWidth < 1400 ? 2 : 3
                 columnSpacing: 12
                 rowSpacing: 10
                 StatCard { theme: page.theme; iconName: "sorting"; value: "07"; caption: "ALGORITHMS TO EXPLORE"; detail: "Five sorting · two searching" }
                 StatCard { theme: page.theme; iconName: "dashboard"; value: "07"; caption: "LEARNING LABS"; detail: "Guided, interactive modules" }
                 StatCard { theme: page.theme; iconName: "tree"; value: "04"; caption: "STRUCTURE TYPES"; detail: "Lists · stacks · queues · trees" }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 8
+                Label { text: "Continue learning"; color: page.theme.text; font.pixelSize: 19; font.bold: true }
+                Label {
+                    objectName: "emptyRecentActivities"
+                    visible: page.recentActivities.length === 0
+                    text: "Recently explored algorithms and their inputs will appear here."
+                    color: page.theme.muted
+                    font.pixelSize: 11
+                    Accessible.name: text
+                }
+                Repeater {
+                    model: page.recentActivities
+                    delegate: Button {
+                        id: recentButton
+                        required property var modelData
+                        required property int index
+                        objectName: "recentActivity_" + index
+                        Layout.fillWidth: true
+                        implicitHeight: 54
+                        Accessible.name: "Resume " + modelData.algorithm + " in " + modelData.section
+                        Accessible.description: modelData.graph ? modelData.graph.nodeCount + " nodes, " + modelData.graph.edges.length + (modelData.graph.edges.length === 1 ? " edge, starting at node " : " edges, starting at node ") + modelData.graph.startNode : modelData.input ? "Input: " + modelData.input : "Open this lab again"
+                        onClicked: page.resumeRecent(modelData)
+                        background: Rectangle {
+                            radius: 10
+                            color: recentButton.hovered || recentButton.visualFocus ? page.theme.elevated : page.theme.secondary
+                            border.width: recentButton.visualFocus ? 2 : 1
+                            border.color: recentButton.visualFocus ? page.theme.brightPurple : page.theme.border
+                        }
+                        contentItem: ColumnLayout {
+                            anchors.fill: parent
+                            anchors.leftMargin: 12
+                            anchors.rightMargin: 12
+                            spacing: 2
+                            Label { text: modelData.algorithm + " · " + modelData.section; color: page.theme.text; font.pixelSize: 11; font.bold: true }
+                            Label {
+                                objectName: "recentActivityDetails_" + recentButton.index
+                                text: modelData.graph ? modelData.graph.nodeCount + " nodes · " + modelData.graph.edges.length + (modelData.graph.edges.length === 1 ? " edge · start " : " edges · start ") + modelData.graph.startNode + (modelData.graph.destinationNode !== undefined ? " · destination " + modelData.graph.destinationNode : "") : modelData.input ? "Input: " + modelData.input + (modelData.target !== undefined ? " · target " + modelData.target : "") : "Open this lab again"
+                                color: page.theme.muted
+                                font.pixelSize: 9
+                                elide: Text.ElideRight
+                                Layout.fillWidth: true
+                            }
+                        }
+                    }
+                }
             }
 
             RowLayout {
@@ -181,4 +234,5 @@ Item {
             }
         }
     }
+
 }

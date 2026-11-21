@@ -5,7 +5,7 @@ import QtQuick.Layouts
 Popup {
     id: root
     property AppTheme theme
-    property QtObject appSettings
+    property var appSettings
     property bool reducedMotion: false
     property bool sidebarCollapsed: false
     property int windowWidth: 1000
@@ -39,7 +39,7 @@ Popup {
             value: root.appSettings.playbackSpeed
             onMoved: root.appSettings.playbackSpeed = value
         }
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.theme.border }
+        Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: root.theme.border }
         Label { text: "ACCESSIBILITY & LAYOUT"; color: root.theme.purpleText; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.1 }
         Switch { text: "Reduced motion"; checked: root.reducedMotion; onToggled: root.reducedMotionToggled(checked) }
         Switch { text: "Compact sidebar"; checked: root.sidebarCollapsed; onToggled: root.sidebarCollapsedToggled(checked) }
@@ -50,7 +50,7 @@ Popup {
             Layout.fillWidth: true
             onClicked: { root.appSettings.resetPreferences(); root.defaultsRestored(); root.close() }
             background: Rectangle { radius: 8; color: restoreButton.hovered || restoreButton.visualFocus ? root.theme.elevated : root.theme.secondary; border.width: restoreButton.visualFocus ? 2 : 1; border.color: restoreButton.visualFocus ? root.theme.brightPurple : root.theme.border }
-            contentItem: Text { text: parent.text; color: root.theme.text; font.pixelSize: 11; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+            contentItem: Text { text: restoreButton.text; color: root.theme.text; font.pixelSize: 11; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
         }
     }
 }

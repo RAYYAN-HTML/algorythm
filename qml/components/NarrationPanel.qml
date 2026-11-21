@@ -34,12 +34,12 @@ Rectangle {
  color: theme.content
  font.pixelSize: 12 }
         Item { Layout.fillHeight: true }
-        Button { text: "Why does this happen?"
+        Button { id: whyButton; text: "Why does this happen?"
  onClicked: whyDialog.open()
  background: Rectangle { radius: 7
  color: theme.secondary
  border.color: theme.border }
- contentItem: Text { text: parent.text
+ contentItem: Text { text: whyButton.text
  color: theme.code
  font.pixelSize: 10
  horizontalAlignment: Text.AlignHCenter

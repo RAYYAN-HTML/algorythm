@@ -24,7 +24,7 @@ ApplicationWindow {
     property bool sidebarCollapsed: appSettings.sidebarCollapsed
     property bool reducedMotion: appSettings.reducedMotion
 
-    function navigateSection(destination) {
+    function navigateSection(destination, recordActivity) {
         section = destination
         if (destination === "Searching") playback.selectAlgorithm("Linear Search")
         else if (destination === "Sorting") playback.selectAlgorithm("Bubble Sort")
@@ -32,6 +32,32 @@ ApplicationWindow {
         else if (destination === "Stacks") structures.kind = "Stack"
         else if (destination === "Queues") structures.kind = "Queue"
         else if (destination === "Trees") structures.kind = "Binary Search Tree"
+        if (recordActivity !== false && (destination === "Sorting" || destination === "Searching")) {
+            appSettings.recordRecentActivity({ section: destination, algorithm: playback.algorithm })
+        } else if (recordActivity !== false && destination === "Graphs") {
+            appSettings.recordRecentActivity({ section: destination, algorithm: graph.algorithm, graph: graph.configuration() })
+        }
+    }
+
+    function resumeRecent(activity) {
+        if (activity.section === "Sorting" || activity.section === "Searching") {
+            navigateSection(activity.section, false)
+            if (sortingPage.item === null) sortingPage.active = true
+            if (sortingPage.item === null) return
+            sortingPage.item.userInput = activity.input || sortingPage.item.userInput
+            playback.selectAlgorithm(activity.algorithm)
+            if (activity.input && playback.sortInput(activity.input) && activity.algorithm.endsWith("Search") && activity.target !== undefined)
+                playback.setSearchTarget(activity.target)
+        } else if (activity.section === "Graphs") {
+            navigateSection("Graphs", false)
+            if (graphPage.item === null) graphPage.active = true
+            graph.algorithm = activity.algorithm
+            if (activity.graph) {
+                graph.restoreConfiguration(activity.graph)
+                graphPage.item.startNode = activity.graph.startNode
+                graphPage.item.destinationNode = Math.max(0, Math.min(activity.graph.destinationNode === undefined ? graphPage.item.destinationNode : activity.graph.destinationNode, graph.nodeCount - 1))
+            }
+        }
     }
 
     onReducedMotionChanged: appSettings.reducedMotion = reducedMotion
@@ -59,11 +85,29 @@ ApplicationWindow {
         reducedMotion: window.reducedMotion
     }
 
+    Component {
+        id: comparisonPageComponent
+        ComparisonPage { theme: appColors }
+    }
+    Component {
+        id: sortingPageComponent
+        SortingPage { theme: appColors }
+    }
+    Component {
+        id: structurePageComponent
+        StructurePage { theme: appColors }
+    }
+    Component {
+        id: graphPageComponent
+        GraphPage { theme: appColors }
+    }
+
     RowLayout {
         anchors.fill: parent
         spacing: 0
 
         NavigationSidebar {
+            id: navigationSidebar
             theme: appColors
             appSettings: window.settingsController
             section: window.section
@@ -89,12 +133,51 @@ ApplicationWindow {
             id: pages
             Layout.fillWidth: true
             Layout.fillHeight: true
+            Layout.minimumWidth: 0
+            Layout.preferredWidth: Math.max(0, window.width - navigationSidebar.sidebarWidth)
+            Layout.maximumWidth: Math.max(0, window.width - navigationSidebar.sidebarWidth)
+            clip: true
             currentIndex: window.section === "Dashboard" ? 0 : ["Linked Lists", "Stacks", "Queues", "Trees"].includes(window.section) ? 2 : window.section === "Compare" ? 3 : window.section === "Graphs" ? 4 : 1
-            DashboardPage { theme: appColors; onNavigate: destination => window.navigateSection(destination) }
-            SortingPage { theme: appColors }
-            StructurePage { theme: appColors }
-            ComparisonPage { theme: appColors }
-            GraphPage { theme: appColors }
+            DashboardPage {
+                theme: appColors
+                recentActivities: appSettings.recentActivities
+                onNavigate: destination => window.navigateSection(destination)
+                onResumeRecent: activity => window.resumeRecent(activity)
+            }
+            Loader {
+                id: sortingPage
+                property bool activatedOnce: false
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                active: pages.currentIndex === 1 || activatedOnce
+                sourceComponent: sortingPageComponent
+                onLoaded: activatedOnce = true
+            }
+            Loader {
+                property bool activatedOnce: false
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                active: pages.currentIndex === 2 || activatedOnce
+                sourceComponent: structurePageComponent
+                onLoaded: activatedOnce = true
+            }
+            Loader {
+                property bool activatedOnce: false
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                active: pages.currentIndex === 3 || activatedOnce
+                sourceComponent: comparisonPageComponent
+                onLoaded: activatedOnce = true
+            }
+            Loader {
+                id: graphPage
+                property bool activatedOnce: false
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                active: pages.currentIndex === 4 || activatedOnce
+                sourceComponent: graphPageComponent
+                onLoaded: activatedOnce = true
+            }
         }
     }
 }

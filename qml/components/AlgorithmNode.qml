@@ -12,6 +12,7 @@ Item {
     property color doneFill: theme.visitedNode
     property color idleFill: theme.elevated
     property int animationDuration: 380
+    readonly property int colorAnimationDuration: theme.reducedMotion ? 0 : animationDuration * 0.7
     Accessible.name: "Value " + root.value
     Accessible.description: root.nodeState === "found" ? "Search target found" : root.nodeState === "compare" ? "Currently being compared" : root.nodeState === "active" ? "Current algorithm element" : root.nodeState === "done" ? "Completed element" : "Unprocessed element"
     implicitWidth: 62
@@ -29,8 +30,8 @@ Item {
         color: root.nodeState === "active" ? root.activeFill : root.nodeState === "compare" || root.nodeState === "found" ? root.nodeState === "found" ? root.foundFill : root.compareFill : root.nodeState === "done" ? root.doneFill : root.idleFill
         border.width: root.nodeState === "active" || root.nodeState === "compare" || root.nodeState === "found" ? 2 : 1
         border.color: root.nodeState === "active" ? root.accent : root.nodeState === "compare" || root.nodeState === "found" ? root.theme.amber : root.nodeState === "done" ? root.theme.green : root.theme.nodeOutline
-        Behavior on color { ColorAnimation { duration: root.animationDuration * 0.7 } }
-        Behavior on border.color { ColorAnimation { duration: root.animationDuration * 0.7 } }
+        Behavior on color { ColorAnimation { duration: root.colorAnimationDuration } }
+        Behavior on border.color { ColorAnimation { duration: root.colorAnimationDuration } }
         Rectangle { anchors.fill: parent
  anchors.margins: -5
  radius: width / 2
@@ -45,6 +46,17 @@ Item {
  font.pixelSize: 17
  font.bold: true
  Accessible.ignored: true }
+        Text {
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.margins: -4
+            visible: root.nodeState !== "default"
+            text: root.nodeState === "active" ? "▶" : root.nodeState === "compare" ? "↔" : "✓"
+            color: root.nodeState === "done" || root.nodeState === "found" ? root.theme.green : root.theme.amber
+            font.pixelSize: 12
+            font.bold: true
+            Accessible.ignored: true
+        }
     }
 }
 

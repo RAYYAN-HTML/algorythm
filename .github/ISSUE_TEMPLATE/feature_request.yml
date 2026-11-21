@@ -1,0 +1,28 @@
+name: Feature request
+description: Suggest an improvement to learning or visualization
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Learning need
+      description: What should a learner be able to understand or do?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      required: false
+  - type: textarea
+    id: accessibility
+    attributes:
+      label: Accessibility considerations
+      required: false

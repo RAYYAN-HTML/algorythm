@@ -10,8 +10,12 @@ permissions:
 
 jobs:
   build-and-test:
-    name: Windows Qt 6 Release build and CTest
+    name: Windows Qt 6 ${{ matrix.build_type }} build and tests
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -28,11 +32,18 @@ jobs:
       - name: Set up MSVC
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Configure Release build
-        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+      - name: Configure build
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING=ON
 
       - name: Build application and tests
-        run: cmake --build build --config Release --parallel
+        run: cmake --build build --config ${{ matrix.build_type }} --parallel
 
       - name: Run CTest
-        run: ctest --test-dir build --build-config Release --output-on-failure --no-tests=error
+        run: ctest --test-dir build --build-config ${{ matrix.build_type }} --output-on-failure --no-tests=error
+
+      - name: Run QML lint
+        shell: pwsh
+        run: |
+          $qmlFiles = Get-ChildItem qml -Recurse -Filter *.qml | ForEach-Object FullName
+          $qmlTests = Get-ChildItem tests -Filter tst_*.qml | ForEach-Object FullName
+          qmllint -I build @qmlFiles @qmlTests

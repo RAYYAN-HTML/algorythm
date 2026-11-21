@@ -11,6 +11,25 @@ Item {
     property bool focusMode: false
     property bool assistantVisible: page.width >= 980
 
+    function predictionKind(algorithm) {
+        if (algorithm === "Linear Search") return "target"
+        if (algorithm === "Binary Search") return "direction"
+        if (algorithm === "Selection Sort") return "minimum"
+        if (algorithm === "Insertion Sort") return "moveLeft"
+        if (algorithm === "Quick Sort") return "partition"
+        return "swap"
+    }
+
+    function recordRecentInput(values, target) {
+        var activity = {
+            section: playback.algorithm.endsWith("Search") ? "Searching" : "Sorting",
+            algorithm: playback.algorithm,
+            input: values
+        }
+        if (playback.algorithm.endsWith("Search")) activity.target = target
+        appSettings.recordRecentActivity(activity)
+    }
+
 
     SplitView {
         id: workspaceSplit
@@ -59,7 +78,10 @@ Item {
                 RowLayout {
                     ComboBox { model: ["Bubble Sort", "Selection Sort", "Insertion Sort", "Merge Sort", "Quick Sort", "Linear Search", "Binary Search"]
  currentIndex: model.indexOf(playback.algorithm)
- onActivated: playback.selectAlgorithm(currentText)
+                    onActivated: {
+                        playback.selectAlgorithm(currentText)
+                        page.recordRecentInput(page.userInput, playback.searchTarget)
+                    }
  implicitWidth: 145 }
                     Button { id: focusModeButton; text: "Focus mode"
  checkable: true
@@ -68,15 +90,15 @@ Item {
  color: focusModeButton.checked ? theme.highlightSurface : focusModeButton.hovered || focusModeButton.visualFocus ? theme.elevated : theme.secondary
  border.width: focusModeButton.visualFocus ? 2 : 1
  border.color: focusModeButton.visualFocus ? theme.brightPurple : theme.border }
- contentItem: Text { text: parent.text
- color: parent.checked ? theme.purpleText : theme.muted
+ contentItem: Text { text: focusModeButton.text
+ color: focusModeButton.checked ? theme.purpleText : theme.muted
  font.pixelSize: 11
  horizontalAlignment: Text.AlignHCenter
  verticalAlignment: Text.AlignVCenter } }
                     Button { id: assistantVisibilityButton; text: page.assistantVisible ? "Hide assistant" : "Show assistant"
                     onClicked: page.assistantVisible = !page.assistantVisible
                     background: Rectangle { radius: 8; color: assistantVisibilityButton.hovered || assistantVisibilityButton.visualFocus ? theme.elevated : theme.secondary; border.width: assistantVisibilityButton.visualFocus ? 2 : 1; border.color: assistantVisibilityButton.visualFocus ? theme.brightPurple : theme.border }
-                    contentItem: Text { text: parent.text; color: theme.muted; font.pixelSize: 10; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    contentItem: Text { text: assistantVisibilityButton.text; color: theme.muted; font.pixelSize: 10; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                 }
                     Item { Layout.fillWidth: true }
                 }
@@ -114,8 +136,8 @@ Item {
  font.bold: true
  font.letterSpacing: 1.2 }
                         Item { Layout.fillWidth: true }
-                        Rectangle { width: 8
- height: 8
+                        Rectangle { Layout.preferredWidth: 8
+ Layout.preferredHeight: 8
  radius: 4
  color: theme.purple }
                         Label { text: "Active step"
@@ -156,13 +178,21 @@ Item {
  font.pixelSize: 11
  font.bold: true }
                         Item { Layout.fillWidth: true }
-                        Label { visible: playback.algorithm === "Bubble Sort"
+                        Label { visible: playback.operation !== "Ready to sort" && playback.operation !== "Ready to search"
  text: "Challenge score " + challenge.score
  color: theme.muted
  font.pixelSize: 9 }
-                        Button { visible: playback.algorithm === "Bubble Sort" && playback.operation === "Compare neighbors"
- text: "Predict"
- onClicked: challenge.openPrediction() }
+                        Button {
+                            visible: (playback.algorithm === "Bubble Sort" && playback.operation === "Compare neighbors")
+                                || (playback.algorithm === "Selection Sort" && playback.operation === "Find minimum")
+                                || (playback.algorithm === "Insertion Sort" && playback.operation === "Compare key")
+                                || (playback.algorithm === "Merge Sort" && playback.operation === "Merge compare")
+                                || (playback.algorithm === "Quick Sort" && playback.operation === "Compare with pivot")
+                                || (playback.algorithm === "Linear Search" && playback.operation === "Inspect value")
+                                || (playback.algorithm === "Binary Search" && playback.operation === "Inspect midpoint")
+                            text: playback.algorithm === "Linear Search" ? "Predict match" : playback.algorithm === "Binary Search" ? "Predict range" : "Predict next step"
+                            onClicked: challenge.openPrediction(page.predictionKind(challenge.controller.algorithm))
+                        }
                         Label { text: playback.complete ? "COMPLETE" : "RUNNING TRACE"
  color: playback.complete ? theme.green : theme.purpleText
  font.pixelSize: 9
@@ -175,13 +205,23 @@ Item {
                 theme: page.theme
                 controller: playback
                 userInput: page.userInput
-                onInputApplied: page.errorMessage = ""
+                onInputApplied: (values, target) => {
+                    page.errorMessage = ""
+                    page.userInput = values
+                    page.recordRecentInput(values, target)
+                }
             }
             Label { visible: page.errorMessage !== ""
  text: page.errorMessage
  color: theme.error
- font.pixelSize: 11 }
-            PlaybackControls { theme: page.theme; Layout.fillWidth: true }
+ font.pixelSize: 11
+ Accessible.name: "Input error: " + page.errorMessage }
+            PlaybackControls {
+                theme: page.theme
+                controller: playback
+                settingsController: appSettings
+                Layout.fillWidth: true
+            }
         }
 
         ScrollView {
@@ -233,7 +273,10 @@ Item {
     }
 
     Connections { target: playback
- function onInputError(message) { page.errorMessage = message } }
+ function onInputError(message) {
+     page.errorMessage = message
+     page.theme.announce(message)
+ } }
     PredictionChallenge { id: challenge; theme: page.theme; controller: playback }
     Keys.onPressed: event => {
         if (event.isAutoRepeat || inputBar.inputFocused || event.accepted) return

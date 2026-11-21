@@ -73,7 +73,7 @@ Rectangle {
             }
         }
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.theme.border }
+        Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: root.theme.border }
         Label { text: "WORKSPACE"; visible: root.windowWidth >= 980; color: root.theme.muted; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1.3 }
 
         ScrollView {
@@ -99,6 +99,7 @@ Rectangle {
                     ]
                     delegate: Button {
                         id: navigationButton
+                        objectName: "navigation_" + modelData.name.replace(/\W/g, "_")
                         required property var modelData
                         Layout.fillWidth: true
                         implicitHeight: root.windowHeight < 700 ? 34 : 42
@@ -122,9 +123,9 @@ Rectangle {
                             color: navigationButton.selected ? "#35215A" : navigationButton.hovered || navigationButton.visualFocus ? "#211B39" : "transparent"
                             border.width: navigationButton.visualFocus ? 2 : navigationButton.selected ? 1 : 0
                             border.color: navigationButton.visualFocus ? root.theme.brightPurple : navigationButton.selected ? root.theme.deepPurple : "transparent"
-                            gradient: parent.selected ? activeGradient : undefined
+                            gradient: navigationButton.selected ? activeGradient : undefined
                             Behavior on color { ColorAnimation { duration: root.reducedMotion ? 0 : 140 } }
-                            Rectangle { x: 0; y: 6; width: 3; height: parent.height - 12; radius: 2; color: root.theme.purple; visible: parent.parent.selected }
+                            Rectangle { x: 0; y: 6; width: 3; height: parent.height - 12; radius: 2; color: root.theme.purple; visible: navigationButton.selected }
                         }
                         contentItem: RowLayout {
                             spacing: 11
@@ -137,7 +138,7 @@ Rectangle {
         }
 
 
-        Rectangle { Layout.fillWidth: true; height: 1; color: root.theme.border }
+        Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: root.theme.border }
         Button {
             id: compareButton
             Layout.fillWidth: true
@@ -185,12 +186,12 @@ Rectangle {
 
         Rectangle {
             Layout.fillWidth: true
-            height: 66
+            implicitHeight: 66
             visible: root.windowWidth >= 980 && !root.sidebarCollapsed && root.windowHeight >= 700
             radius: 12; color: root.theme.panel; border.color: root.theme.border
             RowLayout {
                 anchors.fill: parent; anchors.margins: 11
-                Rectangle { width: 34; height: 34; radius: 17; color: "#3A235F"; Label { anchors.centerIn: parent; text: "R"; color: "#D8B4FE"; font.bold: true } }
+                Rectangle { implicitWidth: 34; implicitHeight: 34; radius: 17; color: "#3A235F"; Label { anchors.centerIn: parent; text: "R"; color: "#D8B4FE"; font.bold: true } }
                 ColumnLayout {
                     spacing: 2
                     Label { text: "Student Mode"; color: root.theme.text; font.pixelSize: 12; font.bold: true }

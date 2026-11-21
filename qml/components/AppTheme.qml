@@ -3,6 +3,11 @@ import QtQuick
 QtObject {
     property bool reducedMotion: false
 
+    function announce(message) {
+        if (typeof Accessible.announce === "function")
+            Accessible.announce(message, Accessible.Polite)
+    }
+
     readonly property color background: "#080812"
     readonly property color secondary: "#0D0D1A"
     readonly property color panel: "#17172A"
@@ -17,10 +22,10 @@ QtObject {
     readonly property color compareNode: "#40351C"
     readonly property color foundNode: "#514018"
     readonly property color visitedNode: "#15382F"
-    readonly property color nodeOutline: "#594477"
-    readonly property color graphEdge: "#34435D"
-    readonly property color focusOutline: "#53647E"
-    readonly property color treeEdge: "#52617D"
+    readonly property color nodeOutline: "#7c6aa5"
+    readonly property color graphEdge: "#64748b"
+    readonly property color focusOutline: "#7083a0"
+    readonly property color treeEdge: "#718096"
     readonly property color purple: "#8B5CF6"
     readonly property color purpleText: "#B197FC"
     readonly property color brightPurple: "#A855F7"

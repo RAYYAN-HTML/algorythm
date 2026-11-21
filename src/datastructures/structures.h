@@ -54,13 +54,25 @@ class BinarySearchTree {
     struct Node { int value;std::unique_ptr<Node>left,right;explicit Node(int v):value(v){} };
     std::unique_ptr<Node> root;
     template<class F> static void walk(const Node*n,F visit,int order){if(!n)return;if(order==0)visit(n->value);walk(n->left.get(),visit,order);if(order==1)visit(n->value);walk(n->right.get(),visit,order);if(order==2)visit(n->value);}
+    static bool eraseNode(std::unique_ptr<Node>&node,int value){
+        if(!node)return false;
+        if(value<node->value)return eraseNode(node->left,value);
+        if(value>node->value)return eraseNode(node->right,value);
+        if(!node->left){node=std::move(node->right);return true;}
+        if(!node->right){node=std::move(node->left);return true;}
+        Node*successor=node->right.get();while(successor->left)successor=successor->left.get();
+        node->value=successor->value;
+        return eraseNode(node->right,successor->value);
+    }
 public:
     bool insert(int v){auto*link=&root;while(*link){if((*link)->value==v)return false;link=(v<(*link)->value)?&(*link)->left:&(*link)->right;}*link=std::make_unique<Node>(v);return true;}
     int insertionDepth(int v)const{const Node*n=root.get();int depth=0;while(n){if(n->value==v)return depth;n=v<n->value?n->left.get():n->right.get();++depth;}return depth;}
     bool contains(int v)const{auto*n=root.get();while(n){if(n->value==v)return true;n=v<n->value?n->left.get():n->right.get();}return false;}
+    bool erase(int v){return eraseNode(root,v);}
     std::vector<int> inorder()const{std::vector<int>o;walk(root.get(),[&](int v){o.push_back(v);},1);return o;}
     std::vector<int> preorder()const{std::vector<int>o;walk(root.get(),[&](int v){o.push_back(v);},0);return o;}
     std::vector<int> postorder()const{std::vector<int>o;walk(root.get(),[&](int v){o.push_back(v);},2);return o;}
+    std::vector<int> levelorder()const{std::vector<int>out;if(!root)return out;std::queue<const Node*>q;q.push(root.get());while(!q.empty()){const Node*n=q.front();q.pop();out.push_back(n->value);if(n->left)q.push(n->left.get());if(n->right)q.push(n->right.get());}return out;}
     std::vector<TreeVisualNode> visual()const{std::vector<TreeVisualNode> out;if(!root)return out;struct Entry{const Node*n;int depth;int pos;};std::queue<Entry>q;q.push({root.get(),0,0});while(!q.empty()){auto e=q.front();q.pop();out.push_back({e.n->value,e.depth,e.pos});if(e.n->left)q.push({e.n->left.get(),e.depth+1,e.pos*2});if(e.n->right)q.push({e.n->right.get(),e.depth+1,e.pos*2+1});}return out;}
 };
 

@@ -3,6 +3,8 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <QVariantList>
+#include <QTimer>
+#include <QVector>
 
 class StructureVisualModel : public QAbstractListModel {
     Q_OBJECT
@@ -51,6 +53,10 @@ class StructureController : public QObject {
     Q_PROPERTY(QVariantList treeNodes READ treeNodes NOTIFY changed)
     Q_PROPERTY(QString status READ status NOTIFY changed)
     Q_PROPERTY(int size READ size NOTIFY changed)
+    Q_PROPERTY(int traversalValue READ traversalValue NOTIFY changed)
+    Q_PROPERTY(int traversalIndex READ traversalIndex NOTIFY changed)
+    Q_PROPERTY(int traversalCount READ traversalCount NOTIFY changed)
+    Q_PROPERTY(QVariantList traversal READ traversal NOTIFY changed)
     Q_PROPERTY(StructureVisualModel* visualModel READ visualModel CONSTANT)
     Q_PROPERTY(TreeVisualModel* treeVisualModel READ treeVisualModel CONSTANT)
 public:
@@ -61,6 +67,10 @@ public:
     QVariantList treeNodes()const;
     QString status()const{return m_status;}
     int size()const;
+    int traversalValue()const{return m_traversalIndex>=0&&m_traversalIndex<m_traversal.size()?m_traversal[m_traversalIndex]:-1;}
+    int traversalIndex()const{return m_traversalIndex;}
+    int traversalCount()const{return m_traversal.size();}
+    QVariantList traversal()const{QVariantList result;for(int value:m_traversal)result<<value;return result;}
     StructureVisualModel *visualModel() { return &m_visualModel; }
     TreeVisualModel *treeVisualModel() { return &m_treeVisualModel; }
     Q_INVOKABLE void reset();
@@ -68,10 +78,17 @@ public:
     Q_INVOKABLE void remove(int position=0);
     Q_INVOKABLE void search(int value);
     Q_INVOKABLE void traverse(const QString&order="Inorder");
+    Q_INVOKABLE void nextTraversalStep();
+    Q_INVOKABLE void previousTraversalStep();
+    Q_INVOKABLE void restartTraversal();
 signals:void changed();
 private:
     QString m_kind="Linked List",m_status="Ready. Choose an operation.";
     SinglyLinkedList m_list; LinkedStack m_stack; LinkedQueue m_queue; BinarySearchTree m_tree;
+    QVector<int> m_traversal;
+    QString m_traversalOrder;
+    int m_traversalIndex=-1;
+    QTimer m_traversalTimer;
     StructureVisualModel m_visualModel;
     TreeVisualModel m_treeVisualModel;
 };

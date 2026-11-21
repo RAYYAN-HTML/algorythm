@@ -1,5 +1,7 @@
 /build/
+/build-debug/
 /build-release/
+/build-profile/
 /release-package/
 /artifacts/
 /profiler/build/

@@ -1,4 +1,5 @@
 #include "structurecontroller.h"
+#include <algorithm>
 #include <QVariant>
 
 void StructureVisualModel::resetValues(const QVariantList &values)
@@ -50,6 +51,18 @@ void TreeVisualModel::resetNodes(const QVariantList &nodes)
 void TreeVisualModel::syncNodes(const QVariantList &nodes)
 {
     if (m_nodes.isEmpty()) { resetNodes(nodes); return; }
+    for (int row = m_nodes.size() - 1; row >= 0; --row) {
+        const QVariant value = m_nodes.at(row).value("value");
+        const bool stillPresent = std::any_of(nodes.cbegin(), nodes.cend(), [value](const QVariant &entry) {
+            return entry.toMap().value("value") == value;
+        });
+        if (!stillPresent) {
+            beginRemoveRows({}, row, row);
+            m_nodes.removeAt(row);
+            endRemoveRows();
+            emit countChanged();
+        }
+    }
     QVariantList additions;
     for (const auto &entry : nodes) {
         const QVariantMap next = entry.toMap();
@@ -71,7 +84,7 @@ void TreeVisualModel::syncNodes(const QVariantList &nodes)
     }
 }
 
-StructureController::StructureController(QObject*p):QObject(p){m_list.insertEnd(8);m_list.insertEnd(3);m_list.insertEnd(6);m_status="Sample linked list loaded.";m_visualModel.resetValues(values());}
+StructureController::StructureController(QObject*p):QObject(p){m_list.insertEnd(8);m_list.insertEnd(3);m_list.insertEnd(6);m_status="Sample linked list loaded.";m_visualModel.resetValues(values());m_traversalTimer.setInterval(650);connect(&m_traversalTimer,&QTimer::timeout,this,[this]{if(m_traversalIndex+1<m_traversal.size())++m_traversalIndex;else m_traversalTimer.stop();m_status=QString("%1: visited %2 of %3 nodes.").arg(m_traversalOrder).arg(m_traversalIndex+1).arg(m_traversal.size());emit changed();});}
 
 QVariantList StructureController::values()const{
     QVariantList out; std::vector<int> v;
@@ -92,7 +105,7 @@ void StructureController::insert(int value,int position){
     else {
         constexpr int maximumDepth=3;
         if(m_tree.insertionDepth(value)>maximumDepth)m_status="Cannot insert: the tree visualizer supports at most four levels.";
-        else {const bool inserted=m_tree.insert(value);if(inserted)m_treeVisualModel.syncNodes(treeNodes());m_status=inserted?QString("Inserted %1 into the BST.").arg(value):"Duplicate values are ignored in this BST.";}
+        else {const bool inserted=m_tree.insert(value);if(inserted){m_treeVisualModel.syncNodes(treeNodes());m_traversalTimer.stop();m_traversal.clear();m_traversalIndex=-1;}m_status=inserted?QString("Inserted %1 into the BST.").arg(value):"Duplicate values are ignored in this BST.";}
     }
     emit changed();
 }
@@ -100,8 +113,15 @@ void StructureController::remove(int position){
     if(m_kind=="Linked List"){const bool ok=m_list.eraseAt(position);if(ok)m_visualModel.removeValue(position);m_status=ok?QString("Deleted the node at position %1.").arg(position):"Position is outside the list bounds.";}
     else if(m_kind=="Stack"){try{const int value=m_stack.pop();m_visualModel.removeValue(0);m_status=QString("Popped %1 from the top.").arg(value);}catch(const std::underflow_error&){m_status="Cannot pop: the stack is empty.";}}
     else if(m_kind=="Queue"){try{const int value=m_queue.dequeue();m_visualModel.removeValue(0);m_status=QString("Dequeued %1 from the front.").arg(value);}catch(const std::underflow_error&){m_status="Cannot dequeue: the queue is empty.";}}
-    else m_status="Delete is not included in this Binary Search Tree demo.";
+    else {
+        const bool removed=m_tree.erase(position);
+        if(removed){m_treeVisualModel.syncNodes(treeNodes());m_traversalTimer.stop();m_traversal.clear();m_traversalIndex=-1;}
+        m_status=removed?QString("Deleted %1 from the BST and repositioned affected nodes.").arg(position):QString("%1 is not in the tree.").arg(position);
+    }
     emit changed();
 }
 void StructureController::search(int value){if(m_kind=="Linked List"){int i=m_list.find(value);m_status=i<0?QString("%1 is not in the list.").arg(value):QString("Found %1 at position %2.").arg(value).arg(i);}else if(m_kind=="Binary Search Tree")m_status=m_tree.contains(value)?QString("%1 exists in the tree.").arg(value):QString("%1 is not in the tree.").arg(value);else m_status=QString("Front/top value is %1.").arg(values().isEmpty()?QString("(empty)"):values().first().toString());emit changed();}
-void StructureController::traverse(const QString&order){if(m_kind!="Binary Search Tree"){m_status=QString("Current order: %1").arg([&]{QStringList x;for(auto v:values())x<<v.toString();return x.join(" → ");}());}else{std::vector<int> v=order=="Preorder"?m_tree.preorder():order=="Postorder"?m_tree.postorder():m_tree.inorder();QStringList x;for(int n:v)x<<QString::number(n);m_status=order+": "+x.join(" → ");}emit changed();}
+void StructureController::traverse(const QString&order){m_traversalTimer.stop();m_traversal.clear();m_traversalIndex=-1;if(m_kind!="Binary Search Tree"){m_status=QString("Current order: %1").arg([&]{QStringList x;for(auto v:values())x<<v.toString();return x.join(" → ");}());}else{std::vector<int> v=order=="Preorder"?m_tree.preorder():order=="Postorder"?m_tree.postorder():order=="Level-order"?m_tree.levelorder():m_tree.inorder();for(int n:v)m_traversal.push_back(n);m_traversalOrder=order;if(m_traversal.isEmpty())m_status="The tree is empty; there are no nodes to visit.";else{m_traversalIndex=0;m_status=QString("%1: visiting %2 (1 of %3).").arg(order).arg(m_traversal.first()).arg(m_traversal.size());if(m_traversal.size()>1)m_traversalTimer.start();}}emit changed();}
+void StructureController::nextTraversalStep(){m_traversalTimer.stop();if(m_traversalIndex<0||m_traversalIndex+1>=m_traversal.size())return;++m_traversalIndex;m_status=QString("%1: visiting %2 (%3 of %4).").arg(m_traversalOrder).arg(traversalValue()).arg(m_traversalIndex+1).arg(m_traversal.size());emit changed();}
+void StructureController::previousTraversalStep(){m_traversalTimer.stop();if(m_traversalIndex<=0)return;--m_traversalIndex;m_status=QString("%1: revisiting %2 (%3 of %4).").arg(m_traversalOrder).arg(traversalValue()).arg(m_traversalIndex+1).arg(m_traversal.size());emit changed();}
+void StructureController::restartTraversal(){m_traversalTimer.stop();if(m_traversal.isEmpty())return;m_traversalIndex=0;m_status=QString("%1: restarted at %2 (1 of %3).").arg(m_traversalOrder).arg(traversalValue()).arg(m_traversal.size());emit changed();}
