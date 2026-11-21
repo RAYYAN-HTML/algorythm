@@ -27,13 +27,15 @@ class AlgorithmTests : public QObject
 private slots:
     void initTestCase()
     {
+        std::fputs("AlgorithmTests: initTestCase entered.\n", stderr);
+        std::fflush(stderr);
         QCoreApplication::setOrganizationName("Algorythm Tests");
         QCoreApplication::setApplicationName("Settings Controller Tests");
     }
 
     void allAlgorithmsControllersAndPlayback()
     {
-    qWarning("section: settings");
+    std::fputs("AlgorithmTests: settings section.\n", stderr); std::fflush(stderr);
     QSettings::setDefaultFormat(QSettings::IniFormat);
     QTemporaryDir settingsDirectory;
     QVERIFY(settingsDirectory.isValid());
@@ -75,7 +77,7 @@ private slots:
     QVERIFY(restoredSettings.recentActivities().isEmpty());
 
     const QStringList algorithms = SortingAlgorithms::names();
-    qWarning("section: sorting generators");
+    std::fputs("AlgorithmTests: sorting generators section.\n", stderr); std::fflush(stderr);
     const QVector<QVector<int>> cases = {
         {}, {5}, {2, 1}, {1, 2, 3, 4}, {4, 3, 2, 1}, {3, 1, 3, -2, 0, -2},
         {16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1}
@@ -113,7 +115,7 @@ private slots:
         QVERIFY(sawAlgorithmState);
     }
     SinglyLinkedList list;
-    qWarning("section: structures");
+    std::fputs("AlgorithmTests: structures section.\n", stderr); std::fflush(stderr);
     QVERIFY(list.insertAt(0, 5)); QVERIFY(list.insertAt(1, 8)); QVERIFY(list.insertAt(1, 6));
     QVERIFY((list.values() == std::vector<int>{5,6,8})); QVERIFY(list.find(6)==1); QVERIFY(!list.insertAt(5,4));
     QVERIFY(list.eraseAt(1)); QVERIFY(!list.eraseAt(5)); QVERIFY((list.values()==std::vector<int>{5,8}));
@@ -132,7 +134,7 @@ private slots:
     QVERIFY((tree.inorder()==std::vector<int>{4,6,7,8}));
     QVERIFY(!tree.erase(99));
     WeightedGraph graph(5);QVERIFY(graph.addEdge(0,1,4));QVERIFY(graph.addEdge(0,2,1));QVERIFY(graph.addEdge(2,1,2));QVERIFY(graph.addEdge(1,3,1));
-    qWarning("section: graph algorithms");
+    std::fputs("AlgorithmTests: graph algorithms section.\n", stderr); std::fflush(stderr);
     QVERIFY((graph.bfs(0)==std::vector<int>{0,1,2,3}));QVERIFY((graph.dfs(0)==std::vector<int>{0,1,2,3}));
     const auto distances=graph.dijkstra(0);QVERIFY(distances[0]==0&&distances[1]==3&&distances[2]==1&&distances[3]==4);QVERIFY(distances[4]>1000000);
     QVERIFY(!graph.addEdge(0,4,-1));QVERIFY(graph.dijkstra(9).empty());
@@ -165,7 +167,7 @@ private slots:
         QVERIFY(singleTrace.last().operation == "Target found");
     }
     StructureController controller;
-    qWarning("section: structure controller");
+    std::fputs("AlgorithmTests: structure controller section.\n", stderr); std::fflush(stderr);
     controller.reset();
     QVERIFY(controller.visualModel()->rowCount()==0);
     controller.insert(4,0);controller.insert(2,1);QVERIFY(controller.values().size()==2);
@@ -209,7 +211,7 @@ private slots:
     controller.remove(99);
     QVERIFY(controller.status().contains("not in the tree"));
     GraphController graphController;
-    qWarning("section: graph controller");
+    std::fputs("AlgorithmTests: graph controller section.\n", stderr); std::fflush(stderr);
     QString invalidStartError;
     QObject::connect(&graphController,&GraphController::error,[&](const QString&message){invalidStartError=message;});
     const int graphStepCountBeforeInvalidRun=graphController.stepCount();
@@ -329,7 +331,7 @@ private slots:
     QVERIFY(!editableGraph.removeNode(0));
 
     PlaybackController playback;
-    qWarning("section: playback controller");
+    std::fputs("AlgorithmTests: playback controller section.\n", stderr); std::fflush(stderr);
     QVERIFY(playback.nodes()->rowCount() == 7);
     QVERIFY(playback.nodes()->data(playback.nodes()->index(0), AlgorithmNodeModel::ValueRole).toInt() == 8);
     playback.previous();
