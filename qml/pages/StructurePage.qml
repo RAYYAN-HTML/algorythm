@@ -245,6 +245,7 @@ Item {
                     Button { text: "Traverse"
  flat: true
   onClicked: { structures.traverse(orderBox.currentText); page.announceStructureStatus() } }
+                    StructurePredictionChallenge { theme: page.theme; controller: structures; traversalOrder: orderBox.currentText }
                     Button { visible: structures.kind === "Binary Search Tree" && structures.traversalCount > 0; text: "Restart visits"; flat: true; onClicked: { structures.restartTraversal(); page.announceStructureStatus() } }
                     Button { visible: structures.kind === "Binary Search Tree" && structures.traversalCount > 0; text: "Previous visit"; flat: true; enabled: structures.traversalIndex > 0; onClicked: { structures.previousTraversalStep(); page.announceStructureStatus() } }
                     Button { visible: structures.kind === "Binary Search Tree" && structures.traversalCount > 0; text: "Next visit"; flat: true; enabled: structures.traversalIndex + 1 < structures.traversalCount; onClicked: { structures.nextTraversalStep(); page.announceStructureStatus() } }

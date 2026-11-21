@@ -39,6 +39,7 @@ qt_add_qml_module(Algorythm
         qml/components/ComplexityPanel.qml
         qml/components/PredictionChallenge.qml
         qml/components/GraphPredictionChallenge.qml
+        qml/components/StructurePredictionChallenge.qml
         qml/components/ComparisonPlaybackControls.qml
         qml/components/LabCard.qml
         qml/components/SettingsPopup.qml
